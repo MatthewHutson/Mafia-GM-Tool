@@ -10,7 +10,7 @@ import abilities as a
 
 # -- Functions -- #
 @enforce_types
-def get_jester(self, players: dict[str, Any]) -> dict[str, Any]:
+def get_jester(self, players: dict[str, Role]) -> dict[str, Role]:
     jesters = {}
     for key, role in players.items():
         if role.key == "Jester": 
@@ -32,9 +32,11 @@ def main() -> None:
         with open(path + "/" + item, 'r') as file:
             data: dict = json.load(file)  
             data["ability"] = role_functions[data["ability"]]
-            roles.append(Role(**data, individual=True))
+            roles.append(Role(**data))
     
-    print(roles)
+    #print(roles[0].ability(roles[0].name, {"Sherrif": roles[0]}))
+    #roles[0].poisoned = True
+    #print(roles[0].ability(roles[0].name, {"Sherrif": roles[0]}))
     
 # -- On Run -- #
 if __name__ == "__main__":

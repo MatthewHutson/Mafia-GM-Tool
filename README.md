@@ -2,10 +2,11 @@
 A Program to allocate roles in a game of mafia
 
 # Changes
-Added linked, priority and is_protected tags to players
-Added methods to get other linked player
-Added jester search functionto main
-Added valid_input_list function for input validation to utils
+Replaced Individual with Max Count Tag
+Added Mafia Alternative Tag
+Added Priority Tags
+Made a few roles
+Other Stuff
 
 # To Do
-Make role abilities
+Make more role abilities

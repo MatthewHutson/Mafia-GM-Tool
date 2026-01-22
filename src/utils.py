@@ -1,5 +1,5 @@
 # -- Imports -- #
-from typing import get_type_hints, Callable
+from typing import get_type_hints, get_origin, get_args, Callable
 
 # -- Subroutines -- #
 def enforce_types(func: Callable) -> Callable:
@@ -13,7 +13,13 @@ def enforce_types(func: Callable) -> Callable:
             try:
                 value = args[i + args_offset] if kwargs.get(key) is None else kwargs.get(key)  # -- Checks Args then Kwargs For Entered Data Type -- #
                 if type(value) == int and hint == float: value = float(value) # -- Removes Half-Correct floats as int -- #
-                assert isinstance(value, hint), f"Argument {key} must be of type {hint} but {value=} of type={type(value)} provided" # -- Throws Error For Wrong Type -- #
+                origin: type = get_origin(hint)
+                if origin != None:
+                    # -- Dealing With Parameterized Generals #
+                    origin = str(origin)[8:][:-2]
+                    data_type: type = eval(origin)
+                else: data_type: type = hint
+                assert isinstance(value, data_type), f"Argument {key} must be of type {hint} but {value=} of type={type(value)} provided" # -- Throws Error For Wrong Type -- #
             except IndexError: pass  # -- Ignores The No Given Hint Case -- #
 
         result = func(*args, **kwargs) # -- Performs The Function Normally -- #
@@ -25,10 +31,12 @@ def enforce_types(func: Callable) -> Callable:
 @enforce_types
 def valid_input_list(input_text: str, failure_text: str, valid_inputs: list[str]) -> str:
     # -- Makes an input that requires a match in the lsit -- #
+    valid_inputs: list = [string.lower() for string in valid_inputs]
+
     while (True):
         try:
           input_string: str = input(input_text)
-          assert input_string in valid_inputs
+          assert input_string.lower() in valid_inputs
           return input_string
         except AssertionError:
             printLine(failure_text)

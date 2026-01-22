@@ -23,21 +23,15 @@ def enforce_types(func: Callable) -> Callable:
     return wrapper # -- Sends The Checking Function -- #
 
 @enforce_types
-def positive_int(function: Callable) -> Callable:
-    # -- Checks If A Function Output Returns A Positive Integer -- #
-    def wrapper(*args, **kwargs):
-        while (True):
-            try:
-                data: str = function(*args, **kwargs)
-                output: int = int(data)
-                assert(output > 0)
-                return output
-            except ValueError:
-                printLine("Input a whole number greater than 0!")
-            except AssertionError:
-                printLine("This number is not greater than 0!")
-
-    return wrapper
+def valid_input_list(input_text: str, failure_text: str, valid_inputs: list[str]) -> str:
+    # -- Makes an input that requires a match in the lsit -- #
+    while (True):
+        try:
+          input_string: str = input(input_text)
+          assert input_string in valid_inputs
+          return input_string
+        except AssertionError:
+            printLine(failure_text)
 
 @enforce_types
 def printLine(inputString: str) -> None: print("\n" + inputString + "\n")

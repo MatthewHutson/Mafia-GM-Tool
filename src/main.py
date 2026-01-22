@@ -9,6 +9,13 @@ from classes import *
 import abilities as a
 
 # -- Functions -- #
+@enforce_types
+def get_jester(self, players: dict[str, Any]) -> dict[str, Any]:
+    jesters = {}
+    for key, role in players.items():
+        if role.key == "Jester": 
+            jesters[key] = role
+    return jesters
 
 # -- Main -- #
 @enforce_types

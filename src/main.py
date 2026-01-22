@@ -1,8 +1,6 @@
 # -- Imports -- #
 import json
 import os
-from dataclasses import asdict
-from pathlib import Path
 from copy import deepcopy
 from utils import *
 from classes import *
@@ -22,7 +20,7 @@ def select_player(user: str, players: dict[str, Role]) -> None:
     target_num: int = players[user].ability.targets
 
     for i in range(target_num):
-        players[user].targets.append(valid_input_list(f"{user} is {players[user].name}, pick a player to {players[user].ability.__name__}", "Invalid Player!", [*players.keys()]))
+        players[user].targets.append(valid_input_list(f"{user} is {players[user].name}, pick a player to {players[user].ability.__name__}", "Invalid Player!", [*players.keys()]).lower().capitalize())
 
 # -- Main -- #
 @enforce_types
@@ -45,6 +43,14 @@ def main() -> None:
     priority: dict[str, Role] = dict(sorted(players.items(), key = lambda item: item[1].priority))
     good_aligned: dict[str, Role] = {name: role for name, role in players.items() if role.alignment}
     evil_aligned: dict[str, Role] = {name: role for name, role in players.items() if not role.alignment}
+    alive_players: dict[str, Role] = deepcopy(players)
+    dead_players: dict[str, Role] = {}
+
+    # -- Filter The Sherrif To Be Last -- #
+    sherrif: dict[str, Role] = {name: role for name, role in players.items() if role.name == "Sherrif"}
+    sherrif_name = next(iter(sherrif))
+    del players[sherrif_name]
+    players[sherrif_name] = sherrif[sherrif_name]
 
     # -- Game Loop -- #
     playing: bool = True
@@ -52,7 +58,21 @@ def main() -> None:
     good_win = False
 
     while playing:
+        # -- Game Loop -- #
+        for name, role in players.items():
+            if not (role.ability_type == "singular" and role.used_ability):
+                select_player(name, players)
 
+        for name, role in priority.items():
+            role.ability(name, players)
+
+        for name, role in players.items():
+            if not role.currently_alive:
+                del alive_players[name]
+                dead_players[name] = role
+
+        printLine(f"Alive Players: {[name for name in alive_players.keys()]}")
+        printLine(f"Dead Players: {[name for name in dead_players.keys()]}")
 
         # -- Checks For Win Conditions -- #
         if len(evil_aligned) == 0:

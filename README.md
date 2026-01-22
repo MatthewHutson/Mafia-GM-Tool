@@ -2,11 +2,10 @@
 A Program to allocate roles in a game of mafia
 
 # Changes
-Added all the Roles
-Added target selection system
-Added more tags
-Added game loop framework
-Added Win Conditions
+Made The Game Loop
+Made Some Adjustments
 
 # To Do
-Make the actual game loop functionality
+Make The Player Initialisation
+Allow For More Adjustability In Player Size
+Fix Hashing Bug With Dictionaries

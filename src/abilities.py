@@ -1,5 +1,5 @@
 # -- Imports -- #
-from utils import enforce_types, valid_input_list, add_attributes
+from utils import *
 from classes import Role
 
 # -- Roles -- #
@@ -10,12 +10,12 @@ def none(user: str, players: dict[str, Role]) -> None:
 
 @add_attributes(targets = 1)
 @enforce_types
-def reveal(user: str, players: dict[str, Role]) -> str:
+def reveal(user: str, players: dict[str, Role]) -> None:
     target: str = players[user].targets[0]
     alignment: bool = players[user].poisoned ^ players[target].alignment
 
-    if alignment: return f"{user} is revealed that {target} is good."
-    else: return f"{user} is revealed that {target} is evil."
+    if alignment: printLine(f"{user} is revealed that {target} is good.")
+    else: printLine(f"{user} is revealed that {target} is evil.")
 
 @add_attributes(targets = 0)
 @enforce_types
@@ -37,11 +37,11 @@ def link(user: str, players: dict[str, Role]) -> None:
     players[link_1].linked = True
     players[link_2].linked = True
 
-    players[link_1].linker = {user, players[user]}
-    players[link_2].linker = {user, players[user]}
+    players[link_1].linker = dict({user, players[user]})
+    players[link_2].linker = dict({user, players[user]})
 
-    players[link_1].linked_to = {link_2, players[link_2]}
-    players[link_2].linked_to = {link_1, players[link_1]}
+    players[link_1].linked_to =  dict({link_2, players[link_2]})
+    players[link_2].linked_to =  dict({link_1, players[link_1]})
 
 @add_attributes(targets = 0)
 @enforce_types

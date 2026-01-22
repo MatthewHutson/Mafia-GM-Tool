@@ -20,8 +20,9 @@ class Role():
     poisoned: bool = False
     linked: bool = False
     is_protected: bool = False
-    linker: object = None
-    linked_to: object = None
+    linker: dict[str, object] = None
+    linked_to: dict[str, object] = None
+    used_ability: bool = False
 
     # -- Methods -- #
     @enforce_types

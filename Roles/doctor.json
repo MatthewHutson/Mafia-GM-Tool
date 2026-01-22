@@ -1,0 +1,9 @@
+{
+    "name": "Doctor",
+    "ability": "protect",
+    "alignment": true,
+    "mafia_alternative": false,
+    "priority": 2,
+    "max_count": 1,
+    "ability_type": "repeat"
+}

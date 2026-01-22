@@ -1,0 +1,9 @@
+{
+    "name": "Soldier",
+    "ability": "endure",
+    "alignment": true,
+    "mafia_alternative": false,
+    "priority": 1,
+    "max_count": 1,
+    "ability_type": "passive"
+}

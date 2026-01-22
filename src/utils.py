@@ -1,9 +1,18 @@
 # -- Imports -- #
 from typing import get_type_hints, get_origin, get_args, Callable
 
-# -- Subroutines -- #
+# -- Decerators -- #
+def add_attributes(**attributes) -> Callable:
+    # -- Adds an Attribute to A Function -- #
+    def decerator(function: Callable) -> Callable:
+        for key, value in attributes.items():
+            setattr(function, key, value)
+        return function
+    return decerator
+
 def enforce_types(func: Callable) -> Callable:
      # -- Creates Checking Function -- #
+    @add_attributes(__name__ = func.__name__)
     def wrapper(*args, **kwargs): # -- Gets Parameter Types and Type Hints -- #
         args_offset: int = 0 if len(func.__qualname__.split(".")) == 1 else 1 # -- Checks If A Method (1) or Class Or Standalone Subroutine (0) -- #
         type_hints = get_type_hints(func) # -- Gets Type Hints or None if Not Given -- #
@@ -28,6 +37,7 @@ def enforce_types(func: Callable) -> Callable:
     
     return wrapper # -- Sends The Checking Function -- #
 
+# -- Subroutines -- #
 @enforce_types
 def valid_input_list(input_text: str, failure_text: str, valid_inputs: list[str]) -> str:
     # -- Makes an input that requires a match in the lsit -- #
@@ -35,11 +45,16 @@ def valid_input_list(input_text: str, failure_text: str, valid_inputs: list[str]
 
     while (True):
         try:
-          input_string: str = input(input_text)
+          input_string: str = inputLine(input_text)
           assert input_string.lower() in valid_inputs
           return input_string
         except AssertionError:
             printLine(failure_text)
+        except:
+            printLine("No input detected!")
 
 @enforce_types
-def printLine(inputString: str) -> None: print("\n" + inputString + "\n")
+def printLine(inputString: str) -> None: print("\n" + inputString)
+
+@enforce_types
+def inputLine(inputString: str) -> str: return input("\n" + inputString + ": ")

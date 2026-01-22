@@ -10,20 +10,26 @@ import abilities as a
 
 # -- Functions -- #
 @enforce_types
-def get_jester(self, players: dict[str, Role]) -> dict[str, Role]:
+def get_jester(players: dict[str, Role]) -> dict[str, Role]:
     jesters = {}
     for key, role in players.items():
         if role.key == "Jester": 
             jesters[key] = role
     return jesters
 
+@enforce_types
+def select_player(user: str, players: dict[str, Role]) -> None:
+    target_num: int = players[user].ability.targets
+
+    for i in range(target_num):
+        players[user].targets.append(valid_input_list(f"{user} is {players[user].name}, pick a player to {players[user].ability.__name__}", "Invalid Player!", [*players.keys()]))
+
 # -- Main -- #
 @enforce_types
 def main() -> None:
     # -- Game Data -- #
-    players: dict[str, Role] = {}
     role_functions: dict[str, Callable] = {name : getattr(a, name) for name in dir(a) if callable(getattr(a, name))}
-    roles: list = []
+    roles: list[Role] = []
 
     # -- File Handling -- #
     path = "Roles"
@@ -32,11 +38,32 @@ def main() -> None:
         with open(path + "/" + item, 'r') as file:
             data: dict = json.load(file)  
             data["ability"] = role_functions[data["ability"]]
-            roles.append(Role(**data))
-    
-    #print(roles[0].ability(roles[0].name, {"Sherrif": roles[0]}))
-    #roles[0].poisoned = True
-    #print(roles[0].ability(roles[0].name, {"Sherrif": roles[0]}))
+            roles.append(Role(**data, targets = []))
+
+    # -- Player Organisation -- #
+    players: dict[str, Role] = {role.name.capitalize(): role for role in roles}
+    priority: dict[str, Role] = dict(sorted(players.items(), key = lambda item: item[1].priority))
+    good_aligned: dict[str, Role] = {name: role for name, role in players.items() if role.alignment}
+    evil_aligned: dict[str, Role] = {name: role for name, role in players.items() if not role.alignment}
+
+    # -- Game Loop -- #
+    playing: bool = True
+    jester_win = False
+    good_win = False
+
+    while playing:
+
+
+        # -- Checks For Win Conditions -- #
+        if len(evil_aligned) == 0:
+            playing = False
+            good_win = True
+        if jester_win or len(evil_aligned) == len(good_aligned):
+            playing = False
+
+    if jester_win: printLine("The Jester Wins!")
+    elif good_win: printLine("Good Team Wins!")
+    else: printLine("Mafia Wins!")
     
 # -- On Run -- #
 if __name__ == "__main__":

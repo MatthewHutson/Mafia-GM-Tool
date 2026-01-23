@@ -37,11 +37,11 @@ def link(user: str, players: dict[str, Role]) -> None:
     players[link_1].linked = True
     players[link_2].linked = True
 
-    players[link_1].linker = dict({user, players[user]})
-    players[link_2].linker = dict({user, players[user]})
+    players[link_1].linker = user
+    players[link_2].linker = user
 
-    players[link_1].linked_to =  dict({link_2, players[link_2]})
-    players[link_2].linked_to =  dict({link_1, players[link_1]})
+    players[link_1].linked_to = link_2
+    players[link_2].linked_to = link_1
 
 @add_attributes(targets = 0)
 @enforce_types
@@ -57,4 +57,4 @@ def poison(user: str, players: dict[str, Role]) -> None:
 @enforce_types
 def kill(user: str, players: dict[str, Role]) -> None:
     target: str = players[user].targets[0]
-    players[target].die()
+    players[target].die(players)

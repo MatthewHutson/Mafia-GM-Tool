@@ -39,7 +39,7 @@ def main() -> None:
             roles.append(Role(**data, targets = []))
 
     # -- Player Organisation -- #
-    players: dict[str, Role] = {role.name.capitalize(): role for role in roles}
+    players: dict[str, Role] = {role.name.capitalize(): role for role in roles} # -- Replace Later - #
     priority: dict[str, Role] = dict(sorted(players.items(), key = lambda item: item[1].priority))
     good_aligned: dict[str, Role] = {name: role for name, role in players.items() if role.alignment}
     evil_aligned: dict[str, Role] = {name: role for name, role in players.items() if not role.alignment}
@@ -59,7 +59,7 @@ def main() -> None:
 
     while playing:
         # -- Game Loop -- #
-        for name, role in players.items():
+        for name, role in alive_players.items():
             if not (role.ability_type == "singular" and role.used_ability):
                 select_player(name, players)
 
@@ -70,6 +70,10 @@ def main() -> None:
             if not role.currently_alive:
                 del alive_players[name]
                 dead_players[name] = role
+
+        for role in players.values():
+            for i in range(len(role.targets)):
+                del role.targets[0]
 
         printLine(f"Alive Players: {[name for name in alive_players.keys()]}")
         printLine(f"Dead Players: {[name for name in dead_players.keys()]}")

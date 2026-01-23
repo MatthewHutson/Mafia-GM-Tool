@@ -20,27 +20,27 @@ class Role():
     poisoned: bool = False
     linked: bool = False
     is_protected: bool = False
-    linker: dict[str, object] = None
-    linked_to: dict[str, object] = None
+    linker: str = None
+    linked_to: str = None
     used_ability: bool = False
 
     # -- Methods -- #
     @enforce_types
-    def die(self, recurse: bool = True) -> bool:
+    def die(self, players: dict[str, object], recurse: bool = True) -> bool:
         if self.poisoned or (not self.is_protected): 
-            if (not self.linked) or self.poisoned: 
+            if not (self.linked and recurse): 
                 self.currently_alive = False
                 return True
-            elif recurse and (not self.linker.poisoned): # Recursion Base Case and Cupid Poison Check #
-                if self.linked_to.die(recurse = False):
+            elif recurse and (not players[self.linker].poisoned): # Recursion Base Case and Cupid Poison Check #
+                if players[self.linked_to].die(players, recurse = False):
                         self.currently_alive = False
                         return True
                 
         return False
 
     @enforce_types
-    def voted_out(self) -> bool:
+    def voted_out(self, players: dict[str, object]) -> bool:
         self.die()
         jester_win: bool = self.ability.__name__ == "Jester" and (not self.poisoned)
-        if self.linked:jester_win = jester_win or (self.linked_to.ability.__name__ == "Jester" and (not self.linked_to.poisoned))
+        if self.linked: jester_win = jester_win or (players[self.linked_to].ability.__name__ == "Jester" and (not players[self.linked_to].poisoned))
         return jester_win

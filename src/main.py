@@ -4,6 +4,7 @@ import os
 from copy import deepcopy
 from utils import *
 from classes import *
+from menu import *
 import abilities as a
 
 # -- Functions -- #
@@ -25,6 +26,9 @@ def select_player(user: str, players: dict[str, Role]) -> None:
 # -- Main -- #
 @enforce_types
 def main() -> None:
+    # -- Menu -- #
+    setup_menu()
+
     # -- Game Data -- #
     role_functions: dict[str, Callable] = {name : getattr(a, name) for name in dir(a) if callable(getattr(a, name))}
     roles: list[Role] = []

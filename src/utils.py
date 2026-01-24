@@ -26,6 +26,8 @@ def is_instance(value: Any, hint: type | TypeAlias | None) -> bool:
     hint = paramaterized_generals(hint)
     if type(hint) is type:
         return isinstance(value, hint)
+    elif hint == None:
+        return True
     else: 
         return type(value) is TypeAlias
 

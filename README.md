@@ -2,7 +2,7 @@
 A Program to allocate roles in a game of mafia
 
 # Changes
-Removed None Check From is_instance in utils.py
+Nevermind that None check is important
 
 # To Do
 Continue Making The Menu

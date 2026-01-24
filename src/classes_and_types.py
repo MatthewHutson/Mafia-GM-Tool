@@ -1,9 +1,10 @@
 # -- Imports -- #
 from dataclasses import dataclass
 from utils import *
-from typing import Any
+from typing import cast
 from copy import deepcopy
 
+# -- Role Class -- #
 @dataclass
 class Role():
     # -- Attributes - #
@@ -44,3 +45,10 @@ class Role():
         jester_win: bool = self.ability.__name__ == "Jester" and (not self.poisoned)
         if self.linked: jester_win = jester_win or (players[self.linked_to].ability.__name__ == "Jester" and (not players[self.linked_to].poisoned))
         return jester_win
+    
+# -- Type Definitions -- #
+class Players(dict[str, Role]):
+    @enforce_types
+    def __setitem__(self, key: str, value: Role):
+        key = key.lower().capitalize()
+        return super().__setitem__(key, value)

@@ -26,9 +26,6 @@ def select_player(user: str, players: Players) -> None:
 # -- Main -- #
 @enforce_types
 def main() -> None:
-    # -- Menu -- #
-    setup_menu()
-
     # -- Game Data -- #
     role_functions: dict[str, Callable] = {name : getattr(a, name) for name in dir(a) if callable(getattr(a, name))}
     roles: list[Role] = []
@@ -41,6 +38,9 @@ def main() -> None:
             data: dict = json.load(file)  
             data["ability"] = role_functions[data["ability"]]
             roles.append(Role(**data, targets = []))
+
+    # -- Menu -- #
+    setup_menu()
 
     # -- Player Organisation -- #
     players = Players({role.name.capitalize(): role for role in roles}) # -- Replace Later - #

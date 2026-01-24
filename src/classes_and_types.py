@@ -46,6 +46,10 @@ class Role():
         if self.linked: jester_win = jester_win or (players[self.linked_to].ability.__name__ == "Jester" and (not players[self.linked_to].poisoned))
         return jester_win
     
+    @enforce_types
+    def __eq__(self, value) -> None:
+        return self.name == value
+    
 # -- Type Definitions -- #
 class Players(dict[str, Role]):
     @enforce_types

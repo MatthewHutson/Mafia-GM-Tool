@@ -1,7 +1,6 @@
 # -- Imports -- #
 import json
 import os
-from copy import deepcopy
 from utils import *
 from classes_and_types import *
 from menu import *
@@ -47,11 +46,11 @@ def main() -> None:
     priority = Players(dict(sorted(players.items(), key = lambda item: item[1].priority)))
     good_aligned = Players({name: role for name, role in players.items() if role.alignment})
     evil_aligned = Players({name: role for name, role in players.items() if not role.alignment})
-    alive_players = deepcopy(players)
+    alive_players = players.deepcopy()
     dead_players = Players({})
 
     # -- Filter The Sherrif To Be Last -- #
-    sherrif: Players = {name: role for name, role in players.items() if role.name == "Sherrif"}
+    sherrif: dict[str, Role] = {name: role for name, role in players.items() if role.name == "Sherrif"}
     sherrif_name = next(iter(sherrif))
     del players[sherrif_name]
     players[sherrif_name] = sherrif[sherrif_name]

@@ -47,12 +47,40 @@ class Role():
         return jester_win
     
     @enforce_types
-    def __eq__(self, value) -> None:
+    def __eq__(self, value: str) -> None:
         return self.name == value
+    
     
 # -- Type Definitions -- #
 class Players(dict[str, Role]):
     @enforce_types
-    def __setitem__(self, key: str, value: Role):
+    def __setitem__(self, key: str, value: Role) -> None:
         key = key.lower().capitalize()
         return super().__setitem__(key, value)
+    
+    @enforce_types
+    def __eq__(self, value: dict[str, Role]) -> bool:
+        if len(self) != len(value):
+            return False
+        else:
+            try:
+                for key, item in self.items():
+                    if value[key] != item:
+                        return False
+            except: 
+                return False
+        return True
+    
+    @enforce_types
+    def deepcopy(self) -> dict[str, Role]:
+        # -- To Avoid copy.deepcopy Issues -- #
+        new_data: dict[str, Role] = {}
+
+        for key, value in self.items():
+            new_data[key] = value
+
+        return Players(new_data)
+    
+    @enforce_types
+    def __delitem__(self, key: str) -> None:
+        return super().__delitem__(key)

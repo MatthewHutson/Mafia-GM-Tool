@@ -42,8 +42,8 @@ def add_player(players: list[tk.Label], roles: list[Role]) -> None:
                 raise ValueError
         
         player_frame = Player_Select_Frame(user_input, player_tab, main_font, players)
-        add_role_tile(len(players), roles)
         players.append(player_frame)
+        add_role_tile(len(players), roles)
 
     except: pass
 

@@ -2,12 +2,9 @@
 A Program to allocate roles in a game of mafia
 
 # Changes
-Created Menu Folder
-Made A Generalised Frame Parent Class
-Created menu Folder and menu_classes file
-Created Properties For Role Classes To Consider Neutrality
-Created Menu_Entry dataclass to Move Data Out of setup_menu later
+Created Framework to add roles based on player count
 
 # To Do
+Get the role selection framework complete
 Continue Making The Menu
 Double Check Kill Logic (Might be only when player is linked to themself)

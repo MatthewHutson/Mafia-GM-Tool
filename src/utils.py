@@ -82,5 +82,4 @@ def capitalise_words(input_string: str) -> str:
         output += word + " "
 
     output = output[0:-1]
-    print(output[-1])
     return output

@@ -40,8 +40,11 @@ def main() -> None:
             del data["alignment"]
             roles.append(Role(**data, targets = []))
 
+    entries = Menu_Entry([], [])
+    roles = sorted(roles, key = lambda item: item.load_priority)
+
     # -- Menu -- #
-    setup_menu()
+    setup_menu(entries, roles)
 
     # -- Player Organisation -- #
     players = Players({role.name.capitalize(): role for role in roles}) # -- Replace Later - #

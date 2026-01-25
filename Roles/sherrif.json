@@ -5,5 +5,6 @@
     "mafia_alternative": false,
     "priority": 10,
     "max_count": 1,
-    "ability_type": "repeat"
+    "ability_type": "repeat",
+    "load_priority": 2
 }

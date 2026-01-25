@@ -12,6 +12,7 @@ class Role:
     mafia_alternative: bool # Switches to Mafiaa Abiltity When All Normal Mafia Dies #
     priority: int # Order of Execution of Abilities From Lowest To Highest #
     max_count: int
+    load_priority: int # The Default Order The Roles Are Loaded In
     ability_type: str # Either singular, passive or repeat #
     targets: list[object]
     currently_alive: bool = True

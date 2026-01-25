@@ -1,7 +1,7 @@
 {
     "name": "Jester",
     "ability": "Jester",
-    "alignment": true,
+    "alignment": null,
     "mafia_alternative": false,
     "priority": 9,
     "max_count": 1,

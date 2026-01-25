@@ -3,7 +3,7 @@ import json
 import os
 from utils import *
 from classes_and_types import *
-from menu import *
+from menu.menu import *
 import abilities as a
 
 # -- Functions -- #
@@ -36,6 +36,8 @@ def main() -> None:
         with open(path + "/" + item, 'r') as file:
             data: dict = json.load(file)  
             data["ability"] = role_functions[data["ability"]]
+            data["_alignment"] = data["alignment"]
+            del data["alignment"]
             roles.append(Role(**data, targets = []))
 
     # -- Menu -- #

@@ -1,16 +1,14 @@
 # -- Imports -- #
 from dataclasses import dataclass
 from utils import *
-from typing import cast
-from copy import deepcopy
 
 # -- Role Class -- #
 @dataclass
-class Role():
+class Role:
     # -- Attributes - #
     name: str
     ability: Callable
-    alignment: bool # True Being Good, False Being Evil #
+    _alignment: bool # True Being Good, False Being Evil #
     mafia_alternative: bool # Switches to Mafiaa Abiltity When All Normal Mafia Dies #
     priority: int # Order of Execution of Abilities From Lowest To Highest #
     max_count: int
@@ -24,6 +22,26 @@ class Role():
     linker: str = None
     linked_to: str = None
     used_ability: bool = False
+
+    # -- Properties -- #
+    @property
+    @enforce_types
+    def alignment(self) -> bool:
+        if self._alignment == None: return True
+        else: return self._alignment
+
+    @property
+    @enforce_types
+    def true_alignment(self) -> bool | None:
+        return self._alignment
+    
+    @property
+    @enforce_types
+    def named_alignment(self) -> str:
+        match(self._alignment):
+            case None: return "Neutral"
+            case True: return "Good"
+            case False: return "Evil"
 
     # -- Methods -- #
     @enforce_types
@@ -50,12 +68,11 @@ class Role():
     def __eq__(self, value: str) -> None:
         return self.name == value
     
-    
 # -- Type Definitions -- #
 class Players(dict[str, Role]):
     @enforce_types
     def __setitem__(self, key: str, value: Role) -> None:
-        key = key.lower().capitalize()
+        key = capitalise_words(key)
         return super().__setitem__(key, value)
     
     @enforce_types
@@ -84,3 +101,13 @@ class Players(dict[str, Role]):
     @enforce_types
     def __delitem__(self, key: str) -> None:
         return super().__delitem__(key)
+    
+# -- Data Handling Class -- #
+@dataclass
+class Menu_Entry:
+    players: list[str]
+    roles: list[Role]
+
+    @enforce_types
+    def assign_roles(self) -> Players:
+        return Players({})

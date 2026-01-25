@@ -67,7 +67,20 @@ def valid_input_list(input_text: str, failure_text: str, valid_inputs: list[str]
             printLine("No input detected!")
 
 @enforce_types
-def printLine(inputString: str) -> None: print("\n" + inputString)
+def printLine(input_string: str) -> None: print("\n" + input_string)
 
 @enforce_types
-def inputLine(inputString: str) -> str: return input("\n" + inputString + ": ")
+def inputLine(input_string: str) -> str: return input("\n" + input_string + ": ")
+
+@enforce_types
+def capitalise_words(input_string: str) -> str:
+    words: list[str] = input_string.split(" ")
+    output: str = ""
+
+    for word in words:
+        word = word.lower().capitalize()
+        output += word + " "
+
+    output = output[0:-1]
+    print(output[-1])
+    return output

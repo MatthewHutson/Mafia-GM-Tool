@@ -6,8 +6,9 @@ from tkinter import messagebox
 
 # -- Global Variables -- #
 root: tk.Tk = tk.Tk()
+root.resizable(False, False)
 
-MAX_PLAYERS: int = 8
+MAX_PLAYERS: int = 7
 players: list[Player_Frame] = []
 
 player_margin = tk.Frame(root)
@@ -41,9 +42,9 @@ def add_player(players: list[tk.Label], roles: list[Role]) -> None:
                 messagebox.showwarning("Warning", "A Player With This Name Already Exists!")
                 raise ValueError
         
-        player_frame = Player_Select_Frame(user_input, player_tab, main_font, players)
-        players.append(player_frame)
         add_role_tile(len(players), roles)
+        player_frame = Player_Select_Frame(user_input, player_tab, main_font, players, role_row_frames)
+        players.append(player_frame)
 
     except: pass
 
@@ -68,10 +69,11 @@ def setup_menu(entries: Menu_Entry, all_roles: list[Role]) -> None:
 
     # -- Role Selection -- #
     tk.Label(role_frame, text = "Roles", font = main_font).pack(side = tk.TOP, padx = 4, pady = 4 , fill = "x")
+    #role_tab.pack(side = tk.TOP, anchor = "nw", padx = 4, pady = 4, fill = "both", expand = True)
 
     # -- Main Partitions -- #
     player_margin.pack(side = tk.LEFT, anchor = "nw")
-    role_frame.pack(side = tk.LEFT, anchor = "nw", fill = "both", padx = 4, pady = 4, expand = True)
+    role_frame.pack(side = tk.TOP, anchor = "nw", fill = "both", padx = 4, pady = 4, expand = True)
 
     # -- Player Display Tab -- #
     tk.Label(player_tab, text = "Players", font = main_font).pack(side = tk.TOP, padx = 4, pady = 4,  fill = "x")

@@ -32,7 +32,6 @@ class Role:
         else: return self._alignment
 
     @property
-    @enforce_types
     def true_alignment(self) -> bool | None:
         return self._alignment
     

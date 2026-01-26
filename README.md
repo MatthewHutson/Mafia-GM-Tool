@@ -2,10 +2,10 @@
 A Program to allocate roles in a game of mafia
 
 # Changes
-Temporary fixes until next commit
+Fix add_role_tile in menu.py
+Complete Role Adding Framework
 
 # To Do
-Fix add_role_tile in menu.py
-Get the role selection framework complete
+Fix Players List Bug
 Continue Making The Menu
 Double Check Kill Logic (Might be only when player is linked to themself)

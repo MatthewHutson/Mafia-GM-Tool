@@ -2,8 +2,6 @@
 from utils import *
 from classes_and_types import *
 import tkinter as tk
-from tkinter import messagebox
-from copy import deepcopy
 
 # -- Classes -- #
 class Role_Icon:
@@ -143,13 +141,12 @@ class Player_Select_Frame(Player_Frame):
         super().__init__(user_input, main_frame, main_font)
         self.players = players
         self.icon_frame = icon_frame
-        self.delete_button = tk.Button(self.frame, text = "Remove", fg = "#ffffff", bg = "#ff0000", highlightbackground = "#cd0000", activebackground = "#aa0000", font = main_font, command = lambda: self.delete(self.icon_frame)).pack(side = tk.RIGHT)
+        self.delete_button = tk.Button(self.frame, text = "Remove", fg = "#ffffff", bg = "#ff0000", highlightbackground = "#cd0000", activebackground = "#aa0000", font = main_font, command = self.delete).pack(side = tk.RIGHT)
         self.pack()
 
     # -- Methods -- #
     @enforce_types
-    def delete(self, role_icon_frame: Role_Row) -> None:
+    def delete(self) -> None:
         self.frame.pack_forget()
-        role_icon_frame.remove_end_item()
-        self.players.remove(self)
-        del self
+        self.icon_frame.remove_end_item()
+        print(self in self.players)

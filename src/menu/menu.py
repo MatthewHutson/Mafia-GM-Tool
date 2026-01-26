@@ -32,6 +32,7 @@ def add_player(players: list[tk.Label], roles: list[Role]) -> None:
             raise ValueError
         
         name_entry.delete(0, tk.END)
+        print(players)
 
         if len(players) >= MAX_PLAYERS: 
             messagebox.showwarning("Warning", "You Have Reached The Maximum Number of Players!")

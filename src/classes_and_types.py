@@ -12,7 +12,6 @@ class Role:
     mafia_alternative: bool # Switches to Mafiaa Abiltity When All Normal Mafia Dies #
     priority: int # Order of Execution of Abilities From Lowest To Highest #
     max_count: int
-    load_priority: int # The Default Order The Roles Are Loaded In
     ability_type: str # Either singular, passive or repeat #
     targets: list[object]
     currently_alive: bool = True
@@ -108,6 +107,18 @@ class Menu_Entry:
     players: list[str]
     roles: list[Role]
 
+    # -- Properties -- #
+    @property
+    def role_dict(self) -> dict[str, Role]:
+        return {role.name: role for role in self.roles}
+
+    # -- Methods -- #
     @enforce_types
     def assign_roles(self) -> Players:
         return Players({})
+    
+    @enforce_types
+    def filter_roles(self, roles: list[str]) -> None:
+        dict = self.role_dict
+        self.roles = [dict[name] for name in roles]
+    

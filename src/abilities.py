@@ -47,6 +47,10 @@ def link(user: str, players: Players) -> None:
 @enforce_types
 def Jester(user: str, players: Players) -> None: pass
 
+@add_attributes(targets = 0)
+@enforce_types
+def Trial(user: str, players: Players) -> None: pass
+
 @add_attributes(targets = 1)
 @enforce_types
 def poison(user: str, players: Players) -> None:

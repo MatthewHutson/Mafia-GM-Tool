@@ -27,10 +27,13 @@ def select_player(user: str, players: Players) -> None:
 def main() -> None:
     # -- Game Data -- #
     role_functions: dict[str, Callable] = {name : getattr(a, name) for name in dir(a) if callable(getattr(a, name))}
-    roles: list[Role] = []
+    roles: dict[str, Role] = {}
+    role_priority_list: list[str] = []
 
     # -- File Handling -- #
-    path = "Roles"
+    path: str = "Roles"
+    roles_load_priority: list[list[Role]] = []
+
 
     for item in os.listdir(path):
         with open(path + "/" + item, 'r') as file:
@@ -38,14 +41,19 @@ def main() -> None:
             data["ability"] = role_functions[data["ability"]]
             data["_alignment"] = data["alignment"]
             del data["alignment"]
-            roles.append(Role(**data, targets = []))
+            roles[data["name"]] = Role(**data, targets = [])
 
-    entries = Menu_Entry([], [])
-    roles = sorted(roles, key = lambda item: item.load_priority)
+    with open("load_priority.json", 'r') as file:
+        data: dict = json.load(file)
+        for value in data.values():
+            roles_load_priority.append(value)
+
+    entries = Menu_Entry([], list(roles.values()))
 
     # -- Menu -- #
-    setup_menu(entries, roles)
+    setup_menu(entries, roles_load_priority)
 
+def play():
     # -- Player Organisation -- #
     players = Players({role.name.capitalize(): role for role in roles}) # -- Replace Later - #
     priority = Players(dict(sorted(players.items(), key = lambda item: item[1].priority)))

@@ -5,6 +5,5 @@
     "mafia_alternative": false,
     "priority": 3,
     "max_count": 1,
-    "ability_type": "singular",
-    "load_priority": 7
+    "ability_type": "singular"
 }

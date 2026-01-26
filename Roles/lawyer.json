@@ -1,6 +1,6 @@
 {
-    "name": "Jester",
-    "ability": "Jester",
+    "name": "Lawyer",
+    "ability": "Trial",
     "alignment": null,
     "mafia_alternative": false,
     "priority": 9,

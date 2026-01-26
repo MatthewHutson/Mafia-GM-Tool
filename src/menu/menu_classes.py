@@ -7,13 +7,15 @@ import tkinter as tk
 class Role_Icon:
     # -- Constructor -- #
     @enforce_types
-    def __init__(self, role: Role, main_font: tuple[str, int]) -> None:
-        self.name = role.name
-        self.alignment = role.true_alignment
+    def __init__(self, roles: list[str], main_font: tuple[str, int], entries: Menu_Entry) -> None:
+        self.roles = [entries.role_dict[role] for role in roles]
+        self.index = 0
         self.bg_colour = "#000000"
         self.fg_colour = "#000000"
         self.font = main_font
         self.label = None
+        self.frame = None
+        self.frames = None
 
         if self.alignment == None:
             self.bg_colour = "#f5f5f5"
@@ -22,6 +24,19 @@ class Role_Icon:
         else:
             self.bg_colour = "#c72e2e"
             self.fg_colour = "#ffffff"
+
+    # -- Property -- #
+    @property
+    def role(self) -> Role:
+        return self.roles[self.index]
+
+    @property
+    def name(self) -> str:
+        return self.role.name
+    
+    @property
+    def alignment(self) -> bool:
+        return self.role.true_alignment
 
     # -- Methods -- #
     @enforce_types
@@ -33,8 +48,10 @@ class Role_Icon:
         return self.name
         
     @enforce_types
-    def pack(self, frame: tk.Frame) -> None:
-        self.label = tk.Label(frame, text = self.name, font = self.font, bg = self.bg_colour, fg = self.fg_colour, width = 16, height = 4)
+    def pack(self, frame: tk.Frame, frames: list[object]) -> None:
+        self.label = tk.Button(frame, text = self.name, font = self.font, bg = self.bg_colour, highlightbackground = self.bg_colour, activebackground = self.bg_colour, fg = self.fg_colour, activeforeground = self.fg_colour, width = 16, height = 4, command = self.cycle)
+        self.frame = frame
+        self.frames = frames
         self.label.pack(padx = 2, pady = 0, side = tk.LEFT, expand = False)
 
     @enforce_types
@@ -47,15 +64,33 @@ class Role_Icon:
         if self.label != None:
             self.label.pack_forget()
 
+    @enforce_types
+    def cycle(self) -> None:
+        self.index += 1
+        self.index = self.index % len(self.roles)
+
+        for frame in self.frames:
+            frame.forget()
+
+        for frame in self.frames:
+            frame.pack(self.frame, self.frames)
+
 class Role_Row:
     # -- Constructor -- #
     @enforce_types
     def __init__(self, frame: tk.Frame) -> None:
         self.frames: list[tk.Frame] = []
-        self.icons: list[list[tk.Label]] = []
+        self.icons: list[list[Role_Icon]] = []
         self.master_frame = frame
         self.max_row_length = 5
-        self.add_row()
+
+    # -- Property -- #
+    @property
+    def icon_list(self) -> list[Role_Icon]:
+        icons = []
+        for icon_set in self.icons:
+            icons.extend(icon_set)
+        return icons
 
     # -- Methods -- #
     @enforce_types
@@ -65,34 +100,38 @@ class Role_Row:
 
     @enforce_types
     def remove_end_row(self) -> None:
+        self.disapear()
         del self.frames[-1]
         del self.icons[-1]
+        self.pack()
 
     @enforce_types
     def add_item(self, icon: Role_Icon) -> None:
-        if len(self.icons[-1]) < self.max_row_length:
-            self.icons[-1].append(icon)
-            self.pack()
-        else:
+        if len(self.icons) == 0:
             self.add_row()
-            self.add_item(icon)
+
+        if len(self.icons[-1]) >= self.max_row_length:
+            self.add_row()
+
+        self.icons[-1].append(icon)
+        self.pack()
+
             
     @enforce_types
     def remove_item(self, row: int, index: int) -> None:
-        lst: list[Role_Icon] = self.icons[row]
-        item = lst[index]
-        del list[index]
-        item.delete()
+        icon = self.icons[row][index]
+        del self.icons[row][index]
+        icon.delete()
 
     @enforce_types
     def remove_end_item(self) -> None:
         if len(self.icons[-1]) == 0:
             self.remove_end_row()
-            self.remove_end_item()
-        else:
-            icon = self.icons[-1][-1]
-            del self.icons[-1][-1]
-            icon.delete()
+
+        self.remove_item(-1, -1)
+
+        if len(self.icons[-1]) == 0:
+            self.remove_end_row()
 
     @enforce_types
     def disapear(self) -> None:
@@ -108,7 +147,7 @@ class Role_Row:
         self.disapear()
         for i in range(len(self.frames)):
             for icon in self.icons[i]:
-                icon.pack(self.frames[i])
+                icon.pack(self.frames[i], self.icons[i])
 
         for frame in self.frames:
             frame.pack(side = tk.TOP, padx = 2, fill = "x", pady = 2)
@@ -125,6 +164,10 @@ class Player_Frame:
     @enforce_types
     def __eq__(self, value: str) -> bool:
         return self.name == value
+    
+    @enforce_types
+    def __eq__(self, value: object) -> bool:
+        return self.name == str(value)
     
     @enforce_types
     def __str__(self) -> str:
@@ -149,4 +192,5 @@ class Player_Select_Frame(Player_Frame):
     def delete(self) -> None:
         self.frame.pack_forget()
         self.icon_frame.remove_end_item()
-        print(self in self.players)
+        self.players.remove(self)
+        del self

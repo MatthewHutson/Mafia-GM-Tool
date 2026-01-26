@@ -1,0 +1,9 @@
+{
+    "1": ["Mafia"],
+    "2": ["Sherrif"],
+    "3": ["Soldier"],
+    "4": ["Doctor"],
+    "5": ["Lawyer", "Jester"],
+    "6": ["Poisoner"],
+    "7": ["Cupid"]
+}

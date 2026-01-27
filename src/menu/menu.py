@@ -65,6 +65,15 @@ def get_data(root: tk.Tk, entries: Menu_Entry) -> None:
     entries.filter_roles([str(icon) for icon in role_row_frames.icon_list])
     entries.players = [str(frame) for frame in players]
     clear(root)
+    root.quit()
+
+@enforce_types
+def start_confirm(entries: Menu_Entry) -> None:
+    if len(players) < 4:
+        messagebox.showerror("Error", "You Need at Least 4 Players to Start!")
+    else:
+        if messagebox.askyesno("Confirm Choice", "Do you wish to start the game?"):
+            get_data(root, entries)
 
 # -- Main Menu -- #
 @enforce_types
@@ -88,12 +97,16 @@ def setup_menu(entries: Menu_Entry, all_roles: list[Role]) -> None:
     input_frame.pack_propagate(False)
     input_frame.pack(side = tk.TOP, anchor = "w", ipadx = 158, ipady = 20)
 
+    # -- Settings Buttons -- #
+    start = tk.Button(settings_frame, text = "Start", command = lambda: start_confirm(entries), bg = "#5D9FF0", activebackground = "#4980C4")
+    start.pack(side = tk.RIGHT, ipady = 3, ipadx = 16, padx = 4)
+
     # -- Role Selection -- #
-    tk.Label(role_frame, text = "Roles", font = main_font).pack(side = tk.TOP, padx = 4, pady = 4 , fill = "x")
+    tk.Label(role_frame, text = "Roles", font = main_font).pack(side = tk.TOP, padx = 4, pady = 4, fill = "x")
 
     # -- Main Partitions -- #
     player_margin.pack(side = tk.LEFT, anchor = "nw")
-    settings_frame.pack(side = tk.TOP, anchor = "n", padx = 4, pady = 4, ipady = 16, fill = "x")
+    settings_frame.pack(side = tk.TOP, anchor = "n", padx = 4, pady = 4, fill = "x")
     role_frame.pack(side = tk.TOP, anchor = "nw", fill = "both", padx = 4, pady = 4, expand = True)
 
     # -- Setting Partitions -- #

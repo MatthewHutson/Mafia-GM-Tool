@@ -2,12 +2,7 @@
 A Program to allocate roles in a game of mafia
 
 # Changes
-Added Load Priority
-Added Mutual Exclusive Role Functionality
-Added Lawyer as mutual exclusive to Jester
-Reworked Load Priority
-Almost Finished Setup Menu
-Many Bug Fixes
+Made The Enter Key Add Player When Typing Name
 
 # To Do
 Finish Lawyer

@@ -162,11 +162,7 @@ class Player_Frame:
 
     # -- Methods -- #
     @enforce_types
-    def __eq__(self, value: str) -> bool:
-        return self.name == value
-    
-    @enforce_types
-    def __eq__(self, value: object) -> bool:
+    def __eq__(self, value) -> bool:
         return self.name == str(value)
     
     @enforce_types

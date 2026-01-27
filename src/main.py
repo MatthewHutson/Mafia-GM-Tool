@@ -53,9 +53,8 @@ def main() -> None:
     # -- Menu -- #
     setup_menu(entries, roles_load_priority)
 
-def play():
     # -- Player Organisation -- #
-    players = Players({role.name.capitalize(): role for role in roles}) # -- Replace Later - #
+    players = Players(entries.assign_roles())
     priority = Players(dict(sorted(players.items(), key = lambda item: item[1].priority)))
     good_aligned = Players({name: role for name, role in players.items() if role.alignment})
     evil_aligned = Players({name: role for name, role in players.items() if not role.alignment})

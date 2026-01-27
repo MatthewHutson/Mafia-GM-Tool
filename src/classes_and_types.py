@@ -1,6 +1,7 @@
 # -- Imports -- #
 from dataclasses import dataclass
 from utils import *
+from random import shuffle
 
 # -- Role Class -- #
 @dataclass
@@ -115,7 +116,9 @@ class Menu_Entry:
     # -- Methods -- #
     @enforce_types
     def assign_roles(self) -> Players:
-        return Players({})
+        shuffle(self.roles)
+        print([role.name for role in self.roles])
+        return Players({self.players[i]: self.roles[i] for i in range(len(self.players))})
     
     @enforce_types
     def filter_roles(self, roles: list[str]) -> None:

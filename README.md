@@ -2,10 +2,9 @@
 A Program to allocate roles in a game of mafia
 
 # Changes
-Finished Setup Menu
+Made Role Assignment
 
 # To Do
-Make Role Assignment
 Make Game Menu
 Finish Lawyer
 Polish Jester Logic

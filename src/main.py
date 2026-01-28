@@ -55,7 +55,7 @@ def main() -> None:
     jester_win: bool = False
     good_win: bool = False
 
-    setup_menu(game_data)
+    innit_game_menu(game_data)
 
     while playing:
         # -- Game Loop -- #
@@ -66,6 +66,8 @@ def main() -> None:
         use_abilities(game_data)
         life_death_sort(game_data)
         remove_round_data(game_data)
+
+        voting_menu(game_data)
 
         printLine(f"Alive Players: {[name for name in game_data.alive_players.keys()]}")
         printLine(f"Dead Players: {[name for name in game_data.dead_players.keys()]}")

@@ -79,7 +79,7 @@ def start_confirm(entries: Menu_Entry) -> None:
 
 # -- Setup Menu -- #
 @enforce_types
-def setup_menu(entries: Menu_Entry, all_roles: list[Role]) -> None:
+def setup_menu(entries: Menu_Entry, all_roles: list[list[Role]]) -> None:
     # -- Specific Functions -- #
     @enforce_types
     def enter_pressed(event) -> None:
@@ -121,9 +121,13 @@ def setup_menu(entries: Menu_Entry, all_roles: list[Role]) -> None:
 
 # -- Main Game Menu -- #
 @enforce_types
-def setup_menu(data: Game_Data) -> None:
+def innit_game_menu(data: Game_Data) -> None:
     tk.Label(root, text = "Game Menu", font = ("Airial", 16), bg = "#d3d3d3").pack(side = tk.TOP, fill = "x", pady = 4)
 
 @enforce_types
 def selection_menu(data: Game_Data, user: str) -> None:
+    root.mainloop()
+
+@enforce_types
+def voting_menu(data: Game_Data, user: str) -> None:
     root.mainloop()

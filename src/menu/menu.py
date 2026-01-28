@@ -1,14 +1,16 @@
 # -- Imports -- #
 from utils import *
 from menu.menu_classes import *
-import tkinter as tk
 from tkinter import messagebox
+from copy import deepcopy
+import tkinter as tk
 
 # -- Setup Global Variables -- #
 root: tk.Tk = tk.Tk()
 
 MAX_PLAYERS: int = 7
 MIN_PLAYERS: int = 4
+
 players: list[Player_Select_Frame] = []
 
 player_margin = tk.Frame(root)
@@ -25,6 +27,11 @@ role_row_frames = Role_Row(role_frame)
 main_font = ("Airial", 10)
 
 # -- Game Menu Global Vars -- #
+alive_margin = None
+dead_margin = None
+alive_frames = []
+dead_frames = []
+selected_players = []
 
 # -- Functions -- #
 @enforce_types
@@ -77,6 +84,27 @@ def start_confirm(entries: Menu_Entry) -> None:
         if messagebox.askyesno("Confirm Choice", "Do you wish to start the game?"):
             get_data(root, entries)
 
+@enforce_types
+def pack_alive_and_dead(data: Game_Data, active_role: Role) -> None:
+    for i in range(len(alive_frames)):
+        frame = alive_frames[0]
+        alive_frames.remove(frame)
+        frame.delete()
+
+    for i in range(len(dead_frames)):
+        frame = dead_frames[0]
+        dead_frames.remove(frame)
+        frame.delete()
+
+    for name, Role in data.alive_players.items():
+        player_frame = Player_Role_Frame(name, Role, alive_margin, main_font, selected_players, active_role.ability.targets)
+        alive_frames.append(player_frame)
+
+    for name, Role in data.dead_players.items():
+        player_frame = Player_Role_Frame(name, Role, dead_margin, main_font, selected_players, active_role.ability.targets)
+        dead_frames.append(player_frame)
+
+
 # -- Setup Menu -- #
 @enforce_types
 def setup_menu(entries: Menu_Entry, all_roles: list[list[Role]]) -> None:
@@ -100,7 +128,7 @@ def setup_menu(entries: Menu_Entry, all_roles: list[list[Role]]) -> None:
     input_frame.pack(side = tk.TOP, anchor = "w", ipadx = 158, ipady = 20)
 
     # -- Settings Buttons -- #
-    start = tk.Button(settings_frame, text = "Start", command = lambda: start_confirm(entries), bg = "#5D9FF0", activebackground = "#4980C4")
+    start = tk.Button(settings_frame, text = "Start", command = lambda: start_confirm(entries), bg = "#5D9FF0", activebackground = "#4980C4", fg = "#ffffff", activeforeground = "#ffffff")
     start.pack(side = tk.RIGHT, ipady = 3, ipadx = 16, padx = 4)
 
     # -- Role Selection -- #
@@ -123,11 +151,21 @@ def setup_menu(entries: Menu_Entry, all_roles: list[list[Role]]) -> None:
 @enforce_types
 def innit_game_menu(data: Game_Data) -> None:
     tk.Label(root, text = "Game Menu", font = ("Airial", 16), bg = "#d3d3d3").pack(side = tk.TOP, fill = "x", pady = 4)
+    globals()["alive_margin"] = tk.Frame(root, bg = "#d3d3d3")
+    globals()["dead_margin"] = tk.Frame(root, bg = "#d3d3d3")
+    tk.Label(alive_margin, text = "Alive Players").pack(side = tk.TOP, padx = 4, pady = 4, fill = "x", ipady = 4)
+    tk.Label(dead_margin, text = "Dead Players").pack(side = tk.TOP, padx = 4, pady = 4, fill = "x", ipady = 4)
+    alive_margin.pack(side = tk.LEFT, padx = 4, pady = 4, fill = "y", ipadx = 96)
+    dead_margin.pack(side = tk.RIGHT, padx = 4, pady = 4, fill = "y", ipadx = 96)
 
 @enforce_types
 def selection_menu(data: Game_Data, user: str) -> None:
+    globals()["selected_players"] = []
+    pack_alive_and_dead(data, data.players[user])
     root.mainloop()
+    data.players[user].targets = deepcopy(selected_players)
 
 @enforce_types
 def voting_menu(data: Game_Data, user: str) -> None:
+    pack_alive_and_dead(data)
     root.mainloop()

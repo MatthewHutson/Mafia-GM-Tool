@@ -194,18 +194,71 @@ class Player_Select_Frame(Player_Frame):
 class Player_Role_Frame(Player_Frame):
     # -- Constructor -- #
     @enforce_types
-    def __init__(self, name: str, role: Role, main_frame: tk.Frame, main_font: tuple[str, int]) -> None:
+    def __init__(self, name: str, role: Role, main_frame: tk.Frame, main_font: tuple[str, int], selected_players: list[str], number_of_targets: int = 0) -> None:
         super().__init__(name, main_frame, main_font)
         self.role = role
         self.alignment = role.true_alignment
+        self.selected_players = selected_players
+        self.number_of_targets = number_of_targets
+        self.selected = False
+
+        # -- Role Colours -- #
+        self.role_fg = "#000000"
         
         if self.alignment == None:
-            self.bg_colour = "#f5f5f5"
+            self.role_bg = "#f5f5f5"
         elif self.alignment:
-            self.bg_colour = "#48f748"
+            self.role_bg = "#48f748"
         else:
-            self.bg_colour = "#c72e2e"
-            self.fg_colour = "#ffffff"
+            self.role_bg = "#c72e2e"
+            self.role_fg = "#ffffff"
 
-        self.role_icon = tk.Label(self.frame, text = role.name, bg = self.bg_colour, fg = self.fg_colour).pack(side = tk.RIGHT)
+        # -- Linked Icons -- #
+        self.linked_bg = "#d1d1d1"
+        self.linked_text = "Single"
+
+        if self.role.linked:
+            self.linked_bg = "#cf6bf7"
+            self.linked_text = "Linked"
+
+        # -- Extra Icons -- #
+        self.role_icon = tk.Button(self.frame, text = role.name, bg = self.role_bg, activebackground = self.role_bg, fg = self.role_fg, activeforeground = self.role_fg, width = 6, height = 4)
+        self.linked_icon = tk.Button(self.frame, text = self.linked_text, bg = self.linked_bg, activebackground = self.linked_bg, fg = "#000000", activeforeground = "#000000", width = 6, height = 4)
+        self.select_icon = tk.Button(self.frame, text = "Select", bg = "#5D9FF0", activebackground = "#4980C4", fg = "#FFFFFF", activeforeground = "#FFFFFF", width = 6, height = 4, command = self.select)
+
         self.pack()
+
+    # -- Propterties -- #
+    @property
+    def selected_bg(self) -> str:
+        if self.selected:
+            return "#2F8DFF"
+        else:
+            return "#5D9FF0"
+
+    # -- Methods -- #
+    @enforce_types
+    def delete(self) -> None:
+        self.frame.pack_forget()
+        del self
+
+    @enforce_types
+    def pack(self) -> None:
+        self.role_icon.pack(side = tk.RIGHT, padx = 2, expand = False)
+        self.linked_icon.pack(side = tk.RIGHT, padx = 2, expand = False)
+        self.select_icon.pack(side = tk.RIGHT, padx = 2, expand = False)
+        super().pack()
+
+    @enforce_types
+    def select(self) -> None:
+        if len(self.selected_players) < self.number_of_targets and not self.selected:
+            self.selected_players.append(self.name)
+            self.selected = not self.selected
+
+        elif self.selected:
+            self.selected_players.remove(self.name)
+            self.selected = not self.selected
+        
+        self.select_icon.pack_forget()
+        self.select_icon = tk.Button(self.frame, text = "Select", bg = self.selected_bg, activebackground = "#4980C4", fg = "#FFFFFF", activeforeground = "#FFFFFF", width = 6, height = 4, command = self.select)
+        self.select_icon.pack(side = tk.RIGHT, padx = 2, expand = False)

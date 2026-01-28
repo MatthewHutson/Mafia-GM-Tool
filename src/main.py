@@ -48,7 +48,7 @@ def main() -> None:
 
     # -- Player Organisation -- #
     game_data = Game_Data(Players(entries.assign_roles()))
-    game_data.innit()
+    game_data.innit(a.none)
 
     # -- Game Loop -- #
     playing: bool = True
@@ -60,7 +60,7 @@ def main() -> None:
     while playing:
         # -- Game Loop -- #
         for name, role in game_data.alive_players.items():
-            if not (role.ability_type == "singular" and role.used_ability):
+            if not (role.ability_type == "singular" and role.used_ability) and role.targets > 0:
                 selection_menu(game_data, name)
 
         use_abilities(game_data)

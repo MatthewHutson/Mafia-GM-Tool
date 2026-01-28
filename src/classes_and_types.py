@@ -65,7 +65,7 @@ class Role:
         return jester_win
     
     @enforce_types
-    def __eq__(self, value: str) -> None:
+    def __eq__(self, value: str) -> bool:
         return self.name == value
     
 # -- Type Definitions -- #
@@ -110,20 +110,18 @@ class Menu_Entry:
 
     # -- Properties -- #
     @property
-    def role_dict(self) -> dict[str, Role]:
-        return {role.name: role for role in self.roles}
+    def role_dict(self) -> Players:
+        return Players({role.name: role for role in self.roles})
 
     # -- Methods -- #
     @enforce_types
     def assign_roles(self) -> Players:
-        shuffle(self.roles)
-        print([role.name for role in self.roles])
+        shuffle(self.players)
         return Players({self.players[i]: self.roles[i] for i in range(len(self.players))})
     
     @enforce_types
     def filter_roles(self, roles: list[str]) -> None:
-        dict = self.role_dict
-        self.roles = [dict[name] for name in roles]
+        self.roles = [role for role in self.roles if role in roles]
     
 @dataclass
 class Game_Data():
@@ -136,14 +134,16 @@ class Game_Data():
     dead_players = Players({})
 
     # -- Methods -- #
-    def innit(self) -> None:
-        self.priority = Players(dict(sorted(self.players.items(), key = lambda item: item[1].priority)))
-        self.good_aligned = Players({name: role for name, role in self.players.items() if role.alignment})
-        self.evil_aligned = Players({name: role for name, role in self.players.items() if not role.alignment})
-        self.alive_players = self.players.deepcopy()
-
+    def innit(self, none_function: Callable) -> None:
         # -- Filter The Sherrif To Be Last -- #
         sherrif: dict[str, Role] = {name: role for name, role in self.players.items() if role.name == "Sherrif"}
         sherrif_name = next(iter(sherrif))
         del self.players[sherrif_name]
         self.players[sherrif_name] = sherrif[sherrif_name]
+
+        self.priority = Players(dict(sorted(self.players.items(), key = lambda item: item[1].priority)))
+        self.good_aligned = Players({name: role for name, role in self.players.items() if role.alignment})
+        self.evil_aligned = Players({name: role for name, role in self.players.items() if not role.alignment})
+        self.alive_players = self.players.deepcopy()
+
+        self.none_role: Role = Role("Villager", none_function, True, False, 999, 999, "passive", [])

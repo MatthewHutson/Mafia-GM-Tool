@@ -13,7 +13,7 @@ class Role:
     mafia_alternative: bool # Switches to Mafiaa Abiltity When All Normal Mafia Dies #
     priority: int # Order of Execution of Abilities From Lowest To Highest #
     max_count: int
-    ability_type: str # Either singular, passive or repeat #
+    ability_type: str # Either "singular", "passive", "repeat", "on death" or "on vote" #
     targets: list[object]
     currently_alive: bool = True
     protected: bool = False
@@ -102,7 +102,7 @@ class Players(dict[str, Role]):
     def __delitem__(self, key: str) -> None:
         return super().__delitem__(key)
     
-# -- Data Handling Class -- #
+# -- Data Handling Classes -- #
 @dataclass
 class Menu_Entry:
     players: list[str]
@@ -125,3 +125,25 @@ class Menu_Entry:
         dict = self.role_dict
         self.roles = [dict[name] for name in roles]
     
+@dataclass
+class Game_Data():
+    # -- Attributes -- #
+    players: Players
+    priority: Players = None
+    good_aligned: Players = None
+    evil_aligned: Players = None
+    alive_players: Players = None
+    dead_players = Players({})
+
+    # -- Methods -- #
+    def innit(self) -> None:
+        self.priority = Players(dict(sorted(self.players.items(), key = lambda item: item[1].priority)))
+        self.good_aligned = Players({name: role for name, role in self.players.items() if role.alignment})
+        self.evil_aligned = Players({name: role for name, role in self.players.items() if not role.alignment})
+        self.alive_players = self.players.deepcopy()
+
+        # -- Filter The Sherrif To Be Last -- #
+        sherrif: dict[str, Role] = {name: role for name, role in self.players.items() if role.name == "Sherrif"}
+        sherrif_name = next(iter(sherrif))
+        del self.players[sherrif_name]
+        self.players[sherrif_name] = sherrif[sherrif_name]

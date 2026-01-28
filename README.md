@@ -2,7 +2,7 @@
 A Program to allocate roles in a game of mafia
 
 # Changes
-Made Role Assignment
+Made Adjustments to Game Logic Better Suit The Menu Based Format. Cant be bothered to put them all here
 
 # To Do
 Make Game Menu

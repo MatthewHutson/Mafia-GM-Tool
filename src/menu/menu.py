@@ -4,7 +4,7 @@ from menu.menu_classes import *
 import tkinter as tk
 from tkinter import messagebox
 
-# -- Global Variables -- #
+# -- Setup Global Variables -- #
 root: tk.Tk = tk.Tk()
 
 MAX_PLAYERS: int = 7
@@ -23,6 +23,8 @@ role_frame = tk.Frame(root, bg = "#d3d3d3")
 role_row_frames = Role_Row(role_frame)
 
 main_font = ("Airial", 10)
+
+# -- Game Menu Global Vars -- #
 
 # -- Functions -- #
 @enforce_types
@@ -75,7 +77,7 @@ def start_confirm(entries: Menu_Entry) -> None:
         if messagebox.askyesno("Confirm Choice", "Do you wish to start the game?"):
             get_data(root, entries)
 
-# -- Main Menu -- #
+# -- Setup Menu -- #
 @enforce_types
 def setup_menu(entries: Menu_Entry, all_roles: list[Role]) -> None:
     # -- Specific Functions -- #
@@ -115,4 +117,13 @@ def setup_menu(entries: Menu_Entry, all_roles: list[Role]) -> None:
     # -- Player Display Tab -- #
     tk.Label(player_tab, text = "Players", font = main_font).pack(side = tk.TOP, padx = 4, pady = 4,  fill = "x")
     player_tab.pack(side = tk.TOP, anchor = "w", padx = 4, pady = 4, ipadx = 128, ipady = 256)
+    root.mainloop()
+
+# -- Main Game Menu -- #
+@enforce_types
+def setup_menu(data: Game_Data) -> None:
+    tk.Label(root, text = "Game Menu", font = ("Airial", 16), bg = "#d3d3d3").pack(side = tk.TOP, fill = "x", pady = 4)
+
+@enforce_types
+def selection_menu(data: Game_Data, user: str) -> None:
     root.mainloop()

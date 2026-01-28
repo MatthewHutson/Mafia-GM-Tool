@@ -190,3 +190,22 @@ class Player_Select_Frame(Player_Frame):
         self.icon_frame.remove_end_item()
         self.players.remove(self)
         del self
+
+class Player_Role_Frame(Player_Frame):
+    # -- Constructor -- #
+    @enforce_types
+    def __init__(self, name: str, role: Role, main_frame: tk.Frame, main_font: tuple[str, int]) -> None:
+        super().__init__(name, main_frame, main_font)
+        self.role = role
+        self.alignment = role.true_alignment
+        
+        if self.alignment == None:
+            self.bg_colour = "#f5f5f5"
+        elif self.alignment:
+            self.bg_colour = "#48f748"
+        else:
+            self.bg_colour = "#c72e2e"
+            self.fg_colour = "#ffffff"
+
+        self.role_icon = tk.Label(self.frame, text = role.name, bg = self.bg_colour, fg = self.fg_colour).pack(side = tk.RIGHT)
+        self.pack()

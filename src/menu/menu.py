@@ -11,17 +11,19 @@ root: tk.Tk = tk.Tk()
 MAX_PLAYERS: int = 7
 MIN_PLAYERS: int = 4
 
+bg_2 = "#d3d3d3"
+
 players: list[Player_Select_Frame] = []
 
 player_margin = tk.Frame(root)
-player_tab = tk.Frame(player_margin, bg = "#d3d3d3")
+player_tab = tk.Frame(player_margin, bg = bg_2)
 
 input_frame = tk.Frame(player_margin)
 name_entry: tk.Entry = tk.Entry(input_frame)
 
 settings_frame = tk.Frame(root)
 
-role_frame = tk.Frame(root, bg = "#d3d3d3")
+role_frame = tk.Frame(root, bg = bg_2)
 role_row_frames = Role_Row(role_frame)
 
 main_font = ("Airial", 10)
@@ -96,11 +98,6 @@ def pack_alive_and_dead(data: Game_Data, active_role: Role) -> None:
         dead_frames.remove(frame)
         frame.delete()
 
-    try:
-        if active_role == None: 
-            active_role = data.none_role
-    except: pass
-
     for name, Role in data.alive_players.items():
         player_frame = Player_Role_Frame(name, Role, alive_margin, main_font, selected_players, active_role)
         alive_frames.append(player_frame)
@@ -115,7 +112,10 @@ def confirm_selection(role: Role) -> None:
         if messagebox.askyesno("Confirm Selection", f"Are you sure you want to select {selected_players}?"):
             root.quit()
     else:
-        messagebox.showwarning("Warning", f"{role.name} must select {role.ability.targets} target{"s" if role.ability.targets > 1 else ""}!")
+        if role.name == "Voting":
+            messagebox.showwarning("Warning", f"{role.name} must select {role.ability.targets} target{"s" if role.ability.targets > 1 else ""}!")
+        else:
+            messagebox.showwarning("Warning", "You can only vote 1 person out!")
 
 
 # -- Setup Menu -- #
@@ -130,7 +130,7 @@ def setup_menu(entries: Menu_Entry, all_roles: list[list[Role]]) -> None:
     root.resizable(False, False)
     root.geometry("1024x512")
     root.title("Mafia Game")
-    tk.Label(root, text = "Player Selection", font = ("Airial", 16), bg = "#d3d3d3").pack(side = tk.TOP, fill = "x", pady = 4)
+    tk.Label(root, text = "Player Selection", font = ("Airial", 16), bg = bg_2).pack(side = tk.TOP, fill = "x", pady = 4)
 
     # -- Add Player Input -- #
     tk.Label(input_frame, text = "Name:").pack(side = tk.LEFT, padx = 8, pady = 8)
@@ -163,9 +163,9 @@ def setup_menu(entries: Menu_Entry, all_roles: list[list[Role]]) -> None:
 # -- Main Game Menu -- #
 @enforce_types
 def innit_game_menu(data: Game_Data) -> None:
-    tk.Label(root, text = "Game Menu", font = ("Airial", 16), bg = "#d3d3d3").pack(side = tk.TOP, fill = "x", pady = 4)
-    globals()["alive_margin"] = tk.Frame(root, bg = "#d3d3d3")
-    globals()["dead_margin"] = tk.Frame(root, bg = "#d3d3d3")
+    tk.Label(root, text = "Game Menu", font = ("Airial", 16), bg = bg_2).pack(side = tk.TOP, fill = "x", pady = 4)
+    globals()["alive_margin"] = tk.Frame(root, bg = bg_2)
+    globals()["dead_margin"] = tk.Frame(root, bg = bg_2)
     tk.Label(alive_margin, text = "Alive Players").pack(side = tk.TOP, padx = 4, pady = 4, fill = "x", ipady = 4)
     tk.Label(dead_margin, text = "Dead Players").pack(side = tk.TOP, padx = 4, pady = 4, fill = "x", ipady = 4)
     alive_margin.pack(side = tk.LEFT, padx = 4, pady = 4, fill = "y", ipadx = 104)
@@ -176,12 +176,17 @@ def selection_menu(data: Game_Data, user: str) -> None:
     globals()["selected_players"] = []
     role = data.players[user]
     pack_alive_and_dead(data, role)
-    action_frame = tk.Frame(root, bg = "#d3d3d3")
-    action_label = tk.Label(action_frame, font = main_font, text = f"{user} is the {role.name}. They need to select {role.ability.targets} target{"s" if role.ability.targets > 1 else ""}!")
-    action_label.pack(fill = "x", padx = 4, pady = 4, ipady = 4)
-    action_frame.pack(side = tk.TOP, fill = "both", padx = 4, pady = 4, expand = True)
+    action_frame = tk.Frame(root, bg = bg_2)
 
-    tk.Button(action_frame, text = "Confirm Choices", command = lambda: confirm_selection(role), bg = "#5D9FF0", activebackground = "#4980C4", fg = "#ffffff", activeforeground = "#ffffff").pack(ipadx = 16, ipady = 8)
+    action_label = tk.Label(action_frame, font = main_font, text = f"{user} is the {role.name}. They need to select {role.ability.targets} target{"s" if role.ability.targets > 1 else ""}!")
+    confirm_frame = tk.Frame(action_frame, bg = bg_2)
+
+    action_label.pack(side = tk.TOP, fill = "x", padx = 4, pady = 4, ipady = 4)
+
+    tk.Button(confirm_frame, text = "Confirm Choices", command = lambda: confirm_selection(role), bg = "#5D9FF0", activebackground = "#4980C4", fg = "#ffffff", activeforeground = "#ffffff").pack(ipadx = 16, ipady = 8)
+    confirm_frame.pack(side = tk.BOTTOM, fill = "x", ipady = 1, expand = True)
+
+    action_frame.pack(side = tk.TOP, fill = "both", padx = 4, pady = 4, expand = True)
 
     root.mainloop()
 
@@ -190,6 +195,32 @@ def selection_menu(data: Game_Data, user: str) -> None:
     action_label.pack_forget()
 
 @enforce_types
-def voting_menu(data: Game_Data) -> None:
-    pack_alive_and_dead(data, None)
+def voting_menu(data: Game_Data) -> str:
+    globals()["selected_players"] = []
+    pack_alive_and_dead(data, data.vote_role)
+    action_frame = tk.Frame(root, bg = bg_2)
+    action_label = tk.Label(action_frame, font = main_font, text = "Voting Menu")
+    action_label.pack(fill = "x", padx = 4, pady = 4, ipady = 4)
+    action_frame.pack(side = tk.TOP, fill = "both", padx = 4, pady = 4, expand = True)
+
+    confirm_frame = tk.Frame(action_frame, bg = bg_2)
+
+    tk.Button(confirm_frame, text = "Confirm Choices", command = lambda: confirm_selection(role), bg = "#5D9FF0", activebackground = "#4980C4", fg = "#ffffff", activeforeground = "#ffffff").pack(ipadx = 16, ipady = 8)
+    confirm_frame.pack(side = tk.BOTTOM, fill = "x", ipady = 1, expand = True)
+
     root.mainloop()
+
+    action_frame.pack_forget()
+    action_label.pack_forget()
+
+    return selected_players[0]
+
+@enforce_types
+def information(data: Game_Data) -> None:
+    for player, role in data.players.items():
+        info = ""
+
+        for item in role.information:
+            info += "" + item
+        
+        messagebox.showinfo("Info", f"{player} is told: {info}")

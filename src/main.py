@@ -34,7 +34,7 @@ def main() -> None:
             data["ability"] = role_functions[data["ability"]]
             data["_alignment"] = data["alignment"]
             del data["alignment"]
-            roles[data["name"]] = Role(**data, targets = [])
+            roles[data["name"]] = Role(**data, targets = [], information = [])
 
     with open("load_priority.json", 'r') as file:
         data: dict = json.load(file)
@@ -48,7 +48,7 @@ def main() -> None:
 
     # -- Player Organisation -- #
     game_data = Game_Data(Players(entries.assign_roles()))
-    game_data.innit(a.none)
+    game_data.innit(a.none, a.vote)
 
     # -- Game Loop -- #
     playing: bool = True
@@ -65,12 +65,11 @@ def main() -> None:
 
         use_abilities(game_data)
         life_death_sort(game_data)
+
+        information(game_data)
         remove_round_data(game_data)
 
         voting_menu(game_data)
-
-        printLine(f"Alive Players: {[name for name in game_data.alive_players.keys()]}")
-        printLine(f"Dead Players: {[name for name in game_data.dead_players.keys()]}")
 
         # -- Checks For Win Conditions -- #
         if len(game_data.evil_aligned) == 0:

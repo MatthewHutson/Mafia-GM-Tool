@@ -10,12 +10,17 @@ def none(user: str, players: Players) -> None:
 
 @add_attributes(targets = 1)
 @enforce_types
+def vote(user: str, players: Players) -> None:
+    pass
+
+@add_attributes(targets = 1)
+@enforce_types
 def reveal(user: str, players: Players) -> None:
     target: str = players[user].targets[0]
     alignment: bool = players[user].poisoned ^ players[target].alignment
 
-    if alignment: printLine(f"{user} is revealed that {target} is good.")
-    else: printLine(f"{user} is revealed that {target} is evil.")
+    if alignment: players[user].information.append(f"{target} is good")
+    else: players[user].information.append(f"{target} is evil")
 
 @add_attributes(targets = 0)
 @enforce_types

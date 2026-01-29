@@ -2,7 +2,8 @@
 A Program to allocate roles in a game of mafia
 
 # Changes
-Completed Selection Menu
+Almost Completed Voting System
+Added Menu Based Information System
 
 # To Do
 Make Game Menu Function

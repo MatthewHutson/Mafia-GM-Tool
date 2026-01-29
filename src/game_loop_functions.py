@@ -27,6 +27,7 @@ def remove_round_data(data: Game_Data) -> None:
 
         role.poisoned = False
         role.is_protected = False
+        role.information = []
 
 @enforce_types
 def select_player(user: str, players: Players) -> None: # -- Outdated To Be Replaced -- #

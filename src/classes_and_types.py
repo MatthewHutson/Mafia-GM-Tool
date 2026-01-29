@@ -15,6 +15,7 @@ class Role:
     max_count: int
     ability_type: str # Either "singular", "passive", "repeat", "on death" or "on vote" #
     targets: list[object]
+    information: list[str]
     currently_alive: bool = True
     protected: bool = False
     poisoned: bool = False
@@ -134,7 +135,7 @@ class Game_Data():
     dead_players = Players({})
 
     # -- Methods -- #
-    def innit(self, none_function: Callable) -> None:
+    def innit(self, none_function: Callable, vote_function: Callable) -> None:
         # -- Filter The Sherrif To Be Last -- #
         sherrif: dict[str, Role] = {name: role for name, role in self.players.items() if role.name == "Sherrif"}
         sherrif_name = next(iter(sherrif))
@@ -146,4 +147,5 @@ class Game_Data():
         self.evil_aligned = Players({name: role for name, role in self.players.items() if not role.alignment})
         self.alive_players = self.players.deepcopy()
 
-        self.none_role: Role = Role("Villager", none_function, True, False, 999, 999, "passive", [])
+        self.none_role: Role = Role("Villager", none_function, True, False, 999, 999, "passive", [], []) # -- If A Person Loses a Role -- #
+        self.vote_role: Role = Role("Voting", vote_function, True, False, 999, 999, "passive", [], []) # -- Using A Role For Menu Purposes -- #

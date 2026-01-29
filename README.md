@@ -2,12 +2,10 @@
 A Program to allocate roles in a game of mafia
 
 # Changes
-Readded changes header in README
-Added A way to select targets for each role without risk of duplication
+Added the relevant display to indicate who is selecting targets
 
 # To Do
 Add the ability to confirm choices for selection
-Add the relevant display to indicate who is selecting targets
 
 Make Game Menu Function
 Make Role Type Into A List of Strings rather than a String

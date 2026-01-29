@@ -97,11 +97,11 @@ def pack_alive_and_dead(data: Game_Data, active_role: Role) -> None:
         frame.delete()
 
     for name, Role in data.alive_players.items():
-        player_frame = Player_Role_Frame(name, Role, alive_margin, main_font, selected_players, active_role.ability.targets)
+        player_frame = Player_Role_Frame(name, Role, alive_margin, main_font, selected_players, active_role)
         alive_frames.append(player_frame)
 
     for name, Role in data.dead_players.items():
-        player_frame = Player_Role_Frame(name, Role, dead_margin, main_font, selected_players, active_role.ability.targets)
+        player_frame = Player_Role_Frame(name, Role, dead_margin, main_font, selected_players, active_role)
         dead_frames.append(player_frame)
 
 
@@ -161,9 +161,16 @@ def innit_game_menu(data: Game_Data) -> None:
 @enforce_types
 def selection_menu(data: Game_Data, user: str) -> None:
     globals()["selected_players"] = []
-    pack_alive_and_dead(data, data.players[user])
+    role = data.players[user]
+    pack_alive_and_dead(data, role)
+    action_frame = tk.Frame(root, bg = "#d3d3d3")
+    action_label = tk.Label(action_frame, font = main_font, text = f"{user} is {role.name}.They need to select {role.ability.targets} target{"s" if role.ability.targets > 1 else ""}!")
+    action_label.pack(fill = "x", padx = 4, pady = 4, ipady = 4)
+    action_frame.pack(side = tk.TOP, fill = "both", padx = 4, pady = 4, expand = True)
     root.mainloop()
-    data.players[user].targets = deepcopy(selected_players)
+    role.targets = deepcopy(selected_players)
+    action_frame.pack_forget()
+    action_label.pack_forget()
 
 @enforce_types
 def voting_menu(data: Game_Data, user: str) -> None:

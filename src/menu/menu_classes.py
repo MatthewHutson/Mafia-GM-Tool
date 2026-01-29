@@ -2,6 +2,7 @@
 from utils import *
 from classes_and_types import *
 import tkinter as tk
+from tkinter import messagebox
 
 # -- Classes -- #
 class Role_Icon:
@@ -194,12 +195,13 @@ class Player_Select_Frame(Player_Frame):
 class Player_Role_Frame(Player_Frame):
     # -- Constructor -- #
     @enforce_types
-    def __init__(self, name: str, role: Role, main_frame: tk.Frame, main_font: tuple[str, int], selected_players: list[str], number_of_targets: int = 0) -> None:
+    def __init__(self, name: str, role: Role, main_frame: tk.Frame, main_font: tuple[str, int], selected_players: list[str], selected_role: Role) -> None:
         super().__init__(name, main_frame, main_font)
         self.role = role
         self.alignment = role.true_alignment
         self.selected_players = selected_players
-        self.number_of_targets = number_of_targets
+        self.number_of_targets = selected_role.ability.targets
+        self.selected_role_name = selected_role.name
         self.selected = False
 
         # -- Role Colours -- #
@@ -232,7 +234,7 @@ class Player_Role_Frame(Player_Frame):
     @property
     def selected_bg(self) -> str:
         if self.selected:
-            return "#2F8DFF"
+            return "#0065E1"
         else:
             return "#5D9FF0"
 
@@ -258,6 +260,9 @@ class Player_Role_Frame(Player_Frame):
         elif self.selected:
             self.selected_players.remove(self.name)
             self.selected = not self.selected
+
+        elif len(self.selected_players) >= self.number_of_targets:
+            messagebox.showwarning("Warning", f"{self.selected_role_name} can only select {self.number_of_targets} target{"s" if self.number_of_targets > 1 else ""}!")
         
         self.select_icon.pack_forget()
         self.select_icon = tk.Button(self.frame, text = "Select", bg = self.selected_bg, activebackground = "#4980C4", fg = "#FFFFFF", activeforeground = "#FFFFFF", width = 6, height = 4, command = self.select)

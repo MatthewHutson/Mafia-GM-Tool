@@ -221,12 +221,12 @@ class Player_Role_Frame(Player_Frame):
 
         if self.role.linked:
             self.linked_bg = "#cf6bf7"
-            self.linked_text = "Linked"
+            self.linked_text = "Soulbound"
 
         # -- Extra Icons -- #
-        self.role_icon = tk.Button(self.frame, text = role.name, bg = self.role_bg, activebackground = self.role_bg, fg = self.role_fg, activeforeground = self.role_fg, width = 6, height = 4)
-        self.linked_icon = tk.Button(self.frame, text = self.linked_text, bg = self.linked_bg, activebackground = self.linked_bg, fg = "#000000", activeforeground = "#000000", width = 6, height = 4)
-        self.select_icon = tk.Button(self.frame, text = "Select", bg = "#5D9FF0", activebackground = "#4980C4", fg = "#FFFFFF", activeforeground = "#FFFFFF", width = 6, height = 4, command = self.select)
+        self.role_icon = tk.Button(self.frame, text = role.name, bg = self.role_bg, activebackground = self.role_bg, fg = self.role_fg, activeforeground = self.role_fg, width = 8, height = 4)
+        self.linked_icon = tk.Button(self.frame, text = self.linked_text, bg = self.linked_bg, activebackground = self.linked_bg, fg = "#000000", activeforeground = "#000000", width = 8, height = 4)
+        self.select_icon = tk.Button(self.frame, text = "Select", bg = "#5D9FF0", activebackground = "#4980C4", fg = "#FFFFFF", activeforeground = "#FFFFFF", width = 8, height = 4, command = self.select)
 
         self.pack()
 
@@ -265,5 +265,5 @@ class Player_Role_Frame(Player_Frame):
             messagebox.showwarning("Warning", f"{self.selected_role_name} can only select {self.number_of_targets} target{"s" if self.number_of_targets > 1 else ""}!")
         
         self.select_icon.pack_forget()
-        self.select_icon = tk.Button(self.frame, text = "Select", bg = self.selected_bg, activebackground = "#4980C4", fg = "#FFFFFF", activeforeground = "#FFFFFF", width = 6, height = 4, command = self.select)
+        self.select_icon = tk.Button(self.frame, text = "Select", bg = self.selected_bg, activebackground = "#4980C4", fg = "#FFFFFF", activeforeground = "#FFFFFF", width = 8, height = 4, command = self.select)
         self.select_icon.pack(side = tk.RIGHT, padx = 2, expand = False)

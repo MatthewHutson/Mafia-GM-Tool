@@ -12,7 +12,7 @@ import abilities as a
 def get_jester(players: Players) -> Players:
     jesters = {}
     for key, role in players.items():
-        if role.key == "Jester": 
+        if role.name == "Jester": 
             jesters[key] = role
     return jesters
 
@@ -52,7 +52,6 @@ def main() -> None:
 
     # -- Game Loop -- #
     playing: bool = True
-    jester_win: bool = False
     good_win: bool = False
 
     innit_game_menu(game_data)
@@ -69,18 +68,31 @@ def main() -> None:
         information(game_data)
         remove_round_data(game_data)
 
-        voting_menu(game_data)
+        voted_out: str = voting_menu(game_data)
+        game_data.players[voted_out].die(game_data.players)
+
+        life_death_sort(game_data)
+
+        pack_alive_and_dead(game_data, game_data.vote_role)
 
         # -- Checks For Win Conditions -- #
         if len(game_data.evil_aligned) == 0:
             playing = False
             good_win = True
-        if jester_win or len(game_data.evil_aligned) == len(game_data):
+
+        if (len(game_data.evil_aligned) == 1 and len(game_data.good_aligned) == 1) or len(game_data.evil_aligned) > len(game_data.good_aligned):
             playing = False
 
-    if jester_win: printLine("The Jester Wins!")
-    elif good_win: printLine("Good Team Wins!")
-    else: printLine("Mafia Wins!")
+    winners = []
+
+    for name, role in game_data.players.items():
+        if role.solo_win:
+            winners.append(f"{name} as {role.name}")
+
+    if good_win: winners.append("The Good Team!")
+    else: winners.append("The Evil Team!")
+
+    show_victory(winners)
     
 # -- On Run -- #
 if __name__ == "__main__":

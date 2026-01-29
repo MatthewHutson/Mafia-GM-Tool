@@ -191,6 +191,7 @@ def selection_menu(data: Game_Data, user: str) -> None:
     root.mainloop()
 
     role.targets = deepcopy(selected_players)
+
     action_frame.pack_forget()
     action_label.pack_forget()
 
@@ -205,7 +206,7 @@ def voting_menu(data: Game_Data) -> str:
 
     confirm_frame = tk.Frame(action_frame, bg = bg_2)
 
-    tk.Button(confirm_frame, text = "Confirm Choices", command = lambda: confirm_selection(role), bg = "#5D9FF0", activebackground = "#4980C4", fg = "#ffffff", activeforeground = "#ffffff").pack(ipadx = 16, ipady = 8)
+    tk.Button(confirm_frame, text = "Confirm Choices", command = lambda: confirm_selection(data.vote_role), bg = "#5D9FF0", activebackground = "#4980C4", fg = "#ffffff", activeforeground = "#ffffff").pack(ipadx = 16, ipady = 8)
     confirm_frame.pack(side = tk.BOTTOM, fill = "x", ipady = 1, expand = True)
 
     root.mainloop()
@@ -223,4 +224,5 @@ def information(data: Game_Data) -> None:
         for item in role.information:
             info += "" + item
         
-        messagebox.showinfo("Info", f"{player} is told: {info}")
+        if info != "":
+            messagebox.showinfo("Info", f"{player} is told: {info}")

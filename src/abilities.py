@@ -19,8 +19,8 @@ def reveal(user: str, players: Players) -> None:
     target: str = players[user].targets[0]
     alignment: bool = players[user].poisoned ^ players[target].alignment
 
-    if alignment: players[user].information.append(f"{target} is good")
-    else: players[user].information.append(f"{target} is evil")
+    if alignment: players[user].information.append(f"{target} is GOOD!")
+    else: players[user].information.append(f"{target} is EVIL!")
 
 @add_attributes(targets = 0)
 @enforce_types

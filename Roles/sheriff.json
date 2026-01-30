@@ -1,9 +1,9 @@
 {
-    "name": "Sherrif",
+    "name": "Sheriff",
     "ability": "reveal",
     "alignment": true,
     "mafia_alternative": false,
     "priority": 10,
     "max_count": 1,
-    "ability_type": "repeat"
+    "ability_type": ["repeat"]
 }

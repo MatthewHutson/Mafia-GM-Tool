@@ -48,6 +48,20 @@ def show_victory(victory_data: list[str]) -> None:
     for item in victory_data:
         victory_str += item + ", "
 
-    victory_str = victory_str[:-2]
+    if len(victory_data) > 0:
+        victory_str = victory_str[:-2]
+    else:
+        victory_str += "None"
 
     messagebox.showinfo("Game Over", victory_str)
+
+@enforce_types
+def check_for_victory(data: Game_Data) -> None:
+    # -- Checks For Win Conditions -- #
+        if len(data.evil_aligned) == 0:
+            data.playing = False
+            data.good_win = True
+
+        if (len(data.evil_aligned) == 1 and len(data.good_aligned) == 1) or len(data.evil_aligned) > len(data.good_aligned):
+            data.playing = False
+            data.evil_win = True

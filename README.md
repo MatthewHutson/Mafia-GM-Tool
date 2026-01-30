@@ -2,13 +2,12 @@
 A Program to allocate roles in a game of mafia
 
 # Changes
-Made Voting System
-Fixed Logical Errors
-Adjusted jester Logic To be Generalised To Other Classes
+Added End Game Button
+Fixed Spelling Error
+Bug Fixes
+Made Role Type Into A List of Strings rather than a String
 
 # To Do
-Make Role Type Into A List of Strings rather than a String
 Finish Lawyer
-
-Make selection menu look better
-Make selections clearer
+Add All Other Roles
+Adjust Menu Role Selection System

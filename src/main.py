@@ -27,7 +27,6 @@ def main() -> None:
     path: str = "Roles"
     roles_load_priority: list[list[Role]] = []
 
-
     for item in os.listdir(path):
         with open(path + "/" + item, 'r') as file:
             data: dict = json.load(file)  
@@ -51,37 +50,35 @@ def main() -> None:
     game_data.innit(a.none, a.vote)
 
     # -- Game Loop -- #
-    playing: bool = True
-    good_win: bool = False
+    innit_game_menu()
 
-    innit_game_menu(game_data)
-
-    while playing:
+    while game_data.playing:
         # -- Game Loop -- #
         for name, role in game_data.alive_players.items():
-            if (not (role.ability_type == "singular" and role.used_ability)) and role.ability.targets > 0:
+            if (not ("singular" in role.ability_type and role.used_ability)) and role.ability.targets > 0 and game_data.playing:
                 selection_menu(game_data, name)
 
-        use_abilities(game_data)
-        life_death_sort(game_data)
+        if game_data.playing:
+            use_abilities(game_data)
+            life_death_sort(game_data)
 
-        information(game_data)
-        remove_round_data(game_data)
+            information(game_data)
+            remove_round_data(game_data)
 
-        voted_out: str = voting_menu(game_data)
-        game_data.players[voted_out].die(game_data.players)
+            check_for_victory(game_data)
 
-        life_death_sort(game_data)
+            if game_data.playing:
+                voted_out: str = voting_menu(game_data)
 
-        pack_alive_and_dead(game_data, game_data.vote_role)
+                if game_data.playing:
+                    game_data.players[voted_out].die(game_data.players)
+            
+                life_death_sort(game_data)
 
-        # -- Checks For Win Conditions -- #
-        if len(game_data.evil_aligned) == 0:
-            playing = False
-            good_win = True
+                if game_data.playing:
+                    pack_alive_and_dead(game_data, game_data.vote_role)
 
-        if (len(game_data.evil_aligned) == 1 and len(game_data.good_aligned) == 1) or len(game_data.evil_aligned) > len(game_data.good_aligned):
-            playing = False
+        check_for_victory(game_data)
 
     winners = []
 
@@ -89,8 +86,8 @@ def main() -> None:
         if role.solo_win:
             winners.append(f"{name} as {role.name}")
 
-    if good_win: winners.append("The Good Team!")
-    else: winners.append("The Evil Team!")
+    if game_data.good_win: winners.append("The Good Team!")
+    if game_data.evil_win: winners.append("The Evil Team!")
 
     show_victory(winners)
     

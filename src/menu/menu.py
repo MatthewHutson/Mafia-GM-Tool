@@ -4,6 +4,7 @@ from menu.menu_classes import *
 from tkinter import messagebox
 from copy import deepcopy
 import tkinter as tk
+import sys
 
 # -- Setup Global Variables -- #
 root: tk.Tk = tk.Tk()
@@ -112,11 +113,21 @@ def confirm_selection(role: Role) -> None:
         if messagebox.askyesno("Confirm Selection", f"Are you sure you want to select {selected_players}?"):
             root.quit()
     else:
-        if role.name == "Voting":
+        if role.name != "Voting":
             messagebox.showwarning("Warning", f"{role.name} must select {role.ability.targets} target{"s" if role.ability.targets > 1 else ""}!")
         else:
             messagebox.showwarning("Warning", "You can only vote 1 person out!")
 
+@enforce_types
+def quit(data: Game_Data) -> None:
+    if messagebox.askyesno("Confirm Selection", "Are you sure you want to end the game?"):
+        data.playing = False
+        root.quit()
+
+@enforce_types
+def terminate() -> None:
+    if messagebox.askyesno("Confirm Selection", "Are you sure you want to quit?"):
+        sys.exit()
 
 # -- Setup Menu -- #
 @enforce_types
@@ -142,7 +153,9 @@ def setup_menu(entries: Menu_Entry, all_roles: list[list[Role]]) -> None:
 
     # -- Settings Buttons -- #
     start = tk.Button(settings_frame, text = "Start", command = lambda: start_confirm(entries), bg = "#5D9FF0", activebackground = "#4980C4", fg = "#ffffff", activeforeground = "#ffffff")
+    exit = tk.Button(settings_frame, text = "Quit", command = terminate, bg = "#E03636", activebackground = "#8B2B2B", fg = "#ffffff", activeforeground = "#ffffff")
     start.pack(side = tk.RIGHT, ipady = 3, ipadx = 16, padx = 4)
+    exit.pack(side = tk.RIGHT, ipady = 3, ipadx = 16, padx = 4)
 
     # -- Role Selection -- #
     tk.Label(role_frame, text = "Roles", font = main_font).pack(side = tk.TOP, padx = 4, pady = 4, fill = "x")
@@ -162,7 +175,7 @@ def setup_menu(entries: Menu_Entry, all_roles: list[list[Role]]) -> None:
 
 # -- Main Game Menu -- #
 @enforce_types
-def innit_game_menu(data: Game_Data) -> None:
+def innit_game_menu() -> None:
     tk.Label(root, text = "Game Menu", font = ("Airial", 16), bg = bg_2).pack(side = tk.TOP, fill = "x", pady = 4)
     globals()["alive_margin"] = tk.Frame(root, bg = bg_2)
     globals()["dead_margin"] = tk.Frame(root, bg = bg_2)
@@ -174,47 +187,45 @@ def innit_game_menu(data: Game_Data) -> None:
 @enforce_types
 def selection_menu(data: Game_Data, user: str) -> None:
     globals()["selected_players"] = []
-    role = data.players[user]
+
+    try: role = data.players[user]
+    except: role = data.vote_role
+
     pack_alive_and_dead(data, role)
     action_frame = tk.Frame(root, bg = bg_2)
 
-    action_label = tk.Label(action_frame, font = main_font, text = f"{user} is the {role.name}. They need to select {role.ability.targets} target{"s" if role.ability.targets > 1 else ""}!")
+    if user == "none":
+        text = "Voting Menu"
+    else:
+        text =  f"{user} is the {role.name}. They need to select {role.ability.targets} target{"s" if role.ability.targets > 1 else ""}"
+
+    action_label = tk.Label(action_frame, font = main_font, text = text)
     confirm_frame = tk.Frame(action_frame, bg = bg_2)
 
     action_label.pack(side = tk.TOP, fill = "x", padx = 4, pady = 4, ipady = 4)
 
-    tk.Button(confirm_frame, text = "Confirm Choices", command = lambda: confirm_selection(role), bg = "#5D9FF0", activebackground = "#4980C4", fg = "#ffffff", activeforeground = "#ffffff").pack(ipadx = 16, ipady = 8)
-    confirm_frame.pack(side = tk.BOTTOM, fill = "x", ipady = 1, expand = True)
+    tk.Button(confirm_frame, text = "Confirm Choices", command = lambda: confirm_selection(role), bg = "#5D9FF0", activebackground = "#4980C4", fg = "#ffffff", activeforeground = "#ffffff").pack(side = tk.LEFT, ipadx = 16, ipady = 8, padx = 4)
+    tk.Button(confirm_frame, text = "End Game", command = lambda: quit(data), bg = "#E03636", activebackground = "#8B2B2B", fg = "#ffffff", activeforeground = "#ffffff").pack(side = tk.RIGHT, ipadx = 16, ipady = 8, pady = 4, padx = 4)
+    confirm_frame.pack(side = tk.BOTTOM, fill = "x", ipady = 1)
 
     action_frame.pack(side = tk.TOP, fill = "both", padx = 4, pady = 4, expand = True)
 
     root.mainloop()
+
+    if data.playing:
+        action_frame.pack_forget()
+        action_label.pack_forget()
 
     role.targets = deepcopy(selected_players)
 
-    action_frame.pack_forget()
-    action_label.pack_forget()
-
 @enforce_types
 def voting_menu(data: Game_Data) -> str:
-    globals()["selected_players"] = []
-    pack_alive_and_dead(data, data.vote_role)
-    action_frame = tk.Frame(root, bg = bg_2)
-    action_label = tk.Label(action_frame, font = main_font, text = "Voting Menu")
-    action_label.pack(fill = "x", padx = 4, pady = 4, ipady = 4)
-    action_frame.pack(side = tk.TOP, fill = "both", padx = 4, pady = 4, expand = True)
+    selection_menu(data, "none")
 
-    confirm_frame = tk.Frame(action_frame, bg = bg_2)
-
-    tk.Button(confirm_frame, text = "Confirm Choices", command = lambda: confirm_selection(data.vote_role), bg = "#5D9FF0", activebackground = "#4980C4", fg = "#ffffff", activeforeground = "#ffffff").pack(ipadx = 16, ipady = 8)
-    confirm_frame.pack(side = tk.BOTTOM, fill = "x", ipady = 1, expand = True)
-
-    root.mainloop()
-
-    action_frame.pack_forget()
-    action_label.pack_forget()
-
-    return selected_players[0]
+    if data.playing:
+        return selected_players[0]
+    else: 
+        return "none"
 
 @enforce_types
 def information(data: Game_Data) -> None:

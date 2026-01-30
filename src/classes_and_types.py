@@ -13,7 +13,7 @@ class Role:
     mafia_alternative: bool # Switches to Mafiaa Abiltity When All Normal Mafia Dies #
     priority: int # Order of Execution of Abilities From Lowest To Highest #
     max_count: int
-    ability_type: str # Either "singular", "passive", "repeat", "on death" or "on vote" #
+    ability_type: list[str] # Can be "singular", "passive", "repeat", "on death" or "on vote" #
     targets: list[object]
     information: list[str]
     currently_alive: bool = True
@@ -130,14 +130,17 @@ class Game_Data():
     evil_aligned: Players = None
     alive_players: Players = None
     dead_players = Players({})
+    playing: bool = True
+    good_win: bool = False
+    evil_win: bool = False
 
     # -- Methods -- #
     def innit(self, none_function: Callable, vote_function: Callable) -> None:
-        # -- Filter The Sherrif To Be Last -- #
-        sherrif: dict[str, Role] = {name: role for name, role in self.players.items() if role.name == "Sherrif"}
-        sherrif_name = next(iter(sherrif))
-        del self.players[sherrif_name]
-        self.players[sherrif_name] = sherrif[sherrif_name]
+        # -- Filter The Sheriff To Be Last -- #
+        Sheriff: dict[str, Role] = {name: role for name, role in self.players.items() if role.name == "Sheriff"}
+        Sheriff_name = next(iter(Sheriff))
+        del self.players[Sheriff_name]
+        self.players[Sheriff_name] = Sheriff[Sheriff_name]
 
         self.priority = Players(dict(sorted(self.players.items(), key = lambda item: item[1].priority)))
         self.good_aligned = Players({name: role for name, role in self.players.items() if role.alignment})

@@ -46,7 +46,7 @@ def main() -> None:
     setup_menu(entries, roles_load_priority)
 
     # -- Player Organisation -- #
-    game_data = Game_Data(Players(entries.assign_roles()))
+    game_data = Game_Data(Players(entries.assign_roles()), deepcopy(roles["Mafia"]))
     game_data.innit(a.none, a.vote)
 
     # -- Game Loop -- #

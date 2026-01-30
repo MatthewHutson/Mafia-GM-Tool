@@ -100,11 +100,11 @@ def pack_alive_and_dead(data: Game_Data, active_role: Role) -> None:
         frame.delete()
 
     for name, Role in data.alive_players.items():
-        player_frame = Player_Role_Frame(name, Role, alive_margin, main_font, selected_players, active_role)
+        player_frame = Player_Role_Frame(name, data, alive_margin, main_font, selected_players, active_role)
         alive_frames.append(player_frame)
 
     for name, Role in data.dead_players.items():
-        player_frame = Player_Role_Frame(name, Role, dead_margin, main_font, selected_players, active_role)
+        player_frame = Player_Role_Frame(name, data, dead_margin, main_font, selected_players, active_role)
         dead_frames.append(player_frame)
 
 @enforce_types

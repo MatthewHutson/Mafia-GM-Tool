@@ -195,10 +195,10 @@ class Player_Select_Frame(Player_Frame):
 class Player_Role_Frame(Player_Frame):
     # -- Constructor -- #
     @enforce_types
-    def __init__(self, name: str, role: Role, main_frame: tk.Frame, main_font: tuple[str, int], selected_players: list[str], selected_role: Role) -> None:
+    def __init__(self, name: str, data: Game_Data, main_frame: tk.Frame, main_font: tuple[str, int], selected_players: list[str], selected_role: Role) -> None:
         super().__init__(name, main_frame, main_font)
-        self.role = role
-        self.alignment = role.true_alignment
+        self.data = data
+        self.alignment = self.role.true_alignment
         self.selected_players = selected_players
         self.number_of_targets = selected_role.ability.targets
         self.selected_role_name = selected_role.name
@@ -217,15 +217,17 @@ class Player_Role_Frame(Player_Frame):
 
         # -- Linked Icons -- #
         self.linked_bg = "#d1d1d1"
+        self.linked_fg = "#000000"
         self.linked_text = "Single"
 
         if self.role.linked:
-            self.linked_bg = "#cf6bf7"
+            self.linked_bg = "#f94af9"
+            self.linked_fg = "#ffffff"
             self.linked_text = "Soulbound"
 
         # -- Extra Icons -- #
-        self.role_icon = tk.Button(self.frame, text = role.name, bg = self.role_bg, activebackground = self.role_bg, fg = self.role_fg, activeforeground = self.role_fg, width = 8, height = 4)
-        self.linked_icon = tk.Button(self.frame, text = self.linked_text, bg = self.linked_bg, activebackground = self.linked_bg, fg = "#000000", activeforeground = "#000000", width = 8, height = 4)
+        self.role_icon
+        self.linked_icon = tk.Button(self.frame, text = self.linked_text, bg = self.linked_bg, activebackground = self.linked_bg, fg = self.linked_fg, activeforeground = self.linked_fg, width = 8, height = 4)
         self.select_icon = tk.Button(self.frame, text = "Select", bg = "#5D9FF0", activebackground = "#4980C4", fg = "#FFFFFF", activeforeground = "#FFFFFF", width = 8, height = 4, command = self.select)
 
         self.pack()
@@ -237,6 +239,14 @@ class Player_Role_Frame(Player_Frame):
             return "#0065E1"
         else:
             return "#5D9FF0"
+        
+    @property
+    def role_icon(self) -> tk.Button:
+        return tk.Button(self.frame, text = self.role.name, bg = self.role_bg, activebackground = self.role_bg, fg = self.role_fg, activeforeground = self.role_fg, width = 8, height = 4)
+
+    @property
+    def role(self) -> Role:
+        return self.data.players[self.name]
 
     # -- Methods -- #
     @enforce_types

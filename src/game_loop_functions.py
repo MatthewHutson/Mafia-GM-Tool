@@ -9,8 +9,9 @@ from menu.menu_classes import *
 @enforce_types
 def use_abilities(data: Game_Data) -> None:
     for name, role in data.priority.items():
-        if role.currently_alive:
+        if role.currently_alive and not ("singular" in role.ability_type and role.used_ability):
             role.ability(name, data.players)
+            role.used_ability = True
 
 @enforce_types
 def life_death_sort(data: Game_Data) -> None:
@@ -23,6 +24,8 @@ def life_death_sort(data: Game_Data) -> None:
                     del data.good_aligned[name]
                 else:
                     del data.evil_aligned[name]
+    
+    revert_to_mafia(data)
 
 @enforce_types
 def remove_round_data(data: Game_Data) -> None:
@@ -65,3 +68,14 @@ def check_for_victory(data: Game_Data) -> None:
         if (len(data.evil_aligned) == 1 and len(data.good_aligned) == 1) or len(data.evil_aligned) > len(data.good_aligned):
             data.playing = False
             data.evil_win = True
+
+@enforce_types
+def revert_to_mafia(data: Game_Data) -> None:
+    mafia_alive = False
+    for role in data.alive_players.values():
+        mafia_alive = mafia_alive or role.name == "Mafia"
+
+    if not mafia_alive:
+        next_evil_player = data.next_evil_player
+        if next_evil_player != None:
+            data.players[next_evil_player] = deepcopy(data.mafia_role)

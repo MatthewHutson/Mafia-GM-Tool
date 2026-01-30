@@ -125,6 +125,7 @@ class Menu_Entry:
 class Game_Data():
     # -- Attributes -- #
     players: Players
+    mafia_role: Role
     priority: Players = None
     good_aligned: Players = None
     evil_aligned: Players = None
@@ -133,6 +134,18 @@ class Game_Data():
     playing: bool = True
     good_win: bool = False
     evil_win: bool = False
+
+    # -- Properties -- #
+    @property
+    def next_evil_player(self) -> str | None:
+        try:
+            player = next(iter(self.evil_aligned.keys()))
+            if self.players[player].mafia_alternative:
+                return player
+            else:
+                return self.next_evil_player
+        except: 
+            pass
 
     # -- Methods -- #
     def innit(self, none_function: Callable, vote_function: Callable) -> None:
@@ -146,6 +159,7 @@ class Game_Data():
         self.good_aligned = Players({name: role for name, role in self.players.items() if role.alignment})
         self.evil_aligned = Players({name: role for name, role in self.players.items() if not role.alignment})
         self.alive_players = self.players.deepcopy()
+    
 
         self.none_role: Role = Role("Villager", none_function, True, False, 999, 999, "passive", [], []) # -- If A Person Loses a Role -- #
         self.vote_role: Role = Role("Voting", vote_function, True, False, 999, 999, "passive", [], []) # -- Using A Role For Menu Purposes -- #

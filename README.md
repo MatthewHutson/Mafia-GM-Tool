@@ -2,10 +2,11 @@
 A Program to allocate roles in a game of mafia
 
 # Changes
-Bug fixes
-Added Mafia Override - When the main maffia is dead, a mafia_alternative is made into a mafia
+Finished Lawyer
+Polished Jester Logic
+Addded On Death and On Vote Logic
+Bug Fixes
 
 # To Do
-Finish Lawyer
 Add All Other Roles
 Adjust Menu Role Selection System

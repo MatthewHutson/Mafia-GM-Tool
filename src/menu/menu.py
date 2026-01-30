@@ -186,11 +186,18 @@ def innit_game_menu() -> None:
 
 @enforce_types
 def selection_menu(data: Game_Data, user: str) -> None:
+    # -- Setup -- #
     globals()["selected_players"] = []
 
     try: role = data.players[user]
     except: role = data.vote_role
 
+    # -- Sub Functions -- #
+    @enforce_types
+    def enter_pressed(event) -> None:
+        confirm_selection(role)
+
+    # -- Subroutine Main -- #
     pack_alive_and_dead(data, role)
     action_frame = tk.Frame(root, bg = bg_2)
 
@@ -206,6 +213,8 @@ def selection_menu(data: Game_Data, user: str) -> None:
 
     tk.Button(confirm_frame, text = "Confirm Choices", command = lambda: confirm_selection(role), bg = "#5D9FF0", activebackground = "#4980C4", fg = "#ffffff", activeforeground = "#ffffff").pack(side = tk.LEFT, ipadx = 16, ipady = 8, padx = 4)
     tk.Button(confirm_frame, text = "End Game", command = lambda: quit(data), bg = "#E03636", activebackground = "#8B2B2B", fg = "#ffffff", activeforeground = "#ffffff").pack(side = tk.RIGHT, ipadx = 16, ipady = 8, pady = 4, padx = 4)
+    confirm_frame.bind("<Return>", enter_pressed)
+
     confirm_frame.pack(side = tk.BOTTOM, fill = "x", ipady = 1)
 
     action_frame.pack(side = tk.TOP, fill = "both", padx = 4, pady = 4, expand = True)
@@ -216,6 +225,7 @@ def selection_menu(data: Game_Data, user: str) -> None:
         action_frame.pack_forget()
         action_label.pack_forget()
 
+    role.selected_target = True
     role.targets = deepcopy(selected_players)
 
 @enforce_types

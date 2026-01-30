@@ -23,7 +23,9 @@ class Role:
     linker: str = None
     linked_to: str = None
     used_ability: bool = False
+    selected_target = False
     solo_win: bool = False
+    was_voted_out: bool = False
 
     # -- Properties -- #
     @property
@@ -47,6 +49,10 @@ class Role:
     # -- Methods -- #
     @enforce_types
     def die(self, players: dict[str, object], recurse: bool = True) -> bool:
+        if "on_death" in self.ability_type:
+            user = list(players.keys())[list(players.values()).index(self)]
+            self.ability(user, players)
+
         if not self.protected: 
             if not (self.linked and recurse): 
                 self.currently_alive = False
@@ -59,16 +65,15 @@ class Role:
         return False
 
     @enforce_types
-    def voted_out(self, players: dict[str, object]) -> None:
-        self.die()
-        self.solo_win = self.ability.__name__ == "Jester" and (not self.poisoned)
-        if self.linked:
-            if self.linked_to.ability.__name__ == "Jester" and (not self.linked_to.poisoned):
-                self.linked_to.solo_win = True
+    def voted_out(self, players: dict[str, object], recurse: bool = True) -> None:
+        self.was_voted_out = True
+        self.die(players, False)
+        if self.linked and recurse:
+            self.linked_to.voted_out(players, False)
     
     @enforce_types
-    def __eq__(self, value: str) -> bool:
-        return self.name == value
+    def __eq__(self, value) -> bool:
+        return self.name == str(value)
     
 # -- Type Definitions -- #
 class Players(dict[str, Role]):

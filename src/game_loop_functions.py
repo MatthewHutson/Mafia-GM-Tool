@@ -9,7 +9,7 @@ from menu.menu_classes import *
 @enforce_types
 def use_abilities(data: Game_Data) -> None:
     for name, role in data.priority.items():
-        if role.currently_alive and not ("singular" in role.ability_type and role.used_ability):
+        if role.currently_alive and not ("singular" in role.ability_type and role.used_ability) and (not "on_vote" in role.ability_type or "on_death" in role.ability_type):
             role.ability(name, data.players)
             role.used_ability = True
 
@@ -79,3 +79,9 @@ def revert_to_mafia(data: Game_Data) -> None:
         next_evil_player = data.next_evil_player
         if next_evil_player != None:
             data.players[next_evil_player] = deepcopy(data.mafia_role)
+
+@enforce_types
+def use_vote_abiltities(data: Game_Data) -> None:
+    for user, role in data.players.items():
+        if "on_vote" in role.ability_type:
+            role.ability(user, data.players)

@@ -55,7 +55,7 @@ def main() -> None:
     while game_data.playing:
         # -- Game Loop -- #
         for name, role in game_data.alive_players.items():
-            if (not ("singular" in role.ability_type and role.used_ability)) and role.ability.targets > 0 and game_data.playing:
+            if (not ("singular" in role.ability_type and (role.selected_target))) and role.ability.targets > 0 and game_data.playing:
                 selection_menu(game_data, name)
 
         if game_data.playing:
@@ -71,9 +71,10 @@ def main() -> None:
                 voted_out: str = voting_menu(game_data)
 
                 if game_data.playing:
-                    game_data.players[voted_out].die(game_data.players)
+                    game_data.players[voted_out].voted_out(game_data.players)
             
                 life_death_sort(game_data)
+                use_vote_abiltities(game_data)
 
                 if game_data.playing:
                     pack_alive_and_dead(game_data, game_data.vote_role)

@@ -50,11 +50,19 @@ def link(user: str, players: Players) -> None:
 
 @add_attributes(targets = 0)
 @enforce_types
-def Jester(user: str, players: Players) -> None: pass
+def Jester(user: str, players: Players) -> None:
+    if players[user].was_voted_out: 
+        players[user].solo_win = True
 
-@add_attributes(targets = 0)
+@add_attributes(targets = 1)
 @enforce_types
-def Trial(user: str, players: Players) -> None: pass
+def stop_vote(user: str, players: Players) -> None: 
+    players[user].solo_win = True
+    if players[players[user].targets[0]].was_voted_out:
+        players[user].solo_win = False
+
+    if not players[players[user].targets[0]].currently_alive and players[user].solo_win:
+        players[user] = Role("Villager", none, True, False, 999, 999, "passive", [], [])
 
 @add_attributes(targets = 1)
 @enforce_types

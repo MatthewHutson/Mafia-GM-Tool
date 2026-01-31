@@ -1,7 +1,6 @@
 # -- Imports -- #
 from utils import *
 from classes_and_types import *
-from abilities import *
 from menu.menu import *
 from menu.menu_classes import *
 
@@ -78,7 +77,15 @@ def revert_to_mafia(data: Game_Data) -> None:
     if not mafia_alive:
         next_evil_player = data.next_evil_player
         if next_evil_player != None:
-            data.players[next_evil_player] = deepcopy(data.mafia_role)
+            role_switch(data.players, next_evil_player, data.mafia_role)
+
+@enforce_types
+def role_switch(players: Players, player: str, new_role: Role) -> None:
+    role = players[player]
+    players[player] = deepcopy(new_role)
+    players[player].linked = role.linked
+    players[player].linked_to = role.linked_to
+    players[player].linker = role.linker
 
 @enforce_types
 def use_vote_abiltities(data: Game_Data) -> None:

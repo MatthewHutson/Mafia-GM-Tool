@@ -11,7 +11,7 @@ class Role:
     name: str
     ability: Callable
     _alignment: bool # True Being Good, False Being Evil #
-    mafia_alternative: bool # Switches to Mafiaa Abiltity When All Normal Mafia Dies #
+    mafia_alternative: bool # Switches to Mafia Abiltity When All Normal Mafia Dies #
     priority: int # Order of Execution of Abilities From Lowest To Highest #
     max_count: int
     ability_type: list[str] # Can be "singular", "passive", "repeat", "on death" or "on vote" #

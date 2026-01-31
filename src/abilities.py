@@ -1,6 +1,7 @@
 # -- Imports -- #
 from utils import *
 from classes_and_types import Role, Players
+from game_loop_functions import *
 
 # -- Roles -- #
 @add_attributes(targets = 0)
@@ -63,7 +64,7 @@ def stop_vote(user: str, players: Players) -> None:
             players[user].solo_win = False
 
         if not players[players[user].targets[0]].currently_alive and players[user].solo_win:
-            players[user] = Role("Villager", none, True, False, 999, 999, "passive", [], [])
+            role_switch(players, user, Role("Villager", none, True, False, 999, 999, "passive", [], []))
 
 @add_attributes(targets = 1)
 @enforce_types
@@ -73,7 +74,7 @@ def execute(user: str, players: Players) -> None:
             players[user].solo_win = True
 
         if not (players[players[user].targets[0]].currently_alive or players[user].solo_win):
-            players[user] = Role("Villager", none, True, False, 999, 999, "passive", [], [])
+            role_switch(players, user, Role("Villager", none, True, False, 999, 999, "passive", [], []))
 
 @add_attributes(targets = 1)
 @enforce_types

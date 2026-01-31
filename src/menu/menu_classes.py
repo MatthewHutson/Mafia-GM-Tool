@@ -11,20 +11,10 @@ class Role_Icon:
     def __init__(self, roles: list[str], main_font: tuple[str, int], entries: Menu_Entry) -> None:
         self.roles = [entries.role_dict[role] for role in roles]
         self.index = 0
-        self.bg_colour = "#000000"
-        self.fg_colour = "#000000"
         self.font = main_font
         self.label = None
         self.frame = None
         self.frames = None
-
-        if self.alignment == None:
-            self.bg_colour = "#f5f5f5"
-        elif self.alignment:
-            self.bg_colour = "#48f748"
-        else:
-            self.bg_colour = "#c72e2e"
-            self.fg_colour = "#ffffff"
 
     # -- Property -- #
     @property
@@ -38,6 +28,22 @@ class Role_Icon:
     @property
     def alignment(self) -> bool:
         return self.role.true_alignment
+    
+    @property
+    def bg_colour(self) -> str:
+        if self.alignment == None:
+            return  "#f5f5f5"
+        elif self.alignment:
+            return "#48f748"
+        else:
+            return "#c72e2e"
+
+    @property
+    def fg_colour(self) -> str:
+        if self.alignment == False:
+            return "#ffffff"
+        else:
+            return "#000000"
 
     # -- Methods -- #
     @enforce_types

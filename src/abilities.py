@@ -57,12 +57,23 @@ def Jester(user: str, players: Players) -> None:
 @add_attributes(targets = 1)
 @enforce_types
 def stop_vote(user: str, players: Players) -> None: 
-    players[user].solo_win = True
-    if players[players[user].targets[0]].was_voted_out:
-        players[user].solo_win = False
+    if not players[user].solo_win:
+        players[user].solo_win = True
+        if players[players[user].targets[0]].was_voted_out:
+            players[user].solo_win = False
 
-    if not players[players[user].targets[0]].currently_alive and players[user].solo_win:
-        players[user] = Role("Villager", none, True, False, 999, 999, "passive", [], [])
+        if not players[players[user].targets[0]].currently_alive and players[user].solo_win:
+            players[user] = Role("Villager", none, True, False, 999, 999, "passive", [], [])
+
+@add_attributes(targets = 1)
+@enforce_types
+def execute(user: str, players: Players) -> None:
+    if not players[user].solo_win:
+        if players[players[user].targets[0]].was_voted_out:
+            players[user].solo_win = True
+
+        if not (players[players[user].targets[0]].currently_alive or players[user].solo_win):
+            players[user] = Role("Villager", none, True, False, 999, 999, "passive", [], [])
 
 @add_attributes(targets = 1)
 @enforce_types

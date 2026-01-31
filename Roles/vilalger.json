@@ -1,0 +1,9 @@
+{
+    "name": "Villager",
+    "ability": "none",
+    "alignment": true,
+    "mafia_alternative": false,
+    "priority": 999,
+    "max_count": 999,
+    "ability_type": ["passive"]
+}

@@ -46,8 +46,8 @@ def main() -> None:
     setup_menu(entries, roles_load_priority)
 
     # -- Player Organisation -- #
-    game_data = Game_Data(Players(entries.assign_roles()), deepcopy(roles["Mafia"]))
-    game_data.innit(a.none, a.vote)
+    game_data = Game_Data(Players(entries.assign_roles()), deepcopy(roles["Mafia"]), deepcopy(roles["Villager"]))
+    game_data.init(a.vote)
 
     # -- Game Loop -- #
     innit_game_menu()
@@ -65,6 +65,10 @@ def main() -> None:
             information(game_data)
             remove_round_data(game_data)
 
+            pack_alive_and_dead(game_data, game_data.vote_role)
+            use_death_abilities(game_data)
+            remove_round_data(game_data)
+
             check_for_victory(game_data)
 
             if game_data.playing:
@@ -75,6 +79,7 @@ def main() -> None:
             
                 life_death_sort(game_data)
                 use_vote_abiltities(game_data)
+                use_death_abilities(game_data)
 
                 if game_data.playing:
                     pack_alive_and_dead(game_data, game_data.vote_role)

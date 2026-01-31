@@ -2,9 +2,12 @@
 A Program to allocate roles in a game of mafia
 
 # Changes
-Finished Lawyer
-Polished Jester Logic
-Addded On Death and On Vote Logic
+Config Changes
+Added a Deepcopy to Consider This
+Added Vilalger
+Added Executioner
+Tidied up Lawyer Function
+Polished On Death Ability Functionality
 Bug Fixes
 
 # To Do

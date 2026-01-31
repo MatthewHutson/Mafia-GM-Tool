@@ -85,3 +85,8 @@ def use_vote_abiltities(data: Game_Data) -> None:
     for user, role in data.players.items():
         if "on_vote" in role.ability_type:
             role.ability(user, data.players)
+
+@enforce_types
+def use_death_abilities(data: Game_Data) -> None:
+    for role in data.players.values():
+        role.on_death_ability(data.players)

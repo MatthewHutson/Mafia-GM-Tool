@@ -2,6 +2,7 @@
 from dataclasses import dataclass
 from utils import *
 from random import shuffle
+from copy import deepcopy
 
 # -- Role Class -- #
 @dataclass
@@ -26,6 +27,7 @@ class Role:
     selected_target = False
     solo_win: bool = False
     was_voted_out: bool = False
+    just_died: bool = False
 
     # -- Properties -- #
     @property
@@ -49,27 +51,31 @@ class Role:
     # -- Methods -- #
     @enforce_types
     def die(self, players: dict[str, object], recurse: bool = True) -> bool:
-        if "on_death" in self.ability_type:
-            user = list(players.keys())[list(players.values()).index(self)]
-            self.ability(user, players)
-
         if not self.protected: 
-            if not (self.linked and recurse): 
-                self.currently_alive = False
-                return True
-            elif recurse and (not players[self.linker].poisoned): # Recursion Base Case and Cupid Poison Check #
-                if players[self.linked_to].die(players, recurse = False):
-                    self.currently_alive = False
-                    return True
+            self.currently_alive = False
+            self.just_died = True
+
+            if self.linked and recurse and (not players[self.linker].poisoned): # Recursion Base Case and Cupid Poison Check #
+                players[self.linked_to].protected = False
+                players[self.linked_to].die(players, recurse = False)
+
+            return True
                 
         return False
+    
+    @enforce_types
+    def on_death_ability(self, players: dict[str, object]) -> None:
+        if "on_death" in self.ability_type and not "on_vote" in self.ability_type and self.just_died:
+            user = list(players.keys())[list(players.values()).index(self)]
+            self.ability(user, players)
+            self.just_died = False
 
     @enforce_types
     def voted_out(self, players: dict[str, object], recurse: bool = True) -> None:
         self.was_voted_out = True
         self.die(players, False)
         if self.linked and recurse:
-            self.linked_to.voted_out(players, False)
+            players[self.linked_to].voted_out(players, False)
     
     @enforce_types
     def __eq__(self, value) -> bool:
@@ -124,13 +130,14 @@ class Menu_Entry:
     
     @enforce_types
     def filter_roles(self, roles: list[str]) -> None:
-        self.roles = [role for role in self.roles if role in roles]
+        self.roles = [deepcopy(self.role_dict[role]) for role in roles]
     
 @dataclass
 class Game_Data():
     # -- Attributes -- #
     players: Players
     mafia_role: Role
+    none_role: Role
     priority: Players = None
     good_aligned: Players = None
     evil_aligned: Players = None
@@ -153,7 +160,7 @@ class Game_Data():
             pass
 
     # -- Methods -- #
-    def innit(self, none_function: Callable, vote_function: Callable) -> None:
+    def init(self, vote_function: Callable) -> None:
         # -- Filter The Sheriff To Be Last -- #
         Sheriff: dict[str, Role] = {name: role for name, role in self.players.items() if role.name == "Sheriff"}
         Sheriff_name = next(iter(Sheriff))
@@ -165,6 +172,4 @@ class Game_Data():
         self.evil_aligned = Players({name: role for name, role in self.players.items() if not role.alignment})
         self.alive_players = self.players.deepcopy()
     
-
-        self.none_role: Role = Role("Villager", none_function, True, False, 999, 999, "passive", [], []) # -- If A Person Loses a Role -- #
         self.vote_role: Role = Role("Voting", vote_function, True, False, 999, 999, "passive", [], []) # -- Using A Role For Menu Purposes -- #

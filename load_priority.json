@@ -1,7 +1,7 @@
 {
     "1": ["Mafia"],
     "2": ["Sheriff"],
-    "3": ["Soldier", "Villager", "Necromancer"],
+    "3": ["Soldier", "Villager"],
     "4": ["Doctor", "Villager"],
     "5": ["Lawyer", "Executioner"],
     "6": ["Poisoner", "Psychic"],

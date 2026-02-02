@@ -128,6 +128,7 @@ class Menu_Entry:
     @enforce_types
     def assign_roles(self) -> Players:
         shuffle(self.players)
+        shuffle(self.roles)
         return Players({self.players[i]: self.roles[i] for i in range(len(self.players))})
     
     @enforce_types
@@ -168,5 +169,4 @@ class Game_Data():
         self.evil_aligned = Players({name: role for name, role in self.players.items() if not role.alignment})
         self.alive_players = self.players.deepcopy()
         self.dead_players = Players({})
-    
         self.vote_role: Role = Role("Voting", vote_function, True, False, 999, 999, "passive", [], [], []) # -- Using A Role For Menu Purposes -- #

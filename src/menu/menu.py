@@ -267,6 +267,7 @@ def selection_menu(data: Game_Data, user: str, target: str = "", can_recurse: bo
 
     for player in selected_players:
         data.players[player].visited_by.append(user)
+        shuffle(data.players[player].visited_by)
 
     if "recurse_targets" in role.ability_type and can_recurse and data.playing:
         for i in range(len(selected_players)):

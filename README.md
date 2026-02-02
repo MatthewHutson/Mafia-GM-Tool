@@ -2,11 +2,9 @@
 A Program to allocate roles in a game of mafia
 
 # Changes
-Added The Necromancer
-Major Adjustments To Fit This - Made selection Menu Recursive and Added New Ability Types
-Removed Unneccesary Sherrif Last Case In Initialisation
-Alter Role Priorities
-Bug Fixes
+Shuffled Roles and Players in Game Setup
+Shuffled The visited by list
+Done To Prevent Metagaming With Knowlwedge of how the program works
 
 # To Do
 Add All Other Roles

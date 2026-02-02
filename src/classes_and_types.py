@@ -17,6 +17,7 @@ class Role:
     ability_type: list[str] # Can be "singular", "passive", "repeat", "on death" or "on vote" #
     targets: list[object]
     information: list[str]
+    visited_by: list[str]
     currently_alive: bool = True
     protected: bool = False
     poisoned: bool = False
@@ -173,4 +174,4 @@ class Game_Data():
         self.alive_players = self.players.deepcopy()
         self.dead_players = Players({})
     
-        self.vote_role: Role = Role("Voting", vote_function, True, False, 999, 999, "passive", [], []) # -- Using A Role For Menu Purposes -- #
+        self.vote_role: Role = Role("Voting", vote_function, True, False, 999, 999, "passive", [], [], []) # -- Using A Role For Menu Purposes -- #

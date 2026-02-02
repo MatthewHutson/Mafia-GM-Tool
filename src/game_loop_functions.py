@@ -8,7 +8,7 @@ from menu.menu_classes import *
 @enforce_types
 def use_abilities(data: Game_Data) -> None:
     for name, role in data.priority.items():
-        if role.currently_alive and not ("singular" in role.ability_type and role.used_ability) and (not "on_vote" in role.ability_type or "on_death" in role.ability_type):
+        if role.currently_alive and (not "on_vote" in role.ability_type or "on_death" in role.ability_type):
             role.ability(name, data.players)
             role.used_ability = True
 
@@ -29,13 +29,14 @@ def life_death_sort(data: Game_Data) -> None:
 @enforce_types
 def remove_round_data(data: Game_Data) -> None:
     for role in data.players.values():
-        if role.true_alignment != None: 
+        if not "singular" in role.ability_type: 
             for i in range(len(role.targets)):
                 del role.targets[0]
 
         role.poisoned = False
         role.protected = False
         role.information = []
+        role.visited_by = []
 
 @enforce_types
 def select_player(user: str, players: Players) -> None: # -- Outdated To Be Replaced -- #

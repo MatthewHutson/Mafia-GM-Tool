@@ -2,8 +2,8 @@
 A Program to allocate roles in a game of mafia
 
 # Changes
-Added a button to load names from a text file in setup in previous commit
-Actually staged readme updates
+Added The Creep
+Minor Adjustments To Fit This
 
 # To Do
 Add All Other Roles

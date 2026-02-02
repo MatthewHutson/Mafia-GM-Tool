@@ -33,7 +33,7 @@ def main() -> None:
             data["ability"] = role_functions[data["ability"]]
             data["_alignment"] = data["alignment"]
             del data["alignment"]
-            roles[data["name"]] = Role(**data, targets = [], information = [])
+            roles[data["name"]] = Role(**data, targets = [], information = [], visited_by = [])
 
     with open("load_priority.json", 'r') as file:
         data: dict = json.load(file)
@@ -47,7 +47,7 @@ def main() -> None:
     entries = Menu_Entry([], list(roles.values()))
 
     # -- Menu -- #
-    setup_menu(entries, roles_load_priority, name_data)
+    setup_menu(entries, roles_load_priority, name_data, len(roles_load_priority))
 
     # -- Player Organisation -- #
     game_data = Game_Data(Players(entries.assign_roles()), deepcopy(roles["Mafia"]), deepcopy(roles["Villager"]))

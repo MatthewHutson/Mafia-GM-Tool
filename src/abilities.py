@@ -64,7 +64,7 @@ def stop_vote(user: str, players: Players) -> None:
             players[user].solo_win = False
 
         if not players[players[user].targets[0]].currently_alive and players[user].solo_win:
-            role_switch(players, user, Role("Villager", none, True, False, 999, 999, "passive", [], []))
+            role_switch(players, user, Role("Villager", none, True, False, 999, 999, "passive", [], [], []))
 
 @add_attributes(targets = 1)
 @enforce_types
@@ -74,7 +74,7 @@ def execute(user: str, players: Players) -> None:
             players[user].solo_win = True
 
         if not (players[players[user].targets[0]].currently_alive or players[user].solo_win):
-            role_switch(players, user, Role("Villager", none, True, False, 999, 999, "passive", [], []))
+            role_switch(players, user, Role("Villager", none, True, False, 999, 999, "passive", [], [], []))
 
 @add_attributes(targets = 1)
 @enforce_types
@@ -98,3 +98,19 @@ def telepathy(user: str, players: Players) -> None:
     players[user].information.append(f"{target} is {role.name}!")
     if is_lover:
         players[user].information.append(f"{target} is linked to another player!")
+
+@add_attributes(targets = 1)
+@enforce_types
+def stalk(user: str, players: Players) -> None:
+    if not players[user].poisoned:
+        target: str = players[user].targets[0]
+        visitors = players[target].visited_by
+        target_str = f"{target} was visited by "
+        
+        for player in visitors:
+            if player != user:
+                target_str += player + ", "
+
+        target_str = target_str[:-2]
+
+        players[user].information.append(target_str)

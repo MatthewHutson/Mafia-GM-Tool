@@ -9,7 +9,6 @@ import sys
 # -- Setup Global Variables -- #
 root: tk.Tk = tk.Tk()
 
-MAX_PLAYERS: int = 7
 MIN_PLAYERS: int = 4
 
 bg_2 = "#d3d3d3"
@@ -38,13 +37,13 @@ selected_players = []
 
 # -- Functions -- #
 @enforce_types
-def add_player(players: list[tk.Label], roles: list[list[Role]], entries: Menu_Entry, name: str) -> None:
+def add_player(players: list[tk.Label], roles: list[list[Role]], entries: Menu_Entry, name: str, max_players: int) -> None:
     try:
         if not name:    raise ValueError
         
         name_entry.delete(0, tk.END)
 
-        if len(players) >= MAX_PLAYERS: raise IndexError
+        if len(players) >= max_players: raise IndexError
         
         for frame in players:
             if frame == capitalise_words(name): raise NameError
@@ -61,17 +60,17 @@ def add_player(players: list[tk.Label], roles: list[list[Role]], entries: Menu_E
         pass
 
 @enforce_types
-def add_defaults(players: list[tk.Label], roles: list[list[Role]], entries: Menu_Entry, default_names: list[str]) -> None:
+def add_defaults(players: list[tk.Label], roles: list[list[Role]], entries: Menu_Entry, default_names: list[str], max_players: int) -> None:
     for i in range(len(players)):
         players[0].delete()
 
     for name in default_names:
-        add_player(players, roles, entries, name)
+        add_player(players, roles, entries, name, max_players)
 
 @enforce_types
-def add_player_from_entry(players: list[tk.Label], roles: list[list[Role]], entries: Menu_Entry) -> None:
+def add_player_from_entry(players: list[tk.Label], roles: list[list[Role]], entries: Menu_Entry, max_players: int) -> None:
     user_input: str = name_entry.get().strip()
-    add_player(players, roles, entries, user_input)
+    add_player(players, roles, entries, user_input, max_players)
 
 @enforce_types
 def add_role_tile(player_count: int, roles: list[Role], entries: Menu_Entry) -> None:
@@ -152,11 +151,11 @@ def terminate() -> None:
 
 # -- Setup Menu -- #
 @enforce_types
-def setup_menu(entries: Menu_Entry, all_roles: list[list[Role]], default_names: list[str]) -> None:
+def setup_menu(entries: Menu_Entry, all_roles: list[list[Role]], default_names: list[str], max_players: int) -> None:
     # -- Specific Functions --  #
     @enforce_types
     def add_enter_press(event) -> None:
-        add_player_from_entry(players, all_roles, entries)
+        add_player_from_entry(players, all_roles, entries, max_players)
         
     # -- Menu -- #
     clear(root)
@@ -167,8 +166,8 @@ def setup_menu(entries: Menu_Entry, all_roles: list[list[Role]], default_names: 
 
     # -- Add Player Input -- #
     tk.Label(input_frame, text = "Name:").pack(side = tk.LEFT, padx = 8, pady = 8)
-    tk.Button(input_frame, text = "Defaults", command = lambda: add_defaults(players, all_roles, entries, default_names), bg = "#5D9FF0", highlightbackground = "#4980C4", activebackground = "#4980C4", fg = "#ffffff", activeforeground = "#ffffff").pack(side = tk.RIGHT, padx = 8, pady = 8)
-    tk.Button(input_frame, text = "Add", command = lambda: add_player_from_entry(players, all_roles, entries), bg = "#00ff00", highlightbackground = "#00cd00", activebackground = "#00aa00").pack(side = tk.RIGHT, padx = 8, pady = 8)
+    tk.Button(input_frame, text = "Defaults", command = lambda: add_defaults(players, all_roles, entries, default_names, max_players), bg = "#5D9FF0", highlightbackground = "#4980C4", activebackground = "#4980C4", fg = "#ffffff", activeforeground = "#ffffff").pack(side = tk.RIGHT, padx = 8, pady = 8)
+    tk.Button(input_frame, text = "Add", command = lambda: add_player_from_entry(players, all_roles, entries, max_players), bg = "#00ff00", highlightbackground = "#00cd00", activebackground = "#00aa00").pack(side = tk.RIGHT, padx = 8, pady = 8)
     name_entry.pack(fill = "x", padx = 8, pady = 8, ipady = 12)
     name_entry.bind("<Return>", add_enter_press)
     input_frame.pack_propagate(False)
@@ -251,6 +250,9 @@ def selection_menu(data: Game_Data, user: str) -> None:
     role.selected_target = True
     role.targets = deepcopy(selected_players)
 
+    for player in selected_players:
+        data.players[player].visited_by.append(user)
+
 @enforce_types
 def voting_menu(data: Game_Data) -> str:
     selection_menu(data, "none")
@@ -267,7 +269,7 @@ def information(data: Game_Data) -> None:
         count: int = 0
 
         for item in role.information:
-            info += f"\n ({count + 1}): " + item
+            info += f"\n #{count + 1}: " + item
         
         if info != "\n":
             messagebox.showinfo("Info", f"{player} is told: {info}")

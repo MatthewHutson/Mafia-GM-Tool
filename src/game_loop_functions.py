@@ -8,8 +8,8 @@ from menu.menu_classes import *
 @enforce_types
 def use_abilities(data: Game_Data) -> None:
     for name, role in data.priority.items():
-        if role.currently_alive and (not "on_vote" in role.ability_type or "on_death" in role.ability_type):
-            role.ability(name, data.players)
+        if role.currently_alive and not ("on_vote" in role.ability_type or "on_death" in role.ability_type):
+            role.ability(name, data)
             role.used_ability = True
 
 @enforce_types
@@ -92,9 +92,9 @@ def role_switch(players: Players, player: str, new_role: Role) -> None:
 def use_vote_abiltities(data: Game_Data) -> None:
     for user, role in data.players.items():
         if "on_vote" in role.ability_type:
-            role.ability(user, data.players)
+            role.ability(user, data)
 
 @enforce_types
 def use_death_abilities(data: Game_Data) -> None:
     for role in data.players.values():
-        role.on_death_ability(data.players)
+        role.on_death_ability(data)

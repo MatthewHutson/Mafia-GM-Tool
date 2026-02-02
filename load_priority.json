@@ -5,6 +5,6 @@
     "4": ["Doctor", "Villager"],
     "5": ["Lawyer", "Executioner"],
     "6": ["Poisoner", "Psychic"],
-    "7": ["Jester", "Cupid"],
-    "8": ["Creep"]
+    "7": ["Cupid", "Bomber"],
+    "8": ["Creep", "Jester"]
 }

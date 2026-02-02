@@ -9,12 +9,11 @@ import abilities as a
 
 # -- Functions -- #
 @enforce_types
-def get_jester(players: Players) -> Players:
-    jesters = {}
-    for key, role in players.items():
-        if role.name == "Jester": 
-            jesters[key] = role
-    return jesters
+def selection_coindition(data: Game_Data, role: Role) -> bool:
+    singular = (not ("singular" in role.ability_type and (role.selected_target)))
+    targets = role.ability.targets > 0 
+
+    return singular and targets and data.playing
 
 # -- Main -- #
 @enforce_types
@@ -59,7 +58,7 @@ def main() -> None:
     while game_data.playing:
         # -- Game Loop -- #
         for name, role in game_data.alive_players.items():
-            if (not ("singular" in role.ability_type and (role.selected_target))) and role.ability.targets > 0 and game_data.playing:
+            if selection_coindition(game_data, role):
                 selection_menu(game_data, name)
 
         if game_data.playing:
@@ -71,6 +70,7 @@ def main() -> None:
 
             pack_alive_and_dead(game_data, game_data.vote_role)
             use_death_abilities(game_data)
+            life_death_sort(game_data)
             remove_round_data(game_data)
 
             check_for_victory(game_data)
@@ -84,6 +84,7 @@ def main() -> None:
                 life_death_sort(game_data)
                 use_vote_abiltities(game_data)
                 use_death_abilities(game_data)
+                life_death_sort(game_data)
 
                 if game_data.playing:
                     pack_alive_and_dead(game_data, game_data.vote_role)

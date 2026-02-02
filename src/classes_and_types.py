@@ -65,10 +65,10 @@ class Role:
         return False
     
     @enforce_types
-    def on_death_ability(self, players: dict[str, object]) -> None:
+    def on_death_ability(self, data: object) -> None:
         if "on_death" in self.ability_type and not "on_vote" in self.ability_type and self.just_died:
-            user = list(players.keys())[list(players.values()).index(self)]
-            self.ability(user, players)
+            user = list(data.players.keys())[list(data.players.values()).index(self)]
+            self.ability(user, data)
             self.just_died = False
 
     @enforce_types

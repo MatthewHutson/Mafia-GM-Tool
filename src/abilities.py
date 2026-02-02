@@ -1,110 +1,110 @@
 # -- Imports -- #
 from utils import *
-from classes_and_types import Role, Players
+from classes_and_types import Role, Game_Data
 from game_loop_functions import *
 
 # -- Roles -- #
 @add_attributes(targets = 0)
 @enforce_types
-def none(user: str, players: Players) -> None:
+def none(user: str, data: Game_Data) -> None:
     pass
 
 @add_attributes(targets = 1)
 @enforce_types
-def vote(user: str, players: Players) -> None:
+def vote(user: str, data: Game_Data) -> None:
     pass
 
 @add_attributes(targets = 1)
 @enforce_types
-def reveal(user: str, players: Players) -> None:
-    target: str = players[user].targets[0]
-    alignment: bool = players[user].poisoned ^ players[target].alignment
+def reveal(user: str, data: Game_Data) -> None:
+    target: str = data.players[user].targets[0]
+    alignment: bool = data.players[user].poisoned ^ data.players[target].alignment
 
-    if alignment: players[user].information.append(f"{target} is GOOD!")
-    else: players[user].information.append(f"{target} is EVIL!")
+    if alignment: data.players[user].information.append(f"{target} is GOOD!")
+    else: data.players[user].information.append(f"{target} is EVIL!")
 
 @add_attributes(targets = 0)
 @enforce_types
-def endure(user: str, players: Players) -> None:
-    if not players[user].poisoned: players[user].protected = True
+def endure(user: str, data: Game_Data) -> None:
+    if not data.players[user].poisoned: data.players[user].protected = True
 
 @add_attributes(targets = 1)
 @enforce_types
-def protect(user: str, players: Players) -> None:
-    target: str = players[user].targets[0]
-    if not players[user].poisoned: players[target].protected = True
+def protect(user: str, data: Game_Data) -> None:
+    target: str = data.players[user].targets[0]
+    if not data.players[user].poisoned: data.players[target].protected = True
 
 @add_attributes(targets = 2)
 @enforce_types
-def link(user: str, players: Players) -> None:
-    link_1: str = players[user].targets[0]
-    link_2: str = players[user].targets[1]
+def link(user: str, data: Game_Data) -> None:
+    link_1: str = data.players[user].targets[0]
+    link_2: str = data.players[user].targets[1]
     
-    players[link_1].linked = True
-    players[link_2].linked = True
+    data.players[link_1].linked = True
+    data.players[link_2].linked = True
 
-    players[link_1].linker = user
-    players[link_2].linker = user
+    data.players[link_1].linker = user
+    data.players[link_2].linker = user
 
-    players[link_1].linked_to = link_2
-    players[link_2].linked_to = link_1
+    data.players[link_1].linked_to = link_2
+    data.players[link_2].linked_to = link_1
 
 @add_attributes(targets = 0)
 @enforce_types
-def Jester(user: str, players: Players) -> None:
-    if players[user].was_voted_out: 
-        players[user].solo_win = True
+def Jester(user: str, data: Game_Data) -> None:
+    if data.players[user].was_voted_out: 
+        data.players[user].solo_win = True
 
 @add_attributes(targets = 1)
 @enforce_types
-def stop_vote(user: str, players: Players) -> None: 
-    if not players[user].solo_win:
-        players[user].solo_win = True
-        if players[players[user].targets[0]].was_voted_out:
-            players[user].solo_win = False
+def stop_vote(user: str, data: Game_Data) -> None: 
+    if not data.players[user].solo_win:
+        data.players[user].solo_win = True
+        if data.players[data.players[user].targets[0]].was_voted_out:
+            data.players[user].solo_win = False
 
-        if not players[players[user].targets[0]].currently_alive and players[user].solo_win:
-            role_switch(players, user, Role("Villager", none, True, False, 999, 999, "passive", [], [], []))
-
-@add_attributes(targets = 1)
-@enforce_types
-def execute(user: str, players: Players) -> None:
-    if not players[user].solo_win:
-        if players[players[user].targets[0]].was_voted_out:
-            players[user].solo_win = True
-
-        if not (players[players[user].targets[0]].currently_alive or players[user].solo_win):
-            role_switch(players, user, Role("Villager", none, True, False, 999, 999, "passive", [], [], []))
+        if not data.players[data.players[user].targets[0]].currently_alive and data.players[user].solo_win:
+            role_switch(data.players, user, Role("Villager", none, True, False, 999, 999, "passive", [], [], []))
 
 @add_attributes(targets = 1)
 @enforce_types
-def poison(user: str, players: Players) -> None:
-    target: str = players[user].targets[0]
-    players[target].poisoned = True
+def execute(user: str, data: Game_Data) -> None:
+    if not data.players[user].solo_win:
+        if data.players[data.players[user].targets[0]].was_voted_out:
+            data.players[user].solo_win = True
+
+        if not (data.players[data.players[user].targets[0]].currently_alive or data.players[user].solo_win):
+            role_switch(data.players, user, Role("Villager", none, True, False, 999, 999, "passive", [], [], []))
 
 @add_attributes(targets = 1)
 @enforce_types
-def kill(user: str, players: Players) -> None:
-    target: str = players[user].targets[0]
-    players[target].die(players)
+def poison(user: str, data: Game_Data) -> None:
+    target: str = data.players[user].targets[0]
+    data.players[target].poisoned = True
 
 @add_attributes(targets = 1)
 @enforce_types
-def telepathy(user: str, players: Players) -> None:
-    target: str = players[user].targets[0]
-    role: Role = players[target]
+def kill(user: str, data: Game_Data) -> None:
+    target: str = data.players[user].targets[0]
+    data.players[target].die(data.players)
+
+@add_attributes(targets = 1)
+@enforce_types
+def telepathy(user: str, data: Game_Data) -> None:
+    target: str = data.players[user].targets[0]
+    role: Role = data.players[target]
     is_lover: bool = role.linked
 
-    players[user].information.append(f"{target} is {role.name}!")
+    data.players[user].information.append(f"{target} is {role.name}!")
     if is_lover:
-        players[user].information.append(f"{target} is linked to another player!")
+        data.players[user].information.append(f"{target} is linked to another player!")
 
 @add_attributes(targets = 1)
 @enforce_types
-def stalk(user: str, players: Players) -> None:
-    if not players[user].poisoned:
-        target: str = players[user].targets[0]
-        visitors = players[target].visited_by
+def stalk(user: str, data: Game_Data) -> None:
+    if not data.players[user].poisoned:
+        target: str = data.players[user].targets[0]
+        visitors = data.players[target].visited_by
         target_str = f"{target} was visited by "
         
         for player in visitors:
@@ -113,4 +113,18 @@ def stalk(user: str, players: Players) -> None:
 
         target_str = target_str[:-2]
 
-        players[user].information.append(target_str)
+        data.players[user].information.append(target_str)
+
+@add_attributes(targets = 0)
+@enforce_types
+def vengance(user: str, data: Game_Data) -> None:
+    if not data.players[user].was_voted_out:
+        data.players[user].ability.targets = 1
+        selection_menu(data, user)
+
+        target = data.players[user].targets[0]
+        role = data.players[target]
+        role.protected = False
+        role.die(data.players)
+
+    data.players[user].ability.targets = 0

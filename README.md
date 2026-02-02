@@ -2,8 +2,9 @@
 A Program to allocate roles in a game of mafia
 
 # Changes
-Added The Creep
-Minor Adjustments To Fit This
+Added The Bomber
+Major Adjustments To Fit This - Ability Checks use Game_Data rather than Players object now
+Bug Fixes
 
 # To Do
 Add All Other Roles

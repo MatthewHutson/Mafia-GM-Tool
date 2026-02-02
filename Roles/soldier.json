@@ -3,7 +3,7 @@
     "ability": "endure",
     "alignment": true,
     "mafia_alternative": false,
-    "priority": 1,
+    "priority": 2,
     "max_count": 1,
     "ability_type": ["passive"]
 }

@@ -1,0 +1,9 @@
+{
+    "name": "Necromancer",
+    "ability": "channel",
+    "alignment": true,
+    "mafia_alternative": false,
+    "priority": 0,
+    "max_count": 1,
+    "ability_type": ["singular", "on_demand", "recurse_targets", "activate_again"]
+}

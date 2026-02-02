@@ -14,7 +14,7 @@ class Role:
     mafia_alternative: bool # Switches to Mafia Abiltity When All Normal Mafia Dies #
     priority: int # Order of Execution of Abilities From Lowest To Highest #
     max_count: int
-    ability_type: list[str] # Can be "singular", "passive", "repeat", "on death" or "on vote" #
+    ability_type: list[str] # Can contain "singular", "passive", "repeat", "on death", "on vote", "on_demand", "recurse_targets" and "activate_again" #
     targets: list[object]
     information: list[str]
     visited_by: list[str]
@@ -29,6 +29,7 @@ class Role:
     solo_win: bool = False
     was_voted_out: bool = False
     just_died: bool = False
+    ability_cancel: bool = False # For "on_demand"
 
     # -- Properties -- #
     @property
@@ -162,12 +163,6 @@ class Game_Data():
 
     # -- Methods -- #
     def init(self, vote_function: Callable) -> None:
-        # -- Filter The Sheriff To Be Last -- #
-        Sheriff: dict[str, Role] = {name: role for name, role in self.players.items() if role.name == "Sheriff"}
-        Sheriff_name = next(iter(Sheriff))
-        del self.players[Sheriff_name]
-        self.players[Sheriff_name] = Sheriff[Sheriff_name]
-
         self.priority = Players(dict(sorted(self.players.items(), key = lambda item: item[1].priority)))
         self.good_aligned = Players({name: role for name, role in self.players.items() if role.alignment})
         self.evil_aligned = Players({name: role for name, role in self.players.items() if not role.alignment})

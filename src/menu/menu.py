@@ -78,8 +78,9 @@ def add_role_tile(player_count: int, roles: list[Role], entries: Menu_Entry) -> 
     role_row_frames.add_item(role_icon)
 
 @enforce_types
-def clear(root: Has_Widget_Children) -> None:
+def clear(root: tk.Tk) -> None:
     clear_widgets(root)
+    root.unbind("<Return>")
 
     for i in range(len(players)):
         players[0].delete()
@@ -207,11 +208,18 @@ def innit_game_menu() -> None:
     dead_margin.pack(side = tk.RIGHT, padx = 4, pady = 4, fill = "y", ipadx = 104)
 
 @enforce_types
-def selection_menu(data: Game_Data, user: str) -> None:
+def selection_menu(data: Game_Data, user: str, target: str = "", can_recurse: bool = True) -> None:
     # -- Setup -- #
     globals()["selected_players"] = []
 
-    try: role = data.players[user]
+    try: 
+        # -- To Check if Ability Selection Or Vote Selection -- #
+        if target == "":
+            role = data.players[user]
+        else:
+            # -- To Consider recurse_targets -- #
+            role = data.players[target]
+
     except: role = data.vote_role
 
     # -- Sub Functions -- #
@@ -223,10 +231,14 @@ def selection_menu(data: Game_Data, user: str) -> None:
     pack_alive_and_dead(data, role)
     action_frame = tk.Frame(root, bg = bg_2)
 
+
     if user == "none":
         text = "Voting Menu"
     else:
-        text =  f"{user} is the {role.name}. They need to select {role.ability.targets} target{"s" if role.ability.targets > 1 else ""}"
+        if target == "":
+            text =  f"{user} is the {role.name}. They need to select {role.ability.targets} target{"s" if role.ability.targets > 1 else ""}"
+        else:
+            text = f"{user} is channeling the power of {role.name}. They need to select {role.ability.targets} target{"s" if role.ability.targets > 1 else ""}"
 
     action_label = tk.Label(action_frame, font = main_font, text = text)
     confirm_frame = tk.Frame(action_frame, bg = bg_2)
@@ -243,15 +255,23 @@ def selection_menu(data: Game_Data, user: str) -> None:
 
     root.mainloop()
 
+    try: role = data.players[user] # -- To Consider recurse_targets -- #
+    except: pass
+
     if data.playing:
         action_frame.pack_forget()
         action_label.pack_forget()
 
     role.selected_target = True
-    role.targets = deepcopy(selected_players)
+    role.targets = role.targets + deepcopy(selected_players)
 
     for player in selected_players:
         data.players[player].visited_by.append(user)
+
+    if "recurse_targets" in role.ability_type and can_recurse and data.playing:
+        for i in range(len(selected_players)):
+            player = selected_players[i]
+            selection_menu(data, user, player, False)
 
 @enforce_types
 def voting_menu(data: Game_Data) -> str:

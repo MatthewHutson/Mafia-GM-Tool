@@ -128,3 +128,11 @@ def vengance(user: str, data: Game_Data) -> None:
         role.die(data.players)
 
     data.players[user].ability.targets = 0
+
+@add_attributes(targets = 1)
+@enforce_types
+def channel(user: str, data: Game_Data) -> None:
+    if len(data.players[user].targets) > 0:
+        target = data.players[user].targets[0]
+        del data.players[user].targets[0]
+        data.players[user].ability = data.players[target].ability

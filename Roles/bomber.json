@@ -3,7 +3,7 @@
     "ability": "vengance",
     "alignment": true,
     "mafia_alternative": false,
-    "priority": 9,
+    "priority": 0,
     "max_count": 1,
     "ability_type": ["on_death"]
 }

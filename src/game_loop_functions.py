@@ -6,11 +6,28 @@ from menu.menu_classes import *
 
 # -- Functions -- #
 @enforce_types
-def use_abilities(data: Game_Data) -> None:
+def ability_conditions(role: Role, has_recursed: bool) -> bool:
+    life = role.currently_alive
+    singular = not ("on_vote" in role.ability_type or "on_death" in role.ability_type)
+
+    if has_recursed:
+        recurse_case = "activate_again" in role.ability_type
+    else:
+        recurse_case = True
+
+    return life and singular and recurse_case
+
+@enforce_types
+def use_abilities(data: Game_Data, can_recurse: bool = True) -> None:
     for name, role in data.priority.items():
-        if role.currently_alive and not ("on_vote" in role.ability_type or "on_death" in role.ability_type):
+        if ability_conditions(role, can_recurse):
             role.ability(name, data)
-            role.used_ability = True
+
+            if not role.ability_cancel or not (can_recurse or "activate_again" in role.ability_type):
+                role.used_ability = True
+
+    if can_recurse:
+        use_abilities(data, False)
 
 @enforce_types
 def life_death_sort(data: Game_Data) -> None:

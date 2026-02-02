@@ -2,8 +2,10 @@
 A Program to allocate roles in a game of mafia
 
 # Changes
-Added The Bomber
-Major Adjustments To Fit This - Ability Checks use Game_Data rather than Players object now
+Added The Necromancer
+Major Adjustments To Fit This - Made selection Menu Recursive and Added New Ability Types
+Removed Unneccesary Sherrif Last Case In Initialisation
+Alter Role Priorities
 Bug Fixes
 
 # To Do

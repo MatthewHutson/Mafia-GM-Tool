@@ -1,10 +1,11 @@
 {
     "1": ["Mafia"],
     "2": ["Sheriff"],
-    "3": ["Soldier", "Villager"],
+    "3": ["Soldier", "Villager", "Necromancer"],
     "4": ["Doctor", "Villager"],
     "5": ["Lawyer", "Executioner"],
     "6": ["Poisoner", "Psychic"],
     "7": ["Cupid", "Bomber"],
-    "8": ["Creep", "Jester"]
+    "8": ["Creep", "Necromancer"],
+    "9": ["Jester"]
 }

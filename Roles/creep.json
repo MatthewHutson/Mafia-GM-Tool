@@ -3,7 +3,7 @@
     "ability": "stalk",
     "alignment": true,
     "mafia_alternative": false,
-    "priority": 3,
+    "priority": 10,
     "max_count": 1,
     "ability_type": ["singular"]
 }

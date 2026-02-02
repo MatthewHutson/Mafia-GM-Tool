@@ -2,6 +2,8 @@
 import json
 import os
 from utils import *
+from tkinter import messagebox
+from time import sleep
 from classes_and_types import *
 from menu.menu import *
 from game_loop_functions import *
@@ -9,11 +11,19 @@ import abilities as a
 
 # -- Functions -- #
 @enforce_types
-def selection_coindition(data: Game_Data, role: Role) -> bool:
+def selection_coindition(data: Game_Data, role: Role, name: str) -> bool:
     singular = (not ("singular" in role.ability_type and (role.selected_target)))
     targets = role.ability.targets > 0 
 
-    return singular and targets and data.playing
+    universal_conditions = singular and targets and data.playing
+    use_ability = True
+
+    if "on_demand" in role.ability_type and universal_conditions:
+        sleep(1)
+        use_ability = messagebox.askyesno("Ability", f"Does {name}, the {role.name} want to use their ability ({role.ability.__name__})?")
+        role.ability_cancel = not use_ability
+
+    return universal_conditions and use_ability
 
 # -- Main -- #
 @enforce_types
@@ -58,7 +68,7 @@ def main() -> None:
     while game_data.playing:
         # -- Game Loop -- #
         for name, role in game_data.alive_players.items():
-            if selection_coindition(game_data, role):
+            if selection_coindition(game_data, role, name):
                 selection_menu(game_data, name)
 
         if game_data.playing:

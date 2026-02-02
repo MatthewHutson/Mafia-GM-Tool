@@ -99,4 +99,7 @@ def main() -> None:
     
 # -- On Run -- #
 if __name__ == "__main__":
-    main()
+    playing: bool = True
+    while playing == True:
+        main()
+        playing = messagebox.askyesno("Restart", "Do you want to play another round?")

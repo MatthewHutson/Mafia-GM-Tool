@@ -142,7 +142,7 @@ class Game_Data():
     good_aligned: Players = None
     evil_aligned: Players = None
     alive_players: Players = None
-    dead_players = Players({})
+    dead_players = None
     playing: bool = True
     good_win: bool = False
     evil_win: bool = False
@@ -171,5 +171,6 @@ class Game_Data():
         self.good_aligned = Players({name: role for name, role in self.players.items() if role.alignment})
         self.evil_aligned = Players({name: role for name, role in self.players.items() if not role.alignment})
         self.alive_players = self.players.deepcopy()
+        self.dead_players = Players({})
     
         self.vote_role: Role = Role("Voting", vote_function, True, False, 999, 999, "passive", [], []) # -- Using A Role For Menu Purposes -- #

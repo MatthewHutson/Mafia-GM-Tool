@@ -1,5 +1,5 @@
 # -- Imports -- #
-from typing import get_type_hints, get_origin, get_args, Callable, TypeAlias, Any
+from typing import get_type_hints, get_origin, get_args, Callable, TypeAlias, Any, Protocol
 
 # -- Decerators -- #
 def add_attributes(**attributes) -> Callable:
@@ -41,7 +41,14 @@ def enforce_types(func: Callable) -> Callable:
             try:
                 value = args[i + args_offset] if kwargs.get(key) is None else kwargs.get(key)  # -- Checks Args then Kwargs For Entered Data Type -- #
                 if type(value) == int and hint == float: value = float(value) # -- Removes Half-Correct floats as int -- #
-                assert is_instance(value, hint), f"Argument {key} must be of type {hint} but {value=} of type={type(value)} provided"
+
+                # -- Protocols Are Meant To Take Many Forms -- #
+                for subclass in Protocol.__subclasses__():
+                    if hint == subclass:
+                        break
+                else:
+                    assert is_instance(value, hint), f"Argument {key} must be of type {hint} but {value=} of type={type(value)} provided"
+
             except IndexError: pass  # -- Ignores The No Given Hint Case -- #
 
         result = func(*args, **kwargs) # -- Performs The Function Normally -- #

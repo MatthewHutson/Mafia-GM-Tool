@@ -1,5 +1,6 @@
 # -- Imports -- #
 from utils import *
+from typing import Protocol
 from classes_and_types import *
 import tkinter as tk
 from tkinter import messagebox
@@ -159,6 +160,11 @@ class Role_Row:
         for frame in self.frames:
             frame.pack(side = tk.TOP, padx = 2, fill = "x", pady = 2)
 
+    @enforce_types
+    def delete(self) -> None:
+        self.disapear()
+        del self
+
 class Player_Frame:
     # -- Constructor -- #
     def __init__(self, user_input: str, main_frame: tk.Frame, main_font: tuple[str, int]) -> None:
@@ -283,3 +289,8 @@ class Player_Role_Frame(Player_Frame):
         self.select_icon.pack_forget()
         self.select_icon = tk.Button(self.frame, text = "Select", bg = self.selected_bg, activebackground = "#4980C4", fg = "#FFFFFF", activeforeground = "#FFFFFF", width = 8, height = 4, command = self.select)
         self.select_icon.pack(side = tk.RIGHT, padx = 2, expand = False)
+
+# -- Protocols -- #
+class Has_Widget_Children(Protocol):
+    def winfo_children():
+        ...

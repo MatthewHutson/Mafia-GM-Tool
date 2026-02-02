@@ -87,3 +87,14 @@ def poison(user: str, players: Players) -> None:
 def kill(user: str, players: Players) -> None:
     target: str = players[user].targets[0]
     players[target].die(players)
+
+@add_attributes(targets = 1)
+@enforce_types
+def telepathy(user: str, players: Players) -> None:
+    target: str = players[user].targets[0]
+    role: Role = players[target]
+    is_lover: bool = role.linked
+
+    players[user].information.append(f"{target} is {role.name}!")
+    if is_lover:
+        players[user].information.append(f"{target} is linked to another player!")

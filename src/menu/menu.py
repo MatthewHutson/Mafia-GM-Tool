@@ -68,9 +68,20 @@ def add_role_tile(player_count: int, roles: list[Role], entries: Menu_Entry) -> 
     role_row_frames.add_item(role_icon)
 
 @enforce_types
-def clear(root: tk.Tk) -> None:
-    for widget in root.winfo_children():
-        widget.destroy()
+def clear(root: Has_Widget_Children) -> None:
+    clear_widgets(root)
+
+    for i in range(len(players)):
+        players[0].delete()
+
+@enforce_types
+def clear_widgets(root: Has_Widget_Children) -> None:
+    try:
+        for widget in root.winfo_children():
+            widget.pack_forget()
+            clear_widgets(widget)
+    except: pass
+
 
 @enforce_types
 def get_data(root: tk.Tk, entries: Menu_Entry) -> None:
@@ -132,12 +143,13 @@ def terminate() -> None:
 # -- Setup Menu -- #
 @enforce_types
 def setup_menu(entries: Menu_Entry, all_roles: list[list[Role]]) -> None:
-    # -- Specific Functions -- #
+    # -- Specific Functions --  #
     @enforce_types
-    def enter_pressed(event) -> None:
+    def add_enter_press(event) -> None:
         add_player(players, all_roles, entries)
-
+        
     # -- Menu -- #
+    clear(root)
     root.resizable(False, False)
     root.geometry("1024x512")
     root.title("Mafia Game")
@@ -147,7 +159,7 @@ def setup_menu(entries: Menu_Entry, all_roles: list[list[Role]]) -> None:
     tk.Label(input_frame, text = "Name:").pack(side = tk.LEFT, padx = 8, pady = 8)
     add: tk.Button = tk.Button(input_frame, text = "Add", command = lambda: add_player(players, all_roles, entries), bg = "#00ff00", highlightbackground = "#00cd00", activebackground = "#00aa00").pack(side = tk.RIGHT, padx = 8, pady = 8)
     name_entry.pack(fill = "x", padx = 8, pady = 8, ipady = 12)
-    name_entry.bind("<Return>", enter_pressed)
+    name_entry.bind("<Return>", add_enter_press)
     input_frame.pack_propagate(False)
     input_frame.pack(side = tk.TOP, anchor = "w", ipadx = 158, ipady = 20)
 
@@ -213,7 +225,7 @@ def selection_menu(data: Game_Data, user: str) -> None:
 
     tk.Button(confirm_frame, text = "Confirm Choices", command = lambda: confirm_selection(role), bg = "#5D9FF0", activebackground = "#4980C4", fg = "#ffffff", activeforeground = "#ffffff").pack(side = tk.LEFT, ipadx = 16, ipady = 8, padx = 4)
     tk.Button(confirm_frame, text = "End Game", command = lambda: quit(data), bg = "#E03636", activebackground = "#8B2B2B", fg = "#ffffff", activeforeground = "#ffffff").pack(side = tk.RIGHT, ipadx = 16, ipady = 8, pady = 4, padx = 4)
-    confirm_frame.bind("<Return>", enter_pressed)
+    root.bind("<Return>", enter_pressed)
 
     confirm_frame.pack(side = tk.BOTTOM, fill = "x", ipady = 1)
 
@@ -240,10 +252,11 @@ def voting_menu(data: Game_Data) -> str:
 @enforce_types
 def information(data: Game_Data) -> None:
     for player, role in data.players.items():
-        info = ""
+        info: str = "\n"
+        count: int = 0
 
         for item in role.information:
-            info += "" + item
+            info += f"\n ({count + 1}): " + item
         
-        if info != "":
+        if info != "\n":
             messagebox.showinfo("Info", f"{player} is told: {info}")

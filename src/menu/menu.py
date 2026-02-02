@@ -38,29 +38,40 @@ selected_players = []
 
 # -- Functions -- #
 @enforce_types
-def add_player(players: list[tk.Label], roles: list[list[Role]], entries: Menu_Entry) -> None:
-    try: 
-        user_input: str = name_entry.get().strip()
-        
-        if not user_input: 
-            raise ValueError
+def add_player(players: list[tk.Label], roles: list[list[Role]], entries: Menu_Entry, name: str) -> None:
+    try:
+        if not name:    raise ValueError
         
         name_entry.delete(0, tk.END)
 
-        if len(players) >= MAX_PLAYERS: 
-            messagebox.showwarning("Warning", "You Have Reached The Maximum Number of Players!")
-            raise IndexError
+        if len(players) >= MAX_PLAYERS: raise IndexError
         
         for frame in players:
-            if frame == capitalise_words(user_input):
-                messagebox.showwarning("Warning", "A Player With This Name Already Exists!")
-                raise ValueError
+            if frame == capitalise_words(name): raise NameError
         
         add_role_tile(len(players), roles, entries)
-        player_frame = Player_Select_Frame(user_input, player_tab, main_font, players, role_row_frames)
+        player_frame = Player_Select_Frame(name, player_tab, main_font, players, role_row_frames)
         players.append(player_frame)
 
-    except: pass
+    except IndexError:
+        messagebox.showwarning("Warning", "You Have Reached The Maximum Number of Players!")
+    except NameError:
+        messagebox.showwarning("Warning", "A Player With This Name Already Exists!")
+    except ValueError:
+        pass
+
+@enforce_types
+def add_defaults(players: list[tk.Label], roles: list[list[Role]], entries: Menu_Entry, default_names: list[str]) -> None:
+    for i in range(len(players)):
+        players[0].delete()
+
+    for name in default_names:
+        add_player(players, roles, entries, name)
+
+@enforce_types
+def add_player_from_entry(players: list[tk.Label], roles: list[list[Role]], entries: Menu_Entry) -> None:
+    user_input: str = name_entry.get().strip()
+    add_player(players, roles, entries, user_input)
 
 @enforce_types
 def add_role_tile(player_count: int, roles: list[Role], entries: Menu_Entry) -> None:
@@ -81,7 +92,6 @@ def clear_widgets(root: Has_Widget_Children) -> None:
             widget.pack_forget()
             clear_widgets(widget)
     except: pass
-
 
 @enforce_types
 def get_data(root: tk.Tk, entries: Menu_Entry) -> None:
@@ -142,11 +152,11 @@ def terminate() -> None:
 
 # -- Setup Menu -- #
 @enforce_types
-def setup_menu(entries: Menu_Entry, all_roles: list[list[Role]]) -> None:
+def setup_menu(entries: Menu_Entry, all_roles: list[list[Role]], default_names: list[str]) -> None:
     # -- Specific Functions --  #
     @enforce_types
     def add_enter_press(event) -> None:
-        add_player(players, all_roles, entries)
+        add_player_from_entry(players, all_roles, entries)
         
     # -- Menu -- #
     clear(root)
@@ -157,7 +167,8 @@ def setup_menu(entries: Menu_Entry, all_roles: list[list[Role]]) -> None:
 
     # -- Add Player Input -- #
     tk.Label(input_frame, text = "Name:").pack(side = tk.LEFT, padx = 8, pady = 8)
-    add: tk.Button = tk.Button(input_frame, text = "Add", command = lambda: add_player(players, all_roles, entries), bg = "#00ff00", highlightbackground = "#00cd00", activebackground = "#00aa00").pack(side = tk.RIGHT, padx = 8, pady = 8)
+    tk.Button(input_frame, text = "Defaults", command = lambda: add_defaults(players, all_roles, entries, default_names), bg = "#5D9FF0", highlightbackground = "#4980C4", activebackground = "#4980C4", fg = "#ffffff", activeforeground = "#ffffff").pack(side = tk.RIGHT, padx = 8, pady = 8)
+    tk.Button(input_frame, text = "Add", command = lambda: add_player_from_entry(players, all_roles, entries), bg = "#00ff00", highlightbackground = "#00cd00", activebackground = "#00aa00").pack(side = tk.RIGHT, padx = 8, pady = 8)
     name_entry.pack(fill = "x", padx = 8, pady = 8, ipady = 12)
     name_entry.bind("<Return>", add_enter_press)
     input_frame.pack_propagate(False)

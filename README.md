@@ -2,13 +2,8 @@
 A Program to allocate roles in a game of mafia
 
 # Changes
-Added the psychic
-Added Restart Ability
-Polished Info Popup
-Bug Fixes
-Added Enter keybind for selection and voting menu
+Added a button to load names from a file in setup
 
 # To Do
 Add All Other Roles
 Adjust Menu Role Selection System
-Add System To Add Default Player Names In From a File

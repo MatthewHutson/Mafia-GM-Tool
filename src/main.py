@@ -40,10 +40,14 @@ def main() -> None:
         for value in data.values():
             roles_load_priority.append(value)
 
+    with open("defaults.txt") as file:
+        string_data: str = file.readline()
+        name_data: list[str] = string_data.split(", ")
+
     entries = Menu_Entry([], list(roles.values()))
 
     # -- Menu -- #
-    setup_menu(entries, roles_load_priority)
+    setup_menu(entries, roles_load_priority, name_data)
 
     # -- Player Organisation -- #
     game_data = Game_Data(Players(entries.assign_roles()), deepcopy(roles["Mafia"]), deepcopy(roles["Villager"]))

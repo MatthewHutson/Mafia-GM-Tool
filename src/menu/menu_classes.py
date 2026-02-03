@@ -7,15 +7,23 @@ from tkinter import messagebox
 
 # -- Classes -- #
 class Role_Icon:
-    # -- Constructor -- #
+    # -- Constructors -- #
     @enforce_types
-    def __init__(self, roles: list[str], main_font: tuple[str, int], entries: Menu_Entry) -> None:
+    def __init__(self, roles: list[str], main_font: tuple[str, int], entries: Menu_Entry, role_boundary_reset: Any) -> None:
         self.roles = [entries.role_dict[role] for role in roles]
         self.index = 0
         self.font = main_font
+        self.entries = entries
+        self.role_boundary_reset: Callable = role_boundary_reset
         self.label = None
         self.frame = None
         self.frames = None
+
+    @enforce_types
+    def re_init(self, roles: list[str]) -> None:
+        self.roles = [self.entries.role_dict[role] for role in roles]
+        self.index = len(self.roles)
+        self.cycle()
 
     # -- Property -- #
     @property
@@ -56,15 +64,20 @@ class Role_Icon:
         return self.name
         
     @enforce_types
-    def pack(self, frame: tk.Frame, frames: list[object]) -> None:
-        self.label = tk.Button(frame, text = self.name, font = self.font, bg = self.bg_colour, highlightbackground = self.bg_colour, activebackground = self.bg_colour, fg = self.fg_colour, activeforeground = self.fg_colour, width = 16, height = 4, command = self.cycle)
-        self.frame = frame
-        self.frames = frames
+    def pack(self, frame: tk.Frame = None, frames: list[object] = None) -> None:
+        if self.frame == None:
+            self.frame = frame
+        
+        if self.frames == None:
+            self.frames = frames
+        
+        self.label = tk.Button(self.frame, text = self.name, font = self.font, bg = self.bg_colour, highlightbackground = self.bg_colour, activebackground = self.bg_colour, fg = self.fg_colour, activeforeground = self.fg_colour, width = 16, height = 4, command = self.cycle)
         self.label.pack(padx = 2, pady = 0, side = tk.LEFT, expand = False)
 
     @enforce_types
     def delete(self) -> None:
         self.forget()
+        self.role_boundary_reset()
         del self
 
     @enforce_types
@@ -99,6 +112,14 @@ class Role_Row:
         for icon_set in self.icons:
             icons.extend(icon_set)
         return icons
+    
+    @property
+    def icon_single(self) -> list[Role_Icon]:
+        output: list[Role_Icon] = []
+        for row in self.icons:
+            output += row
+
+        return output
 
     # -- Methods -- #
     @enforce_types

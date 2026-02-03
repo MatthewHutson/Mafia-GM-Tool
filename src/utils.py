@@ -44,7 +44,7 @@ def enforce_types(func: Callable) -> Callable:
 
                 # -- Protocols Are Meant To Take Many Forms -- #
                 for subclass in Protocol.__subclasses__():
-                    if hint == subclass:
+                    if hint == subclass or hint == Any:
                         break
                 else:
                     assert is_instance(value, hint), f"Argument {key} must be of type {hint} but {value=} of type={type(value)} provided"

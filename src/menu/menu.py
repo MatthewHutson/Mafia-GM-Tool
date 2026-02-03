@@ -58,29 +58,26 @@ def get_roles_by_players(role_load_priority: dict[int, list[list[Role]]], player
 
     globals()["role_adjust_boundaries"] = deepcopy(keys)
     
-    globals()["max_players"] = keys[-1]
+    globals()["max_players"] = len(list(role_load_priority.values())[-1])
     keys = iter(keys)
     
-    while key < player_count:
+    while key <= player_count and (key != role_adjust_boundaries[-1]):
         key = next(keys)
         
     return role_load_priority[key]
 
 @enforce_types
-def role_boundary_reset(players: list[Player_Select_Frame], roles: list[list[Role]], entries: Menu_Entry) -> None:
-    players_temp: list[str] = []
+def role_boundary_reset(roles: list[list[Role]]) -> None:
+    i = 0
+    for role_icon in role_row_frames.icon_list:
+        role_icon.re_init(roles[i])
+        i += 1
 
-    for player in players:
-        players_temp.append(player.name)
-    
-    for i in range(len(players)):
-        player = players[0]
-        player.delete()
-
-    for name in players_temp:
-        add_player(players, roles, entries, name, False)
-
-    del players_temp
+@enforce_types
+def role_boundary_reset_for_icons() -> None:
+    if len(players) - 1 in role_adjust_boundaries:
+        print(get_roles_by_players(role_player_dict, len(players) - 2)[-1])
+        role_boundary_reset(get_roles_by_players(role_player_dict, len(players) - 2))
 
 @enforce_types
 def add_player(players: list[Player_Select_Frame], roles: list[list[Role]], entries: Menu_Entry, name: str, role_adjust_flag: bool = True) -> None:
@@ -89,7 +86,6 @@ def add_player(players: list[Player_Select_Frame], roles: list[list[Role]], entr
             raise ValueError
         
         name_entry.delete(0, tk.END)
-
 
         if len(players) >= max_players: raise IndexError
         
@@ -101,9 +97,8 @@ def add_player(players: list[Player_Select_Frame], roles: list[list[Role]], entr
         players.append(player_frame)
 
         if len(players) in role_adjust_boundaries and role_adjust_flag:
-            role_boundary_reset(players, roles, entries)
-        else:
-            print(max_players, len(players))
+            role_boundary_reset(roles)
+
     except IndexError:
         messagebox.showwarning("Warning", "You Have Reached The Maximum Number of Players!")
     except NameError:
@@ -126,7 +121,7 @@ def add_player_from_entry(players: list[tk.Label], roles: list[list[Role]], entr
 
 @enforce_types
 def add_role_tile(player_count: int, roles: list[Role], entries: Menu_Entry) -> None:
-    role_icon = Role_Icon(roles[player_count], main_font, entries)
+    role_icon = Role_Icon(roles[player_count], main_font, entries, role_boundary_reset_for_icons)
     role_row_frames.add_item(role_icon)
 
 @enforce_types

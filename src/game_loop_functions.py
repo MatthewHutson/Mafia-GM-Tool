@@ -21,10 +21,10 @@ def ability_conditions(role: Role, has_recursed: bool) -> bool:
 def use_abilities(data: Game_Data, can_recurse: bool = True) -> None:
     for name, role in data.priority.items():
         if ability_conditions(role, can_recurse):
-            role.ability(name, data)
-
-            if not role.ability_cancel or not (can_recurse or "activate_again" in role.ability_type):
+            if not role.ability_cancel or not (can_recurse or "activate_again" in role.ability_type) and not role.recursion_fuck_up:
                 role.used_ability = True
+
+            role.ability(name, data)
 
     if can_recurse:
         use_abilities(data, False)
@@ -50,6 +50,7 @@ def remove_round_data(data: Game_Data) -> None:
             for i in range(len(role.targets)):
                 del role.targets[0]
 
+        role.recursion_fuck_up = False
         role.poisoned = False
         role.protected = False
         role.information = []
@@ -100,10 +101,12 @@ def revert_to_mafia(data: Game_Data) -> None:
 @enforce_types
 def role_switch(players: Players, player: str, new_role: Role) -> None:
     role = players[player]
+    information = role.information
     players[player] = deepcopy(new_role)
     players[player].linked = role.linked
     players[player].linked_to = role.linked_to
     players[player].linker = role.linker
+    players[player].information = information
 
 @enforce_types
 def use_vote_abiltities(data: Game_Data) -> None:

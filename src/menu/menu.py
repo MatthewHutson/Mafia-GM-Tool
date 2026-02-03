@@ -327,7 +327,8 @@ def selection_menu(data: Game_Data, user: str, target: str = "", can_recurse: bo
     if "recurse_targets" in role.ability_type and can_recurse and data.playing:
         for i in range(len(selected_players)):
             player = selected_players[i]
-            selection_menu(data, user, player, False)
+            if data.players[player].ability.targets > 0 and not data.players[user].recursion_fuck_up:
+                selection_menu(data, user, player, False)
 
 @enforce_types
 def voting_menu(data: Game_Data) -> str:

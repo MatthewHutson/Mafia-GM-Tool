@@ -30,6 +30,7 @@ class Role:
     was_voted_out: bool = False
     just_died: bool = False
     ability_cancel: bool = False # For "on_demand"
+    recursion_fuck_up: bool = False
 
     # -- Properties -- #
     @property

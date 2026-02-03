@@ -149,18 +149,19 @@ class Role_Row:
 
             
     @enforce_types
-    def remove_item(self, row: int, index: int) -> None:
+    def remove_item(self, row: int, index: int, reset: bool = True) -> None:
         icon = self.icons[row][index]
         del self.icons[row][index]
         icon.delete()
-        self.role_boundary_reset()
+        if reset:
+            self.role_boundary_reset()
 
     @enforce_types
     def remove_end_item(self) -> None:
         if len(self.icons[-1]) == 0:
             self.remove_end_row()
 
-        self.remove_item(-1, -1)
+        self.remove_item(-1, -1, False)
 
         if len(self.icons[-1]) == 0:
             self.remove_end_row()

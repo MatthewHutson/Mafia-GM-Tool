@@ -79,8 +79,9 @@ def execute(user: str, data: Game_Data) -> None:
 @add_attributes(targets = 1)
 @enforce_types
 def poison(user: str, data: Game_Data) -> None:
-    target: str = data.players[user].targets[0]
-    data.players[target].poisoned = True
+    if data.players[user].name != "Mafia":
+        target: str = data.players[user].targets[0]
+        data.players[target].poisoned = True
 
 @add_attributes(targets = 1)
 @enforce_types
@@ -91,13 +92,14 @@ def kill(user: str, data: Game_Data) -> None:
 @add_attributes(targets = 1)
 @enforce_types
 def telepathy(user: str, data: Game_Data) -> None:
-    target: str = data.players[user].targets[0]
-    role: Role = data.players[target]
-    is_lover: bool = role.linked
+    if data.players[user].name != "Mafia":
+        target: str = data.players[user].targets[0]
+        role: Role = data.players[target]
+        is_lover: bool = role.linked
 
-    data.players[user].information.append(f"{target} is {role.name}!")
-    if is_lover:
-        data.players[user].information.append(f"{target} is linked to another player!")
+        data.players[user].information.append(f"{target} is {role.name}!")
+        if is_lover:
+            data.players[user].information.append(f"{target} is linked to another player!")
 
 @add_attributes(targets = 1)
 @enforce_types
@@ -135,4 +137,25 @@ def channel(user: str, data: Game_Data) -> None:
     if len(data.players[user].targets) > 0:
         target = data.players[user].targets[0]
         del data.players[user].targets[0]
-        data.players[user].ability = data.players[target].ability
+
+        if not data.players[target].currently_alive and not data.players[user].recursion_fuck_up:
+            data.players[user].ability = data.players[target].ability
+
+            data.players[user].ability_type.remove("on_demand")
+            data.players[user].ability_type.remove("recurse_targets")
+            
+            for ability_type in data.players[target].ability_type:
+                if ability_type == "on_death":
+                    data.players[user].ability_type.append("on_death")
+                if ability_type == "on_vote":
+                    data.players[user].ability_type.append("on_vote")
+                if ability_type == "on_demand":
+                    data.players[user].ability_type.append("on_demand")
+                if ability_type == "recurse_targets":
+                    data.players[user].ability_type.append("recurse_targets")
+
+        else:
+            data.players[user].used_ability = False
+            data.players[user].targets = []
+            data.players[user].recursion_fuck_up = True
+            messagebox.showerror("Error", "The Necromancer Cannot Channel an ALive Player!\nThey Shall Regain Their Ability!")

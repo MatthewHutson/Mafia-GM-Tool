@@ -52,7 +52,7 @@ def enforce_types(func: Callable) -> Callable:
             except IndexError: pass  # -- Ignores The No Given Hint Case -- #
 
         result = func(*args, **kwargs) # -- Performs The Function Normally -- #
-        assert is_instance(result, return_hint), f"Argument {key} must be of type {return_hint} but {result=} of type={type(result)} provided" # -- Checks For Correct Output Type -- #
+        assert is_instance(result, return_hint), f"Return Value must be of type {return_hint} but {result=} of type={type(result)} provided" # -- Checks For Correct Output Type -- #
         return result
     
     return wrapper # -- Sends The Checking Function -- #

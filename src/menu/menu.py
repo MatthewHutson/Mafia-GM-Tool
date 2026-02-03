@@ -5,15 +5,19 @@ from tkinter import messagebox
 from copy import deepcopy
 import tkinter as tk
 import sys
+import json
 
 # -- Setup Global Variables -- #
 root: tk.Tk = tk.Tk()
 
 MIN_PLAYERS: int = 4
+max_players: int = 4
 
-bg_2 = "#d3d3d3"
+bg_2: str = "#d3d3d3"
 
 players: list[Player_Select_Frame] = []
+role_player_dict: dict[int, list[list[Role]]] = {}
+role_adjust_boundaries: int = []
 
 player_margin = tk.Frame(root)
 player_tab = tk.Frame(player_margin, bg = bg_2)
@@ -26,7 +30,7 @@ settings_frame = tk.Frame(root)
 role_frame = tk.Frame(root, bg = bg_2)
 role_row_frames = Role_Row(role_frame)
 
-main_font = ("Airial", 10)
+main_font: tuple[str, int] = ("Airial", 10)
 
 # -- Game Menu Global Vars -- #
 alive_margin = None
@@ -37,21 +41,69 @@ selected_players = []
 
 # -- Functions -- #
 @enforce_types
-def add_player(players: list[tk.Label], roles: list[list[Role]], entries: Menu_Entry, name: str, max_players: int) -> None:
+def new_load_system() -> None:
+    role_load_priority: dict[int, list[list[Role]]] = {}
+
+    with open("load_priority.json", 'r') as file:
+        data: dict = json.load(file)
+        for key, value in data.items():
+            role_load_priority[int(key)] = value
+
+    globals()["role_player_dict"] = role_load_priority
+
+@enforce_types
+def get_roles_by_players(role_load_priority: dict[int, list[list[Role]]], player_count: int) -> list[list[Role]]:
+    key = 4
+    keys = list(role_load_priority.keys())
+
+    globals()["role_adjust_boundaries"] = deepcopy(keys)
+    
+    globals()["max_players"] = keys[-1]
+    keys = iter(keys)
+    
+    while key < player_count:
+        key = next(keys)
+        
+    return role_load_priority[key]
+
+@enforce_types
+def role_boundary_reset(players: list[Player_Select_Frame], roles: list[list[Role]], entries: Menu_Entry) -> None:
+    players_temp: list[str] = []
+
+    for player in players:
+        players_temp.append(player.name)
+    
+    for i in range(len(players)):
+        player = players[0]
+        player.delete()
+
+    for name in players_temp:
+        add_player(players, roles, entries, name, False)
+
+    del players_temp
+
+@enforce_types
+def add_player(players: list[Player_Select_Frame], roles: list[list[Role]], entries: Menu_Entry, name: str, role_adjust_flag: bool = True) -> None:
     try:
-        if not name:    raise ValueError
+        if not name:
+            raise ValueError
         
         name_entry.delete(0, tk.END)
+
 
         if len(players) >= max_players: raise IndexError
         
         for frame in players:
             if frame == capitalise_words(name): raise NameError
-        
+
         add_role_tile(len(players), roles, entries)
         player_frame = Player_Select_Frame(name, player_tab, main_font, players, role_row_frames)
         players.append(player_frame)
 
+        if len(players) in role_adjust_boundaries and role_adjust_flag:
+            role_boundary_reset(players, roles, entries)
+        else:
+            print(max_players, len(players))
     except IndexError:
         messagebox.showwarning("Warning", "You Have Reached The Maximum Number of Players!")
     except NameError:
@@ -65,12 +117,12 @@ def add_defaults(players: list[tk.Label], roles: list[list[Role]], entries: Menu
         players[0].delete()
 
     for name in default_names:
-        add_player(players, roles, entries, name, max_players)
+        add_player(players, roles, entries, name)
 
 @enforce_types
 def add_player_from_entry(players: list[tk.Label], roles: list[list[Role]], entries: Menu_Entry, max_players: int) -> None:
     user_input: str = name_entry.get().strip()
-    add_player(players, roles, entries, user_input, max_players)
+    add_player(players, roles, entries, user_input)
 
 @enforce_types
 def add_role_tile(player_count: int, roles: list[Role], entries: Menu_Entry) -> None:
@@ -152,11 +204,14 @@ def terminate() -> None:
 
 # -- Setup Menu -- #
 @enforce_types
-def setup_menu(entries: Menu_Entry, all_roles: list[list[Role]], default_names: list[str], max_players: int) -> None:
+def setup_menu(entries: Menu_Entry, default_names: list[str]) -> None:
+    # -- File Handling -- #
+    new_load_system()
+
     # -- Specific Functions --  #
     @enforce_types
     def add_enter_press(event) -> None:
-        add_player_from_entry(players, all_roles, entries, max_players)
+        add_player_from_entry(players, get_roles_by_players(role_player_dict, len(players)), entries, max_players)
         
     # -- Menu -- #
     clear(root)
@@ -167,8 +222,8 @@ def setup_menu(entries: Menu_Entry, all_roles: list[list[Role]], default_names: 
 
     # -- Add Player Input -- #
     tk.Label(input_frame, text = "Name:").pack(side = tk.LEFT, padx = 8, pady = 8)
-    tk.Button(input_frame, text = "Defaults", command = lambda: add_defaults(players, all_roles, entries, default_names, max_players), bg = "#5D9FF0", highlightbackground = "#4980C4", activebackground = "#4980C4", fg = "#ffffff", activeforeground = "#ffffff").pack(side = tk.RIGHT, padx = 8, pady = 8)
-    tk.Button(input_frame, text = "Add", command = lambda: add_player_from_entry(players, all_roles, entries, max_players), bg = "#00ff00", highlightbackground = "#00cd00", activebackground = "#00aa00").pack(side = tk.RIGHT, padx = 8, pady = 8)
+    tk.Button(input_frame, text = "Defaults", command = lambda: add_defaults(players, get_roles_by_players(role_player_dict, len(players)), entries, default_names, max_players), bg = "#5D9FF0", highlightbackground = "#4980C4", activebackground = "#4980C4", fg = "#ffffff", activeforeground = "#ffffff").pack(side = tk.RIGHT, padx = 8, pady = 8)
+    tk.Button(input_frame, text = "Add", command = lambda: add_player_from_entry(players, get_roles_by_players(role_player_dict, len(players)), entries, max_players), bg = "#00ff00", highlightbackground = "#00cd00", activebackground = "#00aa00").pack(side = tk.RIGHT, padx = 8, pady = 8)
     name_entry.pack(fill = "x", padx = 8, pady = 8, ipady = 12)
     name_entry.bind("<Return>", add_enter_press)
     input_frame.pack_propagate(False)

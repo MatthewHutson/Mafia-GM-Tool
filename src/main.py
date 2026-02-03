@@ -34,7 +34,6 @@ def main() -> None:
 
     # -- File Handling -- #
     path: str = "Roles"
-    roles_load_priority: list[list[Role]] = []
 
     for item in os.listdir(path):
         with open(path + "/" + item, 'r') as file:
@@ -44,11 +43,6 @@ def main() -> None:
             del data["alignment"]
             roles[data["name"]] = Role(**data, targets = [], information = [], visited_by = [])
 
-    with open("load_priority.json", 'r') as file:
-        data: dict = json.load(file)
-        for value in data.values():
-            roles_load_priority.append(value)
-
     with open("defaults.txt") as file:
         string_data: str = file.readline()
         name_data: list[str] = string_data.split(", ")
@@ -56,7 +50,7 @@ def main() -> None:
     entries = Menu_Entry([], list(roles.values()))
 
     # -- Menu -- #
-    setup_menu(entries, roles_load_priority, name_data, len(roles_load_priority))
+    setup_menu(entries, name_data)
 
     # -- Player Organisation -- #
     game_data = Game_Data(Players(entries.assign_roles()), deepcopy(roles["Mafia"]), deepcopy(roles["Villager"]))

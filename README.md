@@ -2,8 +2,7 @@
 A Program to allocate roles in a game of mafia
 
 # Changes
-Simplified implementation of new Role Selection System
-Bug Fixes
+Fixed the new Role System Thus Far
 
 # To Do
 Add All Other Roles

@@ -50,19 +50,25 @@ def new_load_system() -> None:
             role_load_priority[int(key)] = value
 
     globals()["role_player_dict"] = role_load_priority
+    globals()["max_players"] = len(list(role_load_priority.values())[-1])
+    globals()["role_adjust_boundaries"] = list(role_load_priority.keys())
 
 @enforce_types
-def get_roles_by_players(role_load_priority: dict[int, list[list[Role]]], player_count: int) -> list[list[Role]]:
-    key = 4
+def get_roles_by_players(role_load_priority: dict[int, list[list[Role]]], ascending: bool = True) -> list[list[Role]]:
     keys = list(role_load_priority.keys())
+    offset = int(ascending)
 
-    globals()["role_adjust_boundaries"] = deepcopy(keys)
-    
-    globals()["max_players"] = len(list(role_load_priority.values())[-1])
-    keys = iter(keys)
-    
-    while key <= player_count and (key != role_adjust_boundaries[-1]):
-        key = next(keys)
+    for i in range(0, len(keys)):
+        key = keys[i]
+
+        if key > len(players) + offset:
+            if i >= 1:
+                key = keys[i - 1]
+            else:
+                key = 4
+            break
+        elif key == len(players) + offset:
+            break
         
     return role_load_priority[key]
 
@@ -75,9 +81,7 @@ def role_boundary_reset(roles: list[list[Role]]) -> None:
 
 @enforce_types
 def role_boundary_reset_for_icons() -> None:
-    if len(players) - 1 in role_adjust_boundaries:
-        print(get_roles_by_players(role_player_dict, len(players) - 2)[-1])
-        role_boundary_reset(get_roles_by_players(role_player_dict, len(players) - 2))
+    role_boundary_reset(get_roles_by_players(role_player_dict, False))
 
 @enforce_types
 def add_player(players: list[Player_Select_Frame], roles: list[list[Role]], entries: Menu_Entry, name: str, role_adjust_flag: bool = True) -> None:
@@ -107,7 +111,7 @@ def add_player(players: list[Player_Select_Frame], roles: list[list[Role]], entr
         pass
 
 @enforce_types
-def add_defaults(players: list[tk.Label], roles: list[list[Role]], entries: Menu_Entry, default_names: list[str], max_players: int) -> None:
+def add_defaults(players: list[tk.Label], roles: list[list[Role]], entries: Menu_Entry, default_names: list[str]) -> None:
     for i in range(len(players)):
         players[0].delete()
 
@@ -121,7 +125,7 @@ def add_player_from_entry(players: list[tk.Label], roles: list[list[Role]], entr
 
 @enforce_types
 def add_role_tile(player_count: int, roles: list[Role], entries: Menu_Entry) -> None:
-    role_icon = Role_Icon(roles[player_count], main_font, entries, role_boundary_reset_for_icons)
+    role_icon = Role_Icon(roles[player_count], main_font, entries)
     role_row_frames.add_item(role_icon)
 
 @enforce_types
@@ -202,11 +206,12 @@ def terminate() -> None:
 def setup_menu(entries: Menu_Entry, default_names: list[str]) -> None:
     # -- File Handling -- #
     new_load_system()
+    role_row_frames.get_role_reset_function(role_boundary_reset_for_icons)
 
     # -- Specific Functions --  #
     @enforce_types
     def add_enter_press(event) -> None:
-        add_player_from_entry(players, get_roles_by_players(role_player_dict, len(players)), entries, max_players)
+        add_player_from_entry(players, get_roles_by_players(role_player_dict), entries, max_players)
         
     # -- Menu -- #
     clear(root)
@@ -217,8 +222,8 @@ def setup_menu(entries: Menu_Entry, default_names: list[str]) -> None:
 
     # -- Add Player Input -- #
     tk.Label(input_frame, text = "Name:").pack(side = tk.LEFT, padx = 8, pady = 8)
-    tk.Button(input_frame, text = "Defaults", command = lambda: add_defaults(players, get_roles_by_players(role_player_dict, len(players)), entries, default_names, max_players), bg = "#5D9FF0", highlightbackground = "#4980C4", activebackground = "#4980C4", fg = "#ffffff", activeforeground = "#ffffff").pack(side = tk.RIGHT, padx = 8, pady = 8)
-    tk.Button(input_frame, text = "Add", command = lambda: add_player_from_entry(players, get_roles_by_players(role_player_dict, len(players)), entries, max_players), bg = "#00ff00", highlightbackground = "#00cd00", activebackground = "#00aa00").pack(side = tk.RIGHT, padx = 8, pady = 8)
+    tk.Button(input_frame, text = "Defaults", command = lambda: add_defaults(players, list(role_player_dict.values())[-1], entries, default_names), bg = "#5D9FF0", highlightbackground = "#4980C4", activebackground = "#4980C4", fg = "#ffffff", activeforeground = "#ffffff").pack(side = tk.RIGHT, padx = 8, pady = 8)
+    tk.Button(input_frame, text = "Add", command = lambda: add_player_from_entry(players, get_roles_by_players(role_player_dict), entries, max_players), bg = "#00ff00", highlightbackground = "#00cd00", activebackground = "#00aa00").pack(side = tk.RIGHT, padx = 8, pady = 8)
     name_entry.pack(fill = "x", padx = 8, pady = 8, ipady = 12)
     name_entry.bind("<Return>", add_enter_press)
     input_frame.pack_propagate(False)

@@ -9,12 +9,11 @@ from tkinter import messagebox
 class Role_Icon:
     # -- Constructors -- #
     @enforce_types
-    def __init__(self, roles: list[str], main_font: tuple[str, int], entries: Menu_Entry, role_boundary_reset: Any) -> None:
+    def __init__(self, roles: list[str], main_font: tuple[str, int], entries: Menu_Entry) -> None:
         self.roles = [entries.role_dict[role] for role in roles]
         self.index = 0
         self.font = main_font
         self.entries = entries
-        self.role_boundary_reset: Callable = role_boundary_reset
         self.label = None
         self.frame = None
         self.frames = None
@@ -77,7 +76,6 @@ class Role_Icon:
     @enforce_types
     def delete(self) -> None:
         self.forget()
-        self.role_boundary_reset()
         del self
 
     @enforce_types
@@ -123,6 +121,10 @@ class Role_Row:
 
     # -- Methods -- #
     @enforce_types
+    def get_role_reset_function(self, role_boundary_reset: Any) -> None:
+        self.role_boundary_reset: Callable = role_boundary_reset
+
+    @enforce_types
     def add_row(self) -> None:
         self.frames.append(tk.Frame(self.master_frame, bg = "#d3d3d3"))
         self.icons.append([])
@@ -151,6 +153,7 @@ class Role_Row:
         icon = self.icons[row][index]
         del self.icons[row][index]
         icon.delete()
+        self.role_boundary_reset()
 
     @enforce_types
     def remove_end_item(self) -> None:
@@ -221,8 +224,8 @@ class Player_Select_Frame(Player_Frame):
     @enforce_types
     def delete(self) -> None:
         self.frame.pack_forget()
-        self.icon_frame.remove_end_item()
         self.players.remove(self)
+        self.icon_frame.remove_end_item()
         del self
 
 class Player_Role_Frame(Player_Frame):

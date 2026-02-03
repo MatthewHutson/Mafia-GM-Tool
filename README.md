@@ -2,7 +2,7 @@
 A Program to allocate roles in a game of mafia
 
 # Changes
-Fixed Major Bugs involving Loading, Psychic and Necromancer
+Bug Fixes
 
 # To Do
 Add All Other Roles

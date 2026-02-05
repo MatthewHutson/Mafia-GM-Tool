@@ -17,13 +17,17 @@ def selection_coindition(data: Game_Data, role: Role, name: str) -> bool:
 
     universal_conditions = singular and targets and data.playing
     use_ability = True
+    dead_targets = True 
 
-    if "on_demand" in role.ability_type and universal_conditions:
+    if not role.ability.target_living and len(data.dead_players) == 0:
+        dead_targets = False
+
+    if "on_demand" in role.ability_type and universal_conditions and dead_targets:
         sleep(1)
         use_ability = messagebox.askyesno("Ability", f"Does {name}, the {role.name} want to use their ability ({role.ability.__name__})?")
         role.ability_cancel = not use_ability
 
-    return universal_conditions and use_ability
+    return universal_conditions and use_ability and dead_targets
 
 # -- Main -- #
 @enforce_types
@@ -99,10 +103,13 @@ def main() -> None:
 
     for name, role in game_data.players.items():
         if role.solo_win:
-            winners.append(f"{name} as {role.name}")
+            if role.channeled_role == None:
+                winners.append(f"\n{name} as the {role.name}")
+            else:
+                winners.append(f"\n{name} as the {role.name} chanelling the {role.channeled_role}")
 
-    if game_data.good_win: winners.append("The Good Team!")
-    if game_data.evil_win: winners.append("The Evil Team!")
+    if game_data.good_win: winners.append("\nThe Good Team!")
+    if game_data.evil_win: winners.append("\nThe Evil Team!")
 
     show_victory(winners)
     

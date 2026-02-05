@@ -21,7 +21,7 @@ class Role_Icon:
     @enforce_types
     def re_init(self, roles: list[str]) -> None:
         self.roles = [self.entries.role_dict[role] for role in roles]
-        self.index = len(self.roles)
+        self.index = len(self.roles) - 1
         self.cycle()
 
     # -- Property -- #

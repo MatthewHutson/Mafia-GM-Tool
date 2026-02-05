@@ -4,17 +4,17 @@ from classes_and_types import Role, Game_Data
 from game_loop_functions import *
 
 # -- Roles -- #
-@add_attributes(targets = 0)
+@add_attributes(targets = 0, target_living = True)
 @enforce_types
 def none(user: str, data: Game_Data) -> None:
     pass
 
-@add_attributes(targets = 1)
+@add_attributes(targets = 1, target_living = True)
 @enforce_types
 def vote(user: str, data: Game_Data) -> None:
     pass
 
-@add_attributes(targets = 1)
+@add_attributes(targets = 1, target_living = True)
 @enforce_types
 def reveal(user: str, data: Game_Data) -> None:
     target: str = data.players[user].targets[0]
@@ -23,18 +23,18 @@ def reveal(user: str, data: Game_Data) -> None:
     if alignment: data.players[user].information.append(f"{target} is GOOD!")
     else: data.players[user].information.append(f"{target} is EVIL!")
 
-@add_attributes(targets = 0)
+@add_attributes(targets = 0, target_living = True)
 @enforce_types
 def endure(user: str, data: Game_Data) -> None:
     if not data.players[user].poisoned: data.players[user].protected = True
 
-@add_attributes(targets = 1)
+@add_attributes(targets = 1, target_living = True)
 @enforce_types
 def protect(user: str, data: Game_Data) -> None:
     target: str = data.players[user].targets[0]
     if not data.players[user].poisoned: data.players[target].protected = True
 
-@add_attributes(targets = 2)
+@add_attributes(targets = 2, target_living = True)
 @enforce_types
 def link(user: str, data: Game_Data) -> None:
     link_1: str = data.players[user].targets[0]
@@ -49,13 +49,13 @@ def link(user: str, data: Game_Data) -> None:
     data.players[link_1].linked_to = link_2
     data.players[link_2].linked_to = link_1
 
-@add_attributes(targets = 0)
+@add_attributes(targets = 0, target_living = True)
 @enforce_types
 def Jester(user: str, data: Game_Data) -> None:
     if data.players[user].was_voted_out: 
         data.players[user].solo_win = True
 
-@add_attributes(targets = 1)
+@add_attributes(targets = 1, target_living = True)
 @enforce_types
 def stop_vote(user: str, data: Game_Data) -> None: 
     if not data.players[user].solo_win:
@@ -66,7 +66,7 @@ def stop_vote(user: str, data: Game_Data) -> None:
         if not data.players[data.players[user].targets[0]].currently_alive and data.players[user].solo_win:
             role_switch(data.players, user, Role("Villager", none, True, False, 999, 999, "passive", [], [], []))
 
-@add_attributes(targets = 1)
+@add_attributes(targets = 1, target_living = True)
 @enforce_types
 def execute(user: str, data: Game_Data) -> None:
     if not data.players[user].solo_win:
@@ -76,20 +76,20 @@ def execute(user: str, data: Game_Data) -> None:
         if not (data.players[data.players[user].targets[0]].currently_alive or data.players[user].solo_win):
             role_switch(data.players, user, Role("Villager", none, True, False, 999, 999, "passive", [], [], []))
 
-@add_attributes(targets = 1)
+@add_attributes(targets = 1, target_living = True)
 @enforce_types
 def poison(user: str, data: Game_Data) -> None:
     if data.players[user].name != "Mafia":
         target: str = data.players[user].targets[0]
         data.players[target].poisoned = True
 
-@add_attributes(targets = 1)
+@add_attributes(targets = 1, target_living = True)
 @enforce_types
 def kill(user: str, data: Game_Data) -> None:
     target: str = data.players[user].targets[0]
     data.players[target].die(data.players)
 
-@add_attributes(targets = 1)
+@add_attributes(targets = 1, target_living = True)
 @enforce_types
 def telepathy(user: str, data: Game_Data) -> None:
     if data.players[user].name != "Mafia":
@@ -101,7 +101,7 @@ def telepathy(user: str, data: Game_Data) -> None:
         if is_lover:
             data.players[user].information.append(f"{target} is linked to another player!")
 
-@add_attributes(targets = 1)
+@add_attributes(targets = 1, target_living = True)
 @enforce_types
 def stalk(user: str, data: Game_Data) -> None:
     if not data.players[user].poisoned:
@@ -117,7 +117,7 @@ def stalk(user: str, data: Game_Data) -> None:
 
         data.players[user].information.append(target_str)
 
-@add_attributes(targets = 0)
+@add_attributes(targets = 0, target_living = True)
 @enforce_types
 def vengance(user: str, data: Game_Data) -> None:
     if not data.players[user].was_voted_out:
@@ -131,7 +131,7 @@ def vengance(user: str, data: Game_Data) -> None:
 
     data.players[user].ability.targets = 0
 
-@add_attributes(targets = 1)
+@add_attributes(targets = 1, target_living = False)
 @enforce_types
 def channel(user: str, data: Game_Data) -> None:
     if len(data.players[user].targets) > 0:
@@ -140,6 +140,7 @@ def channel(user: str, data: Game_Data) -> None:
 
         if not data.players[target].currently_alive and not data.players[user].recursion_fuck_up:
             data.players[user].ability = data.players[target].ability
+            data.players[user].channeled_role = data.players[target].name
 
             data.players[user].ability_type.remove("on_demand")
             data.players[user].ability_type.remove("recurse_targets")

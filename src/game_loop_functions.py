@@ -65,7 +65,7 @@ def select_player(user: str, players: Players) -> None: # -- Outdated To Be Repl
 
 @enforce_types
 def show_victory(victory_data: list[str]) -> None:
-    victory_str = "Winners: "
+    victory_str = "Winners:\n"
     for item in victory_data:
         victory_str += item + ", "
 
@@ -96,13 +96,15 @@ def revert_to_mafia(data: Game_Data) -> None:
     if not mafia_alive:
         next_evil_player = data.next_evil_player
         if next_evil_player != None:
-            role_switch(data.players, next_evil_player, data.mafia_role)
+            role_switch(data, next_evil_player, data.mafia_role)
 
 @enforce_types
-def role_switch(players: Players, player: str, new_role: Role) -> None:
+def role_switch(data: Game_Data, player: str, new_role: Role) -> None:
+    players = data.players
     role = players[player]
     information = role.information
     players[player] = deepcopy(new_role)
+    data.priority[player] = players[player]
     players[player].linked = role.linked
     players[player].linked_to = role.linked_to
     players[player].linker = role.linker

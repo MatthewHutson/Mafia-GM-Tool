@@ -31,6 +31,7 @@ class Role:
     just_died: bool = False
     ability_cancel: bool = False # For "on_demand"
     recursion_fuck_up: bool = False
+    channeled_role: str = None
 
     # -- Properties -- #
     @property
@@ -161,7 +162,7 @@ class Game_Data():
             else:
                 return self.next_evil_player
         except: 
-            pass
+            return None
 
     # -- Methods -- #
     def init(self, vote_function: Callable) -> None:

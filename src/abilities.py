@@ -64,7 +64,7 @@ def stop_vote(user: str, data: Game_Data) -> None:
             data.players[user].solo_win = False
 
         if not data.players[data.players[user].targets[0]].currently_alive and data.players[user].solo_win:
-            role_switch(data.players, user, Role("Villager", none, True, False, 999, 999, "passive", [], [], []))
+            role_switch(data, user, Role("Villager", none, True, False, 999, 999, "passive", [], [], []))
 
 @add_attributes(targets = 1, target_living = True)
 @enforce_types
@@ -74,7 +74,7 @@ def execute(user: str, data: Game_Data) -> None:
             data.players[user].solo_win = True
 
         if not (data.players[data.players[user].targets[0]].currently_alive or data.players[user].solo_win):
-            role_switch(data.players, user, Role("Villager", none, True, False, 999, 999, "passive", [], [], []))
+            role_switch(data, user, Role("Villager", none, True, False, 999, 999, "passive", [], [], []))
 
 @add_attributes(targets = 1, target_living = True)
 @enforce_types
@@ -160,3 +160,21 @@ def channel(user: str, data: Game_Data) -> None:
             data.players[user].targets = []
             data.players[user].recursion_fuck_up = True
             messagebox.showerror("Error", "The Necromancer Cannot Channel an ALive Player!\nThey Shall Regain Their Ability!")
+
+@add_attributes(targets = 1, target_living = True)
+@enforce_types
+def ambush(user: str, data: Game_Data) -> None:
+    target = data.players[user].targets[0]
+    try:
+        new_target = data.players[target].visited_by[0]
+        bystanders = deepcopy(data.players[target].visited_by[1:])
+
+        bystanders.remove(user)
+
+        data.players[user].targets = [new_target]
+        kill(user, data)
+
+        for player in bystanders:
+            data.players[player].information.append(f"{user} attempted to ambush {new_target}!")
+    except:
+        pass

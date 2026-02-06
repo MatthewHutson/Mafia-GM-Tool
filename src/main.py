@@ -99,14 +99,28 @@ def main() -> None:
 
         check_for_victory(game_data)
 
+    for name, role in game_data.players.items():
+        if "game_end" in role.ability_type:
+            role.ability(name, game_data)
+
     winners = []
 
     for name, role in game_data.players.items():
         if role.solo_win:
-            if role.channeled_role == None:
-                winners.append(f"\n{name} as the {role.name}")
+            if not role.team_win_condition:
+                if role.channeled_role == None:
+                    winners.append(f"\n{name} as the {role.name}")
+                else:
+                    winners.append(f"\n{name} as the {role.name} chanelling the {role.channeled_role}")
             else:
-                winners.append(f"\n{name} as the {role.name} chanelling the {role.channeled_role}")
+                # -- For Mayor -- #
+                if role.currently_alive:
+                    if role.alignment:
+                        game_data.good_win = True
+                        game_data.evil_win = False
+                    else:
+                        game_data.good_win = False
+                        game_data.evil_win = True
 
     if game_data.good_win: winners.append("\nThe Good Team!")
     if game_data.evil_win: winners.append("\nThe Evil Team!")

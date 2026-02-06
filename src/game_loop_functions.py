@@ -78,14 +78,20 @@ def show_victory(victory_data: list[str]) -> None:
 
 @enforce_types
 def check_for_victory(data: Game_Data) -> None:
-    # -- Checks For Win Conditions -- #
-        if len(data.evil_aligned) == 0:
-            data.playing = False
-            data.good_win = True
+    min_players: int = 2
 
-        if (len(data.evil_aligned) == 1 and len(data.good_aligned) == 1) or len(data.evil_aligned) > len(data.good_aligned):
-            data.playing = False
-            data.evil_win = True
+    for role in data.alive_players.values():
+        if role.alternative_end_count > min_players:
+            min_players = role.alternative_end_count  
+
+    # -- Checks For Win Conditions -- #
+    if len(data.evil_aligned) == 0 or (len(data.alive_players) <= min_players and min_players > 2):
+        data.playing = False
+        data.good_win = True
+    elif (len(data.alive_players) == 2) or len(data.evil_aligned) > len(data.good_aligned):
+        data.playing = False
+        data.evil_win = True
+            
 
 @enforce_types
 def revert_to_mafia(data: Game_Data) -> None:

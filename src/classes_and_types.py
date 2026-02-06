@@ -14,7 +14,7 @@ class Role:
     mafia_alternative: bool # Switches to Mafia Abiltity When All Normal Mafia Dies #
     priority: int # Order of Execution of Abilities From Lowest To Highest #
     max_count: int
-    ability_type: list[str] # Can contain "singular", "passive", "repeat", "on death", "on vote", "on_demand", "recurse_targets" and "activate_again" #
+    ability_type: list[str] # Can contain "singular", "passive", "repeat", "on death", "on vote", "on_demand", "recurse_targets", "activate_again", "game_end" #
     targets: list[object]
     information: list[str]
     visited_by: list[str]
@@ -32,7 +32,9 @@ class Role:
     ability_cancel: bool = False # For "on_demand"
     recursion_fuck_up: bool = False
     channeled_role: str = None
-
+    team_win_condition: bool = False
+    alternative_end_count: int = 0
+    
     # -- Properties -- #
     @property
     @enforce_types

@@ -1,0 +1,11 @@
+{
+    "name": "Mayor",
+    "ability": "mayor",
+    "alignment": true,
+    "mafia_alternative": false,
+    "priority": 10,
+    "max_count": 10,
+    "ability_type": ["passive", "game_end"],
+    "alternative_end_count": 3,
+    "team_win_condition": true
+}

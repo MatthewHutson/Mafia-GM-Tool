@@ -2,8 +2,9 @@
 A Program to allocate roles in a game of mafia
 
 # Changes
-Added Ambusher 
+Added the Mayor
 Bug Fixes
+Simplifications For GM
 
 # To Do
 Add All Other Roles

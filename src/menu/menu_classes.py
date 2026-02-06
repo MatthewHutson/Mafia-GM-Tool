@@ -240,6 +240,7 @@ class Player_Role_Frame(Player_Frame):
         self.number_of_targets = selected_role.ability.targets
         self.selected_role_name = selected_role.name
         self.selected = False
+        self.current_role_icon = None
 
         # -- Role Colours -- #
         self.role_fg = "#000000"
@@ -253,19 +254,23 @@ class Player_Role_Frame(Player_Frame):
             self.role_fg = "#ffffff"
 
         # -- Linked Icons -- #
-        self.linked_bg = "#d1d1d1"
+        self.linked_bg = "#ddb3dd"
         self.linked_fg = "#000000"
-        self.linked_text = "Single"
 
         if self.role.linked:
             self.linked_bg = "#f94af9"
             self.linked_fg = "#ffffff"
-            self.linked_text = "Soulbound"
+
+        # -- Solo Win Icons -- #
+        if self.role.solo_win:
+            self.solo_win_bg = "#48f748"
+        else:
+            self.solo_win_bg = "#d1d1d1"
 
         # -- Extra Icons -- #
-        self.role_icon
-        self.linked_icon = tk.Button(self.frame, text = self.linked_text, bg = self.linked_bg, activebackground = self.linked_bg, fg = self.linked_fg, activeforeground = self.linked_fg, width = 8, height = 4)
-        self.select_icon = tk.Button(self.frame, text = "Select", bg = "#5D9FF0", activebackground = "#4980C4", fg = "#FFFFFF", activeforeground = "#FFFFFF", width = 8, height = 4, command = self.select)
+        self.linked_icon = tk.Button(self.frame, text = "", bg = self.linked_bg, activebackground = self.linked_bg, fg = self.linked_fg, activeforeground = self.linked_fg, width = 2, height = 2)
+        self.solo_win_icon = tk.Button(self.frame, text = "", bg = self.solo_win_bg, activebackground = self.solo_win_bg, fg = "#000000", activeforeground = "#000000", width = 2, height = 2)
+        self.select_icon = tk.Button(self.frame, text = "Select", bg = "#5D9FF0", activebackground = "#4980C4", fg = "#FFFFFF", activeforeground = "#FFFFFF", width = 6, height = 4, command = self.select)
 
         self.pack()
 
@@ -279,7 +284,8 @@ class Player_Role_Frame(Player_Frame):
         
     @property
     def role_icon(self) -> tk.Button:
-        return tk.Button(self.frame, text = self.role.name, bg = self.role_bg, activebackground = self.role_bg, fg = self.role_fg, activeforeground = self.role_fg, width = 8, height = 4)
+        self.current_role_icon = tk.Button(self.frame, text = self.role.name, bg = self.role_bg, activebackground = self.role_bg, fg = self.role_fg, activeforeground = self.role_fg, width = 10, height = 4)
+        return self.current_role_icon
 
     @property
     def role(self) -> Role:
@@ -294,9 +300,17 @@ class Player_Role_Frame(Player_Frame):
     @enforce_types
     def pack(self) -> None:
         self.role_icon.pack(side = tk.RIGHT, padx = 2, expand = False)
-        self.linked_icon.pack(side = tk.RIGHT, padx = 2, expand = False)
         self.select_icon.pack(side = tk.RIGHT, padx = 2, expand = False)
+        self.linked_icon.pack(side = tk.RIGHT, padx = 2, pady = 4, expand = False)
+        self.solo_win_icon.pack(side = tk.RIGHT, padx = 2, pady = 4, expand = False)
         super().pack()
+
+    @enforce_types
+    def forget(self) -> None:
+        self.current_role_icon.pack_forget()
+        self.select_icon.pack_forget()
+        self.linked_icon.pack_forget()
+        self.solo_win_icon.pack_forget()
 
     @enforce_types
     def select(self) -> None:
@@ -311,9 +325,9 @@ class Player_Role_Frame(Player_Frame):
         elif len(self.selected_players) >= self.number_of_targets:
             messagebox.showwarning("Warning", f"{self.selected_role_name} can only select {self.number_of_targets} target{"s" if self.number_of_targets > 1 else ""}!")
         
-        self.select_icon.pack_forget()
-        self.select_icon = tk.Button(self.frame, text = "Select", bg = self.selected_bg, activebackground = "#4980C4", fg = "#FFFFFF", activeforeground = "#FFFFFF", width = 8, height = 4, command = self.select)
-        self.select_icon.pack(side = tk.RIGHT, padx = 2, expand = False)
+        self.forget()
+        self.select_icon = tk.Button(self.frame, text = "Select", bg = self.selected_bg, activebackground = "#4980C4", fg = "#FFFFFF", activeforeground = "#FFFFFF", width = 6, height = 4, command = self.select)
+        self.pack()
 
 # -- Protocols -- #
 class Has_Widget_Children(Protocol):

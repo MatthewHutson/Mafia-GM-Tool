@@ -111,7 +111,12 @@ def add_player(players: list[Player_Select_Frame], roles: list[list[Role]], entr
         pass
 
 @enforce_types
-def add_defaults(players: list[tk.Label], roles: list[list[Role]], entries: Menu_Entry, default_names: list[str]) -> None:
+def get_roles_by_defaults(role_load_priority: dict[int, list[list[Role]]], default_names: list[str]) -> list[list[Role]]:
+    return role_load_priority[len(default_names)]
+
+@enforce_types
+def add_defaults(players: list[tk.Label], role_load_priority: dict[int, list[list[Role]]], entries: Menu_Entry, default_names: list[str]) -> None:
+    roles = get_roles_by_defaults(role_load_priority, default_names)
     for i in range(len(players)):
         players[0].delete()
 
@@ -231,13 +236,13 @@ def setup_menu(entries: Menu_Entry, default_names: list[str]) -> None:
     # -- Menu -- #
     clear(root)
     root.resizable(False, False)
-    root.geometry("1024x512")
+    root.geometry("1152x512")
     root.title("Mafia Game")
     tk.Label(root, text = "Player Selection", font = ("Airial", 16), bg = bg_2).pack(side = tk.TOP, fill = "x", pady = 4)
 
     # -- Add Player Input -- #
     tk.Label(input_frame, text = "Name:").pack(side = tk.LEFT, padx = 8, pady = 8)
-    tk.Button(input_frame, text = "Defaults", command = lambda: add_defaults(players, list(role_player_dict.values())[-1], entries, default_names), bg = "#5D9FF0", highlightbackground = "#4980C4", activebackground = "#4980C4", fg = "#ffffff", activeforeground = "#ffffff").pack(side = tk.RIGHT, padx = 8, pady = 8)
+    tk.Button(input_frame, text = "Defaults", command = lambda: add_defaults(players, role_player_dict, entries, default_names), bg = "#5D9FF0", highlightbackground = "#4980C4", activebackground = "#4980C4", fg = "#ffffff", activeforeground = "#ffffff").pack(side = tk.RIGHT, padx = 8, pady = 8)
     tk.Button(input_frame, text = "Add", command = lambda: add_player_from_entry(players, get_roles_by_players(role_player_dict), entries, max_players), bg = "#00ff00", highlightbackground = "#00cd00", activebackground = "#00aa00").pack(side = tk.RIGHT, padx = 8, pady = 8)
     name_entry.pack(fill = "x", padx = 8, pady = 8, ipady = 12)
     name_entry.bind("<Return>", add_enter_press)
@@ -274,8 +279,8 @@ def innit_game_menu() -> None:
     globals()["dead_margin"] = tk.Frame(root, bg = bg_2)
     tk.Label(alive_margin, text = "Alive Players").pack(side = tk.TOP, padx = 4, pady = 4, fill = "x", ipady = 4)
     tk.Label(dead_margin, text = "Dead Players").pack(side = tk.TOP, padx = 4, pady = 4, fill = "x", ipady = 4)
-    alive_margin.pack(side = tk.LEFT, padx = 4, pady = 4, fill = "y", ipadx = 104)
-    dead_margin.pack(side = tk.RIGHT, padx = 4, pady = 4, fill = "y", ipadx = 104)
+    alive_margin.pack(side = tk.LEFT, padx = 4, pady = 4, fill = "y", ipadx = 128)
+    dead_margin.pack(side = tk.RIGHT, padx = 4, pady = 4, fill = "y", ipadx = 128)
 
 @enforce_types
 def selection_menu(data: Game_Data, user: str, target: str = "", can_recurse: bool = True) -> None:
@@ -362,6 +367,9 @@ def information(data: Game_Data) -> None:
 
         for item in role.information:
             info += f"\n #{count + 1}: " + item
+            count += 1
         
         if info != "\n":
             messagebox.showinfo("Info", f"{player} is told: {info}")
+        else:
+            messagebox.showinfo("Info", f"{player} is told nothing!")

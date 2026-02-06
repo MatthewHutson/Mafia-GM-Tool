@@ -2,6 +2,7 @@
 from utils import *
 from classes_and_types import Role, Game_Data
 from game_loop_functions import *
+from time import sleep
 
 # -- Roles -- #
 @add_attributes(targets = 0, target_living = True)
@@ -107,13 +108,17 @@ def stalk(user: str, data: Game_Data) -> None:
     if not data.players[user].poisoned:
         target: str = data.players[user].targets[0]
         visitors = data.players[target].visited_by
+
         target_str = f"{target} was visited by "
         
         for player in visitors:
             if player != user:
                 target_str += player + ", "
 
-        target_str = target_str[:-2]
+        if len(visitors) > 0:
+            target_str = target_str[:-2]
+        else:
+            target_str += " nobody"
 
         data.players[user].information.append(target_str)
 
@@ -154,6 +159,10 @@ def channel(user: str, data: Game_Data) -> None:
                     data.players[user].ability_type.append("on_demand")
                 if ability_type == "recurse_targets":
                     data.players[user].ability_type.append("recurse_targets")
+                if ability_type == "game_end":
+                    data.players[user].ability_type.append("game_end")
+
+            data.players[user].team_win_condition = data.players[target].team_win_condition
 
         else:
             data.players[user].used_ability = False
@@ -178,3 +187,18 @@ def ambush(user: str, data: Game_Data) -> None:
             data.players[player].information.append(f"{user} attempted to ambush {new_target}!")
     except:
         pass
+
+@add_attributes(targets = 0, target_living = True)
+@enforce_types
+def mayor(user: str, data: Game_Data) -> None:
+    if data.playing:
+        if not data.players[user].solo_win:
+            sleep(1)
+            if messagebox.askyesno("Mayor", "Has The Mayor Revealed Themselves?"):
+                data.players[user].solo_win = True
+    else:
+        data.players[user].solo_win = len(data.players) == data.players[user].alternative_end_count
+
+    
+
+    

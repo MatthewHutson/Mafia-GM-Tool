@@ -1,7 +1,46 @@
 {
-    "4": [["Mafia"], ["Sheriff"], ["Soldier"], ["Villager", "Doctor"]],
-    "5": [["Mafia"], ["Sheriff"], ["Soldier"], ["Doctor"], ["Villager"]],
-    "6": [["Mafia"], ["Sheriff"], ["Soldier"], ["Doctor"], ["Lawyer", "Executioner"], ["Poisoner", "Psychic"], ["Creep", "Necromancer"], ["Cupid", "Bomber", "Jester", "Mayor"]],
-    "9": [["Mafia"], ["Sheriff"], ["Soldier"], ["Doctor"], ["Lawyer", "Executioner"], ["Poisoner", "Psychic", "Ambusher"], ["Creep", "Necromancer"], ["Cupid", "Bomber"], ["Jester", "Mayor"]],
-    "10":[["Mafia"], ["Sheriff"], ["Soldier"], ["Doctor"], ["Lawyer", "Executioner"], ["Poisoner", "Psychic", "Ambusher"], ["Creep", "Necromancer"], ["Cupid", "Bomber"], ["Jester"], ["Mayor"]]
+    "4": [
+        ["Mafia"], 
+        ["Sheriff"], ["Soldier"], 
+        ["Villager", "Doctor"]
+    ],
+    "5": [
+        ["Mafia"], 
+        ["Sheriff"], 
+        ["Soldier"], 
+        ["Doctor"], 
+        ["Villager"]
+    ],
+    "6": [
+        ["Mafia"], 
+        ["Sheriff"], 
+        ["Soldier"], 
+        ["Doctor"], 
+        ["Lawyer", "Executioner"], 
+        ["Poisoner", "Psychic"], ["Creep", "Necromancer"], 
+        ["Cupid", "Bomber", "Jester", "Mayor"]
+    ],
+    "9": [
+        ["Mafia"], 
+        ["Sheriff"], 
+        ["Soldier"], 
+        ["Doctor"], 
+        ["Lawyer", "Executioner"], 
+        ["Poisoner", "Psychic", "Ambusher"], 
+        ["Creep", "Necromancer"], 
+        ["Cupid", "Bomber"], 
+        ["Jester", "Mayor"]
+    ],
+    "10":[
+        ["Mafia"], 
+        ["Sheriff"], 
+        ["Soldier"], 
+        ["Doctor"], 
+        ["Lawyer", "Executioner"], 
+        ["Poisoner", "Psychic", "Ambusher"], 
+        ["Creep", "Necromancer"], 
+        ["Cupid", "Bomber"], 
+        ["Jester"], 
+        ["Mayor"]
+    ]
 }

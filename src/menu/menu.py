@@ -1,6 +1,7 @@
 # -- Imports -- #
 from utils import *
 from menu.menu_classes import *
+from menu.milly_stand_counter import counter_init
 from tkinter import messagebox
 from copy import deepcopy
 import tkinter as tk
@@ -255,6 +256,9 @@ def setup_menu(entries: Menu_Entry, default_names: list[str]) -> None:
     start.pack(side = tk.RIGHT, ipady = 3, ipadx = 16, padx = 4)
     exit.pack(side = tk.RIGHT, ipady = 3, ipadx = 16, padx = 4)
 
+    # -- Milly Stand Counter -- #
+    counter_init(root, settings_frame, (8, 3), (4, 0), tk.LEFT)
+
     # -- Role Selection -- #
     tk.Label(role_frame, text = "Roles", font = main_font).pack(side = tk.TOP, padx = 4, pady = 4, fill = "x")
 
@@ -322,6 +326,7 @@ def selection_menu(data: Game_Data, user: str, target: str = "", can_recurse: bo
 
     tk.Button(confirm_frame, text = "Confirm Choices", command = lambda: confirm_selection(data, role), bg = "#5D9FF0", activebackground = "#4980C4", fg = "#ffffff", activeforeground = "#ffffff").pack(side = tk.LEFT, ipadx = 16, ipady = 8, padx = 4)
     tk.Button(confirm_frame, text = "End Game", command = lambda: quit(data), bg = "#E03636", activebackground = "#8B2B2B", fg = "#ffffff", activeforeground = "#ffffff").pack(side = tk.RIGHT, ipadx = 16, ipady = 8, pady = 4, padx = 4)
+    counter_init(root, confirm_frame, (16, 8), (4, 4), tk.RIGHT)
     root.bind("<Return>", enter_pressed)
 
     confirm_frame.pack(side = tk.BOTTOM, fill = "x", ipady = 1)

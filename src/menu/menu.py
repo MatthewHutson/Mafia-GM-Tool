@@ -104,6 +104,8 @@ def add_player(players: list[Player_Select_Frame], roles: list[list[Role]], entr
         if len(players) in role_adjust_boundaries and role_adjust_flag:
             role_boundary_reset(roles)
 
+        role_row_frames.shuffle()
+
     except IndexError:
         messagebox.showwarning("Warning", "You Have Reached The Maximum Number of Players!")
     except NameError:
@@ -237,7 +239,7 @@ def setup_menu(entries: Menu_Entry, default_names: list[str]) -> None:
     # -- Menu -- #
     clear(root)
     root.resizable(False, False)
-    root.geometry("1152x512")
+    root.geometry("1216x512")
     root.title("Mafia Game")
     tk.Label(root, text = "Player Selection", font = ("Airial", 16), bg = bg_2).pack(side = tk.TOP, fill = "x", pady = 4)
 
@@ -253,8 +255,10 @@ def setup_menu(entries: Menu_Entry, default_names: list[str]) -> None:
     # -- Settings Buttons -- #
     start = tk.Button(settings_frame, text = "Start", command = lambda: start_confirm(entries), bg = "#5D9FF0", activebackground = "#4980C4", fg = "#ffffff", activeforeground = "#ffffff")
     exit = tk.Button(settings_frame, text = "Quit", command = terminate, bg = "#E03636", activebackground = "#8B2B2B", fg = "#ffffff", activeforeground = "#ffffff")
+    random_button = tk.Button(settings_frame, text = "Randomise", command = role_row_frames.shuffle, bg = "#48f748", activebackground = "#55E036", fg = "#000000", activeforeground = "#000000")
     start.pack(side = tk.RIGHT, ipady = 3, ipadx = 16, padx = 4)
     exit.pack(side = tk.RIGHT, ipady = 3, ipadx = 16, padx = 4)
+    random_button.pack(side = tk.RIGHT, ipady = 3, ipadx = 16, padx = 4)
 
     # -- Milly Stand Counter -- #
     counter_init(root, settings_frame, (8, 3), (4, 0), tk.LEFT)

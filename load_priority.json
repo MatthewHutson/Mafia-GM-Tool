@@ -17,7 +17,8 @@
         ["Soldier"], 
         ["Doctor"], 
         ["Lawyer", "Executioner"], 
-        ["Poisoner", "Psychic"], ["Creep", "Necromancer"], 
+        ["Creep", "Necromancer"],
+        ["Poisoner", "Psychic"], 
         ["Cupid", "Bomber", "Jester", "Mayor"]
     ],
     "9": [
@@ -26,8 +27,8 @@
         ["Soldier"], 
         ["Doctor"], 
         ["Lawyer", "Executioner"], 
+        ["Creep", "Necromancer"],
         ["Poisoner", "Psychic", "Ambusher"], 
-        ["Creep", "Necromancer"], 
         ["Cupid", "Bomber"], 
         ["Jester", "Mayor"]
     ],
@@ -37,8 +38,8 @@
         ["Soldier"], 
         ["Doctor"], 
         ["Lawyer", "Executioner"], 
-        ["Poisoner", "Psychic", "Ambusher"], 
-        ["Creep", "Necromancer"], 
+        ["Creep", "Necromancer"],
+        ["Poisoner", "Psychic", "Ambusher"],  
         ["Cupid", "Bomber"], 
         ["Jester"], 
         ["Mayor"]

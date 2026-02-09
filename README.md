@@ -2,8 +2,9 @@
 A Program to allocate roles in a game of mafia
 
 # Changes
-Improved The Milly Stand Counter - ABSOLUTELY VITAL
-Adjusted README Instructions For It
+Added Randomise Button To Selection Menu
+Increased Menu Size to Fix Visual Bug
+Config Changes
 
 # To Do
 Add All Other Roles

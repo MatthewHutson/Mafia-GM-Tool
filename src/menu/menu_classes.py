@@ -2,6 +2,7 @@
 from utils import *
 from typing import Protocol
 from classes_and_types import *
+from random import randint, shuffle
 import tkinter as tk
 from tkinter import messagebox
 
@@ -11,6 +12,7 @@ class Role_Icon:
     @enforce_types
     def __init__(self, roles: list[str], main_font: tuple[str, int], entries: Menu_Entry) -> None:
         self.roles = [entries.role_dict[role] for role in roles]
+        self.role_names = roles
         self.index = 0
         self.font = main_font
         self.entries = entries
@@ -94,6 +96,18 @@ class Role_Icon:
         for frame in self.frames:
             frame.pack(self.frame, self.frames)
 
+    @enforce_types
+    def shuffle(self) -> None:
+        count = randint(0, len(self.roles))
+
+        for i in range(count):
+            self.cycle()
+
+    @enforce_types
+    def deepcopy(self) -> object:
+        new_icon = Role_Icon(self.role_names, self.font, self.entries)
+        return new_icon
+
 class Role_Row:
     # -- Constructor -- #
     @enforce_types
@@ -101,7 +115,7 @@ class Role_Row:
         self.frames: list[tk.Frame] = []
         self.icons: list[list[Role_Icon]] = []
         self.master_frame = frame
-        self.max_row_length = 5
+        self.max_row_length = 6
 
     # -- Property -- #
     @property
@@ -149,19 +163,22 @@ class Role_Row:
 
             
     @enforce_types
-    def remove_item(self, row: int, index: int, reset: bool = True) -> None:
+    def remove_item(self, row: int, index: int, reset: bool = True, delete: bool = True) -> None:
         icon = self.icons[row][index]
         del self.icons[row][index]
-        icon.delete()
+
+        if delete:
+            icon.delete()
+
         if reset:
             self.role_boundary_reset()
 
     @enforce_types
-    def remove_end_item(self) -> None:
+    def remove_end_item(self, delete: bool = True) -> None:
         if len(self.icons[-1]) == 0:
             self.remove_end_row()
 
-        self.remove_item(-1, -1, False)
+        self.remove_item(-1, -1, False, delete)
 
         if len(self.icons[-1]) == 0:
             self.remove_end_row()
@@ -189,6 +206,19 @@ class Role_Row:
     def delete(self) -> None:
         self.disapear()
         del self
+
+    @enforce_types
+    def shuffle(self) -> None:
+        icons = [icon.deepcopy() for icon in self.icon_single]
+        shuffle(icons)
+        
+        for i in range(len(self.icons)):
+            for j in range(len(self.icons[0])):
+                self.remove_end_item(True)
+
+        for icon in icons:
+            self.add_item(icon)
+            icon.shuffle()
 
 class Player_Frame:
     # -- Constructor -- #

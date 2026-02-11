@@ -2,12 +2,11 @@
 A Program to allocate roles in a game of mafia
 
 # Changes
-Added Randomise Button To Selection Menu
-Increased Menu Size to Fix Visual Bug
-Config Changes
+Bug Fix - Role Config Weird Interaction With Randomise
 
 # To Do
 Add All Other Roles
+Add Joke Roles
 
 # Using The Milly Stand Counter (For Carlos)
 Press the up arrow key or the up button to add 1 to the counter

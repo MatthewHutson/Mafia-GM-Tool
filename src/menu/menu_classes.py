@@ -174,11 +174,11 @@ class Role_Row:
             self.role_boundary_reset()
 
     @enforce_types
-    def remove_end_item(self, delete: bool = True) -> None:
+    def remove_end_item(self, reset: bool = False, delete: bool = True) -> None:
         if len(self.icons[-1]) == 0:
             self.remove_end_row()
 
-        self.remove_item(-1, -1, False, delete)
+        self.remove_item(-1, -1, reset, delete)
 
         if len(self.icons[-1]) == 0:
             self.remove_end_row()
@@ -209,17 +209,19 @@ class Role_Row:
 
     @enforce_types
     def shuffle(self) -> None:
-        icons = [icon.deepcopy() for icon in self.icon_single]
-        shuffle(icons)
+        roles = [icon.roles for icon in self.icon_single]
+        shuffle(roles)
+        count = 0
         
         for i in range(len(self.icons)):
-            for j in range(len(self.icons[0])):
-                self.remove_end_item(True)
-
-        for icon in icons:
-            self.add_item(icon)
-            icon.shuffle()
-
+            for j in range(len(self.icons[i])):
+                self.icons[i][j].roles = roles[count]
+                role_names = [role.name for role in roles[count]]
+                self.icons[i][j].role_names = role_names
+                self.icons[i][j].index = 0
+                self.icons[i][j].shuffle()
+                count += 1
+        
 class Player_Frame:
     # -- Constructor -- #
     def __init__(self, user_input: str, main_frame: tk.Frame, main_font: tuple[str, int]) -> None:

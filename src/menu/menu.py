@@ -1,7 +1,7 @@
 # -- Imports -- #
 from utils import *
 from menu.menu_classes import *
-from menu.milly_stand_counter import counter_init
+from menu.mimi_stand_counter import counter_init
 from menu.card_index import card_index
 from tkinter import messagebox
 from copy import deepcopy
@@ -77,9 +77,12 @@ def get_roles_by_players(role_load_priority: dict[int, list[list[Role]]], ascend
 @enforce_types
 def role_boundary_reset(roles: list[list[Role]]) -> None:
     i = 0
+    shuffle(roles)
     for role_icon in role_row_frames.icon_list:
         role_icon.re_init(roles[i])
         i += 1
+
+    role_row_frames.shuffle()
 
 @enforce_types
 def role_boundary_reset_for_icons() -> None:
@@ -102,10 +105,7 @@ def add_player(players: list[Player_Select_Frame], roles: list[list[Role]], entr
         player_frame = Player_Select_Frame(name, player_tab, main_font, players, role_row_frames)
         players.append(player_frame)
 
-        if len(players) in role_adjust_boundaries and role_adjust_flag:
-            role_boundary_reset(roles)
-
-        role_row_frames.shuffle()
+        role_boundary_reset(roles)
 
     except IndexError:
         messagebox.showwarning("Warning", "You Have Reached The Maximum Number of Players!")
@@ -231,6 +231,7 @@ def setup_menu(entries: Menu_Entry, default_names: list[str]) -> None:
     # -- File Handling -- #
     new_load_system()
     role_row_frames.get_role_reset_function(role_boundary_reset_for_icons)
+    role_row_frames.add_entries(entries)
 
     # -- Specific Functions --  #
     @enforce_types
@@ -256,16 +257,16 @@ def setup_menu(entries: Menu_Entry, default_names: list[str]) -> None:
     # -- Settings Buttons -- #
     start = tk.Button(settings_frame, text = "Start", command = lambda: start_confirm(entries), bg = "#5D9FF0", activebackground = "#4980C4", fg = "#ffffff", activeforeground = "#ffffff")
     exit = tk.Button(settings_frame, text = "Quit", command = terminate, bg = "#E03636", activebackground = "#8B2B2B", fg = "#ffffff", activeforeground = "#ffffff")
-    random_button = tk.Button(settings_frame, text = "Randomise", command = role_row_frames.shuffle, bg = "#48f748", activebackground = "#55E036", fg = "#000000", activeforeground = "#000000")
+    random_button = tk.Button(settings_frame, text = "Randomise", command = role_boundary_reset_for_icons, bg = "#48f748", activebackground = "#55E036", fg = "#000000", activeforeground = "#000000")
     start.pack(side = tk.RIGHT, ipady = 3, ipadx = 16, padx = 4)
     exit.pack(side = tk.RIGHT, ipady = 3, ipadx = 16, padx = 4)
     random_button.pack(side = tk.RIGHT, ipady = 3, ipadx = 16, padx = 4)
 
-    # -- Milly Stand Counter -- #
+    # -- Mimi Stand Counter -- #
     counter_init(root, settings_frame, (8, 3), (4, 0), tk.LEFT)
 
     # -- Card Index -- #
-    index_access_button = tk.Button(settings_frame, text = "Card Index", command = lambda: card_index(bg_2, main_font, entries), bg = "#C65DF0", activebackground = "#C049C4", fg = "#ffffff", activeforeground = "#ffffff")
+    index_access_button = tk.Button(settings_frame, text = "Card Index", command = lambda: card_index(root, bg_2, main_font, entries), bg = "#C65DF0", activebackground = "#C049C4", fg = "#ffffff", activeforeground = "#ffffff")
     index_access_button.pack(side = tk.RIGHT, ipadx = 8, ipady = 3, padx = 4)
 
     # -- Role Selection -- #
@@ -296,7 +297,7 @@ def innit_game_menu() -> None:
     dead_margin.pack(side = tk.RIGHT, padx = 4, pady = 4, fill = "y", ipadx = 128)
 
 @enforce_types
-def selection_menu(data: Game_Data, user: str, target: str = "", can_recurse: bool = True) -> None:
+def selection_menu(data: Game_Data, entries: Menu_Entry, user: str, target: str = "", can_recurse: bool = True) -> None:
     # -- Setup -- #
     globals()["selected_players"] = []
 
@@ -330,16 +331,24 @@ def selection_menu(data: Game_Data, user: str, target: str = "", can_recurse: bo
 
     action_label = tk.Label(action_frame, font = main_font, text = text)
     confirm_frame = tk.Frame(action_frame, bg = bg_2)
+    info_frame = tk.Frame(action_frame, bg = bg_2)
 
     action_label.pack(side = tk.TOP, fill = "x", padx = 4, pady = 4, ipady = 4)
 
     tk.Button(confirm_frame, text = "Confirm Choices", command = lambda: confirm_selection(data, role), bg = "#5D9FF0", activebackground = "#4980C4", fg = "#ffffff", activeforeground = "#ffffff").pack(side = tk.LEFT, ipadx = 16, ipady = 8, padx = 4)
     tk.Button(confirm_frame, text = "End Game", command = lambda: quit(data), bg = "#E03636", activebackground = "#8B2B2B", fg = "#ffffff", activeforeground = "#ffffff").pack(side = tk.RIGHT, ipadx = 16, ipady = 8, pady = 4, padx = 4)
-    counter_init(root, confirm_frame, (16, 8), (4, 4), tk.RIGHT)
+    
+    # -- Card Index -- #
+    index_access_button = tk.Button(info_frame, text = "Card Index", command = lambda: card_index(root, bg_2, main_font, entries, data), bg = "#C65DF0", activebackground = "#C049C4", fg = "#ffffff", activeforeground = "#ffffff", width = 18)
+    index_access_button.pack(side = tk.LEFT, ipady = 8, padx = 4)
+
+    # -- Mimi Stand Counter -- #
+    counter_init(root, info_frame, (16, 8), (4, 4), tk.RIGHT)
+
     root.bind("<Return>", enter_pressed)
 
+    info_frame.pack(side = tk.BOTTOM, fill = "x", ipady = 1)
     confirm_frame.pack(side = tk.BOTTOM, fill = "x", ipady = 1)
-
     action_frame.pack(side = tk.TOP, fill = "both", padx = 4, pady = 4, expand = True)
 
     root.mainloop()
@@ -362,11 +371,11 @@ def selection_menu(data: Game_Data, user: str, target: str = "", can_recurse: bo
         for i in range(len(selected_players)):
             player = selected_players[i]
             if data.players[player].ability.targets > 0 and not data.players[user].recursion_fuck_up:
-                selection_menu(data, user, player, False)
+                selection_menu(data, entries, user, player, False)
 
 @enforce_types
-def voting_menu(data: Game_Data) -> str:
-    selection_menu(data, "none")
+def voting_menu(data: Game_Data, entries: Menu_Entry) -> str:
+    selection_menu(data, entries, "none")
 
     if data.playing:
         return selected_players[0]

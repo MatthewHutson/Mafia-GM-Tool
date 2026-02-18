@@ -21,16 +21,16 @@ def card_init() -> dict[str, str]:
     return card_data  
 
 @enforce_types
-def card_index(bg: str, font: tuple[str, int], entries: Menu_Entry) -> None:
+def card_index(root: tk.Tk, bg: str, font: tuple[str, int], entries: Menu_Entry, data: Game_Data = None) -> None:
     # -- Initialisation - #
     card_data: dict[str, str] = card_init()
-    root = tk.Tk()
-    root.resizable(False, False)
-    root.geometry("256x384")
-    root.title("Card Index")
+    card_root = tk.Toplevel(root)
+    card_root.resizable(False, True)
+    card_root.geometry("256x384")
+    card_root.title("Card Index")
 
-    scroll_bar = tk.Scrollbar(root, orient = "vertical")
-    canvas = tk.Canvas(root, yscrollcommand = scroll_bar.set)
+    scroll_bar = tk.Scrollbar(card_root, orient = "vertical")
+    canvas = tk.Canvas(card_root, yscrollcommand = scroll_bar.set)
 
     scroll_bar.configure(command = canvas.yview)
     scroll_bar.pack(side = tk.RIGHT, fill = "y", ipadx = 4)
@@ -49,7 +49,7 @@ def card_index(bg: str, font: tuple[str, int], entries: Menu_Entry) -> None:
         canvas.yview_scroll(int(-1*(event.delta/120)), "units")
 
     canvas.bind("<Configure>", scroll_all)
-    scroll_bar.bind("<MouseWheel>", scroll_event)
+    card_root.bind("<MouseWheel>", scroll_event)
 
     # -- Card Index-- #
     frames: list[tk.Frame] = []
@@ -57,6 +57,14 @@ def card_index(bg: str, font: tuple[str, int], entries: Menu_Entry) -> None:
     card_labels: list[tk.Label] = []
 
     for role_name, card in card_data.items():
+        if data != None:
+            try:
+                assert entries.role_dict[role_name] in data.players.values()
+            except AssertionError:
+                continue
+            except KeyError:
+                continue
+
         frame = tk.Frame(canvas_frame)
         role_icon = Role_Icon([role_name], font, entries, (10, 2), (2, 2), none)
         card_label = tk.Label(frame, text = card, bg = bg)
@@ -68,9 +76,3 @@ def card_index(bg: str, font: tuple[str, int], entries: Menu_Entry) -> None:
         role_icon.pack(frame, frames)
         card_label.pack(side = tk.RIGHT, padx = 2, pady = 2, anchor = "e", fill = "both", expand = True)
         frame.pack(side = tk.TOP, pady = 2, padx = 2, anchor = "n", fill = "x")
-
-    root.mainloop()
-
-    for role_icon in roles: role_icon.delete()
-    for frame in frames: frame.pack_forget()
-    for card_label in card_labels: card_label.pack_forget()

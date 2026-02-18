@@ -138,6 +138,10 @@ class Menu_Entry:
     @enforce_types
     def filter_roles(self, roles: list[str]) -> None:
         self.roles = [deepcopy(self.role_dict[role]) for role in roles]
+
+    @enforce_types
+    def shuffle_roles(self) -> None:
+        shuffle(self.roles)
     
 @dataclass
 class Game_Data():

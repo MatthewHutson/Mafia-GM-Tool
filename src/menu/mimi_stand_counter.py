@@ -12,7 +12,7 @@ milly_stand_counter: int = 0
 # -- Functions -- #
 @ enforce_types
 def display_count() -> None:
-    messagebox.showinfo("Stand Counter", f"Milly has stood up {milly_stand_counter} time{"s" if milly_stand_counter != 1 else ""}!")
+    messagebox.showinfo("Stand Counter", f"Mimi has stood up {milly_stand_counter} time{"s" if milly_stand_counter != 1 else ""}!")
 
 @enforce_types
 def add_buttons(frame: tk.Frame, size: tuple[int], padding: tuple[int], side: str) -> None:

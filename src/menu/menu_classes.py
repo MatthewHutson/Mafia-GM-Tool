@@ -216,19 +216,14 @@ class Role_Row:
         del self
 
     @enforce_types
+    def add_entries(self, entries: Menu_Entry) -> None:
+        self.entries = entries
+
+    @enforce_types
     def shuffle(self) -> None:
-        roles = [icon.roles for icon in self.icon_single]
-        shuffle(roles)
-        count = 0
-        
-        for i in range(len(self.icons)):
-            for j in range(len(self.icons[i])):
-                self.icons[i][j].roles = roles[count]
-                role_names = [role.name for role in roles[count]]
-                self.icons[i][j].role_names = role_names
-                self.icons[i][j].index = 0
-                self.icons[i][j].shuffle()
-                count += 1
+        for row in self.icons:
+            for icon in row:
+                icon.shuffle()
         
 class Player_Frame:
     # -- Constructor -- #

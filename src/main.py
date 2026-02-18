@@ -65,11 +65,13 @@ def main() -> None:
 
     while game_data.playing:
         # -- Game Loop -- #
+        pack_alive_and_dead(game_data, game_data.vote_role) # -- Prevents Popup before the first night -- #
+
         for name, role in game_data.alive_players.items():
             result: bool = selection_coindition(game_data, role, name)
             if result:
-                selection_menu(game_data, name)
-            else:
+                selection_menu(game_data, entries, name)
+            elif game_data.playing:
                 sleep(1)
                 messagebox.showinfo("Wake Up", f"Wake Up {name} to use no ability.")
 
@@ -88,7 +90,7 @@ def main() -> None:
             check_for_victory(game_data)
 
             if game_data.playing:
-                voted_out: str = voting_menu(game_data)
+                voted_out: str = voting_menu(game_data, entries)
 
                 if game_data.playing:
                     game_data.players[voted_out].voted_out(game_data.players)

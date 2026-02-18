@@ -66,14 +66,18 @@ def main() -> None:
     while game_data.playing:
         # -- Game Loop -- #
         for name, role in game_data.alive_players.items():
-            if selection_coindition(game_data, role, name):
+            result: bool = selection_coindition(game_data, role, name)
+            if result:
                 selection_menu(game_data, name)
+            else:
+                sleep(1)
+                messagebox.showinfo("Wake Up", f"Wake Up {name} to use no ability.")
 
         if game_data.playing:
             use_abilities(game_data)
+            information(game_data)
             life_death_sort(game_data)
 
-            information(game_data)
             remove_round_data(game_data)
 
             pack_alive_and_dead(game_data, game_data.vote_role)

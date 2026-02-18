@@ -10,21 +10,29 @@ from tkinter import messagebox
 class Role_Icon:
     # -- Constructors -- #
     @enforce_types
-    def __init__(self, roles: list[str], main_font: tuple[str, int], entries: Menu_Entry) -> None:
+    def __init__(self, roles: list[str], main_font: tuple[str, int], entries: Menu_Entry, size: tuple[int] = (16, 4), padding: tuple[int] = (2, 0), command: Any = None) -> None:
         self.roles = [entries.role_dict[role] for role in roles]
         self.role_names = roles
         self.index = 0
         self.font = main_font
         self.entries = entries
+        self.size = size
+        self.padding = padding
         self.label = None
         self.frame = None
         self.frames = None
+
+        if command == None: self.command = self.cycle
+        else: self.command = command
 
     @enforce_types
     def re_init(self, roles: list[str]) -> None:
         self.roles = [self.entries.role_dict[role] for role in roles]
         self.index = len(self.roles) - 1
-        self.cycle()
+        try:
+            self.command()
+        except:
+            pass
 
     # -- Property -- #
     @property
@@ -72,8 +80,8 @@ class Role_Icon:
         if self.frames == None:
             self.frames = frames
         
-        self.label = tk.Button(self.frame, text = self.name, font = self.font, bg = self.bg_colour, highlightbackground = self.bg_colour, activebackground = self.bg_colour, fg = self.fg_colour, activeforeground = self.fg_colour, width = 16, height = 4, command = self.cycle)
-        self.label.pack(padx = 2, pady = 0, side = tk.LEFT, expand = False)
+        self.label = tk.Button(self.frame, text = self.name, font = self.font, bg = self.bg_colour, highlightbackground = self.bg_colour, activebackground = self.bg_colour, fg = self.fg_colour, activeforeground = self.fg_colour, width = self.size[0], height = self.size[1], command = self.command)
+        self.label.pack(padx = self.padding[0], pady = self.padding[1], side = tk.LEFT, expand = False)
 
     @enforce_types
     def delete(self) -> None:

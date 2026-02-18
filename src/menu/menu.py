@@ -2,6 +2,7 @@
 from utils import *
 from menu.menu_classes import *
 from menu.milly_stand_counter import counter_init
+from menu.card_index import card_index
 from tkinter import messagebox
 from copy import deepcopy
 import tkinter as tk
@@ -263,6 +264,10 @@ def setup_menu(entries: Menu_Entry, default_names: list[str]) -> None:
     # -- Milly Stand Counter -- #
     counter_init(root, settings_frame, (8, 3), (4, 0), tk.LEFT)
 
+    # -- Card Index -- #
+    index_access_button = tk.Button(settings_frame, text = "Card Index", command = lambda: card_index(bg_2, main_font, entries), bg = "#C65DF0", activebackground = "#C049C4", fg = "#ffffff", activeforeground = "#ffffff")
+    index_access_button.pack(side = tk.RIGHT, ipadx = 8, ipady = 3, padx = 4)
+
     # -- Role Selection -- #
     tk.Label(role_frame, text = "Roles", font = main_font).pack(side = tk.TOP, padx = 4, pady = 4, fill = "x")
 
@@ -370,7 +375,7 @@ def voting_menu(data: Game_Data) -> str:
 
 @enforce_types
 def information(data: Game_Data) -> None:
-    for player, role in data.players.items():
+    for player, role in data.alive_players.items():
         info: str = "\n"
         count: int = 0
 

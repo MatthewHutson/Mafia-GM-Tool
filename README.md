@@ -2,9 +2,16 @@
 A Program to allocate roles in a game of mafia
 
 # Changes
-Bug Fix - Role Config Weird Interaction With Randomise
+Began a Card Index
+Bug Fixes - Dead Players Getting Info
+Alive Players now get told to wake up regardless of if they can use ability then
 
 # To Do
+Complete card index
+Fix Shuffle Bugs
+Fix Creep Sherrif Bug
+Add Vote Skip Button
+Add Timer
 Add All Other Roles
 Add Joke Roles
 

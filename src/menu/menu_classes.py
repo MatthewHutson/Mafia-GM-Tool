@@ -15,8 +15,8 @@ class Vertical_Scroll_Frame(tk.Frame):
         self.canvas = tk.Canvas(master, yscrollcommand = self.scroll_bar.set, bg = bg)
         self.scroll_bar.configure(command = self.canvas.yview)
 
-        self.scroll_bar.pack(side = tk.RIGHT, fill = "y", ipadx = 4)
-        self.canvas.pack(side = tk.LEFT, fill = tk.BOTH)
+        self.scroll_bar.pack(side = tk.RIGHT, fill = "y", ipadx = 4, expand = False)
+        self.canvas.pack(side = tk.LEFT, fill = tk.BOTH, expand = True)
 
         super().__init__(self.canvas)
         self.bg = bg
@@ -34,9 +34,10 @@ class Vertical_Scroll_Frame(tk.Frame):
         self.canvas.yview_scroll(int(-1*(event.delta/120)), "units")
 
     @enforce_types
-    def initialise(self,) -> None:
+    def initialise(self) -> None:
         self.canvas.bind("<Configure>", self.scroll_all)
-        self.master.bind("<MouseWheel>", self.scroll_event)
+        self.canvas.master.bind("<MouseWheel>", self.scroll_event)
+        
 
 class Role_Icon:
     # -- Constructors -- #
@@ -398,4 +399,6 @@ class Player_Role_Frame(Player_Frame):
 # -- Protocols -- #
 class Has_Widget_Children(Protocol):
     def winfo_children():
+        ...
+    def pack_forget():
         ...

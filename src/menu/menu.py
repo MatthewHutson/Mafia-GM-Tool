@@ -2,7 +2,8 @@
 from utils import *
 from menu.menu_classes import *
 from menu.mimi_stand_counter import counter_init
-from menu.card_index import card_index
+from menu.card_index import card_index, destroy_card_index
+from menu.timer import create_timer, delete_timer
 from tkinter import messagebox
 from copy import deepcopy
 import tkinter as tk
@@ -35,17 +36,13 @@ role_row_frames = Role_Row(role_frame)
 main_font: tuple[str, int] = ("Airial", 10)
 
 # -- Game Menu Global Vars -- #
-alive_margin = None
-alive_canvas = None
-dead_margin = None
-dead_canvas = None
 alive_frames = []
 dead_frames = []
 selected_players = []
 
-# -- Functions -- #
 @enforce_types
 def new_load_system() -> None:
+    global role_player_dict, max_players, role_adjust_boundaries
     role_load_priority: dict[int, list[list[Role]]] = {}
 
     with open("load_priority.json", 'r') as file:
@@ -53,9 +50,9 @@ def new_load_system() -> None:
         for key, value in data.items():
             role_load_priority[int(key)] = value
 
-    globals()["role_player_dict"] = role_load_priority
-    globals()["max_players"] = len(list(role_load_priority.values())[-1])
-    globals()["role_adjust_boundaries"] = list(role_load_priority.keys())
+    role_player_dict = role_load_priority
+    max_players = len(list(role_load_priority.values())[-1])
+    role_adjust_boundaries = list(role_load_priority.keys())
 
 @enforce_types
 def get_roles_by_players(role_load_priority: dict[int, list[list[Role]]], ascending: bool = True) -> list[list[Role]]:
@@ -103,7 +100,10 @@ def add_player(players: list[Player_Select_Frame], roles: list[list[Role]], entr
         for frame in players:
             if frame == capitalise_words(name): raise NameError
 
-        add_role_tile(len(players), roles, entries)
+
+        if len(players) < max_players:
+            add_role_tile(len(players), roles, entries)
+            
         player_frame = Player_Select_Frame(name, player_tab, main_font, players, role_row_frames)
         players.append(player_frame)
 
@@ -140,8 +140,12 @@ def add_role_tile(player_count: int, roles: list[Role], entries: Menu_Entry) -> 
     role_row_frames.add_item(role_icon)
 
 @enforce_types
-def clear(root: tk.Tk) -> None:
+def clear() -> None:
+    delete_timer()
+    destroy_card_index()
+
     clear_widgets(root)
+
     root.unbind("<Return>")
 
     for i in range(len(players)):
@@ -153,13 +157,14 @@ def clear_widgets(root: Has_Widget_Children) -> None:
         for widget in root.winfo_children():
             widget.pack_forget()
             clear_widgets(widget)
-    except: pass
+    except Exception as e: 
+        messagebox.showerror("Error", f"An error occurred while clearing the menu: \n\n{e}")
 
 @enforce_types
 def get_data(root: tk.Tk, entries: Menu_Entry) -> None:
     entries.filter_roles([str(icon) for icon in role_row_frames.icon_list])
     entries.players = [str(frame) for frame in players]
-    clear(root)
+    clear()
     root.quit()
 
 @enforce_types
@@ -183,11 +188,11 @@ def pack_alive_and_dead(data: Game_Data, active_role: Role) -> None:
         frame.delete()
 
     for name, Role in data.alive_players.items():
-        player_frame = Player_Role_Frame(name, data, alive_margin, main_font, selected_players, active_role)
+        player_frame = Player_Role_Frame(name, data, alive_canvas, main_font, selected_players, active_role)
         alive_frames.append(player_frame)
 
     for name, Role in data.dead_players.items():
-        player_frame = Player_Role_Frame(name, data, dead_margin, main_font, selected_players, active_role)
+        player_frame = Player_Role_Frame(name, data, dead_canvas, main_font, selected_players, active_role)
         dead_frames.append(player_frame)
 
 @enforce_types
@@ -217,10 +222,12 @@ def confirm_selection(data: Game_Data, role: Role) -> None:
             messagebox.showwarning("Warning", "You can only vote 1 alive player out!")
 
 @enforce_types
-def quit(data: Game_Data) -> None:
+def menu_quit(data: Game_Data) -> None:
     if messagebox.askyesno("Confirm Selection", "Are you sure you want to end the game?"):
         data.playing = False
         root.quit()
+        clear()
+        delete_timer()
 
 @enforce_types
 def skip() -> None:
@@ -246,7 +253,7 @@ def setup_menu(entries: Menu_Entry, default_names: list[str]) -> None:
         add_player_from_entry(players, get_roles_by_players(role_player_dict), entries, max_players)
         
     # -- Menu -- #
-    clear(root)
+    clear()
     root.resizable(False, False)
     root.geometry("1216x512")
     root.title("Mafia Game")
@@ -295,19 +302,20 @@ def setup_menu(entries: Menu_Entry, default_names: list[str]) -> None:
 # -- Main Game Menu -- #
 @enforce_types
 def init_game_menu(entries: Menu_Entry, data: Game_Data) -> None:
+    global alive_margin, alive_canvas, dead_margin, dead_canvas
     tk.Label(root, text = "Game Menu", font = ("Airial", 16), bg = bg_2).pack(side = tk.TOP, fill = "x", pady = 4)
     
-    globals()["alive_margin"] = tk.Frame(root, bg = bg_2)
-    globals()["dead_margin"] = tk.Frame(root, bg = bg_2)
+    alive_margin = tk.Frame(root, bg = bg_2)
+    dead_margin = tk.Frame(root, bg = bg_2)
 
     tk.Label(alive_margin, text = "Alive Players").pack(side = tk.TOP, padx = 4, pady = 4, fill = "x", ipady = 4)
     tk.Label(dead_margin, text = "Dead Players").pack(side = tk.TOP, padx = 4, pady = 4, fill = "x", ipady = 4)
     
-    #globals()["alive_canvas"] = Vertical_Scroll_Frame(alive_margin)
-    #globals()["dead_canvas"] = Vertical_Scroll_Frame(dead_margin)
+    alive_canvas = Vertical_Scroll_Frame(master = alive_margin, bg  = bg_2)
+    dead_canvas = Vertical_Scroll_Frame(master = dead_margin, bg = bg_2)
 
-    #alive_canvas.pack(side = tk.TOP, padx = 4, pady = 4, fill = "both")
-    #dead_canvas.pack(side = tk.TOP, padx = 4, pady = 4, fill = "both")
+    alive_canvas.pack(side = tk.TOP, padx = 4, pady = 4, fill = "both")
+    dead_canvas.pack(side = tk.TOP, padx = 4, pady = 4, fill = "both")
 
     alive_margin.pack(side = tk.LEFT, padx = 4, pady = 4, fill = "y", ipadx = 128)
     dead_margin.pack(side = tk.RIGHT, padx = 4, pady = 4, fill = "y", ipadx = 128)
@@ -318,7 +326,8 @@ def init_game_menu(entries: Menu_Entry, data: Game_Data) -> None:
 @enforce_types
 def selection_menu(data: Game_Data, entries: Menu_Entry, user: str, target: str = "", can_recurse: bool = True) -> None:
     # -- Setup -- #
-    globals()["selected_players"] = []
+    global selected_players
+    selected_players = []
 
     try: 
         # -- To Check if Ability Selection Or Vote Selection -- #
@@ -351,11 +360,12 @@ def selection_menu(data: Game_Data, entries: Menu_Entry, user: str, target: str 
     action_label = tk.Label(action_frame, font = main_font, text = text)
     confirm_frame = tk.Frame(action_frame, bg = bg_2)
     info_frame = tk.Frame(action_frame, bg = bg_2)
+    vote_frame = tk.Frame(action_frame, bg = bg_2)
 
     action_label.pack(side = tk.TOP, fill = "x", padx = 4, pady = 4, ipady = 4)
 
     tk.Button(confirm_frame, text = "Confirm Choices", command = lambda: confirm_selection(data, role), bg = "#5D9FF0", activebackground = "#4980C4", fg = "#ffffff", activeforeground = "#ffffff").pack(side = tk.LEFT, ipadx = 16, ipady = 8, padx = 4)
-    tk.Button(confirm_frame, text = "End Game", command = lambda: quit(data), bg = "#E03636", activebackground = "#8B2B2B", fg = "#ffffff", activeforeground = "#ffffff").pack(side = tk.RIGHT, ipadx = 16, ipady = 8, pady = 4, padx = 4)
+    tk.Button(confirm_frame, text = "End Game", command = lambda: menu_quit(data), bg = "#E03636", activebackground = "#8B2B2B", fg = "#ffffff", activeforeground = "#ffffff").pack(side = tk.RIGHT, ipadx = 16, ipady = 8, pady = 4, padx = 4)
 
     # -- Card Index -- #
     index_access_button = tk.Button(info_frame, text = "Card Index", command = lambda: card_index(root, bg_2, main_font, entries, data), bg = "#C65DF0", activebackground = "#C049C4", fg = "#ffffff", activeforeground = "#ffffff", width = 18)
@@ -368,11 +378,15 @@ def selection_menu(data: Game_Data, entries: Menu_Entry, user: str, target: str 
 
     info_frame.pack(side = tk.BOTTOM, fill = "x", ipady = 1)
     confirm_frame.pack(side = tk.BOTTOM, fill = "x", ipady = 1)
+    vote_frame.pack(side = tk.TOP, fill = "x", ipady = 1)
     action_frame.pack(side = tk.TOP, fill = "both", padx = 4, pady = 4, expand = True)
 
     # -- Vote Skip Button -- #
     if user == "none":
-        tk.Button(action_frame, text = "Skip Vote", command = skip, bg = "#64F05D", activebackground = "#64C449", fg = "#000000", activeforeground = "#000000").pack(side = tk.BOTTOM, ipadx = 16, ipady = 8, padx = 4, pady = 2, anchor = "sw")
+        tk.Button(vote_frame, text = "Skip Vote", command = skip, bg = "#64F05D", activebackground = "#64C449", fg = "#000000", activeforeground = "#000000").pack(side = tk.LEFT, ipadx = 24, ipady = 8, padx = 4, pady = 2, anchor = "sw")
+
+    # -- Timer Button -- #
+    create_timer(vote_frame, 300, main_font, (12, 2), (4, 2), tk.RIGHT)
 
     root.mainloop()
 

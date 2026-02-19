@@ -2,11 +2,13 @@
 A Program to allocate roles in a game of mafia
 
 # Changes
-Added General Class Implementation For Scrollbar Instances
+Fixed Scrollbar implementation
+Removed Unneccesary imports
+Simplfied Utility Functions
+Added Timer
+Fixed Many bugs These Created
 
 # To Do
-Fix Scrollbar implementation
-Add Timer
 Add All Other Roles
 Add Joke Roles
 Make Doccumentation With Harry

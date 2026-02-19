@@ -1,11 +1,12 @@
 # -- Imports -- #
 from utils import *
 from menu.menu_classes import *
-from tkinter import messagebox
-from copy import deepcopy
 import tkinter as tk
-from tkinter import font
 import json
+
+# -- Global Variables -- #
+instances: list[tk.Toplevel] = []
+
 # -- Functions -- #
 def none() -> None:
     pass
@@ -23,13 +24,17 @@ def card_init() -> dict[str, str]:
 @enforce_types
 def card_index(root: tk.Tk, bg: str, font: tuple[str, int], entries: Menu_Entry, data: Game_Data = None) -> None:
     # -- Initialisation - #
+    global instances
     card_data: dict[str, str] = card_init()
-    card_root = tk.Toplevel(root)
+    card_root = tk.Toplevel()
     card_root.resizable(False, True)
     card_root.geometry("256x384")
     card_root.title("Card Index")
 
-    canvas = Vertical_Scroll_Frame(master = card_root)
+    destroy_card_index()
+    instances.append(card_root)
+
+    main_frame = Vertical_Scroll_Frame(master = card_root)
 
     # -- Card Index-- #
     frames: list[tk.Frame] = []
@@ -45,7 +50,7 @@ def card_index(root: tk.Tk, bg: str, font: tuple[str, int], entries: Menu_Entry,
             except KeyError:
                 continue
 
-        frame = tk.Frame(canvas)
+        frame = tk.Frame(main_frame)
         role_icon = Role_Icon([role_name], font, entries, (10, 2), (2, 2), none)
         card_label = tk.Label(frame, text = card, bg = bg)
 
@@ -55,4 +60,11 @@ def card_index(root: tk.Tk, bg: str, font: tuple[str, int], entries: Menu_Entry,
 
         role_icon.pack(frame, frames)
         card_label.pack(side = tk.RIGHT, padx = 2, pady = 2, anchor = "e", fill = "both", expand = True)
-        frame.pack(side = tk.TOP, pady = 2, padx = 2, anchor = "n", fill = "x")
+        frame.pack(side = tk.TOP, pady = 2, anchor = "n", fill = "x", expand = True)
+
+def destroy_card_index() -> None:
+    global instances
+
+    for i in range(len(instances)):
+        instance = instances.pop(0)
+        instance.destroy()

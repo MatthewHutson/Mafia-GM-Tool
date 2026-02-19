@@ -11,26 +11,23 @@ def add_attributes(**attributes) -> Callable:
         return function
     return decerator
 
-def paramaterized_generals(hint: type) -> type:
-    # -- Dealing With Parameterized Generals #
-    origin: type = get_origin(hint)
-    if origin != None and origin != Union:
-        origin = str(origin)[8:][:-2]
-        data_type: type = eval(origin)
-    else:
-        data_type: type = hint
+def origin(hint: type) -> type | TypeAlias:
+    if hint != None:
+        temp_hint = get_origin(hint)
 
-    return data_type
+        if temp_hint != None and temp_hint != Union:
+            hint = temp_hint
+
+    return hint
 
 def get_union(hint: type | TypeAlias) -> list[type | TypeAlias]:
-    hint = paramaterized_generals(hint)
+    hint = origin(hint)
 
-    try:
-        hints = hint.__args__
-    except:
-        hints = [hint]
+    try: hints = hint.__args__
+    except: hints = [hint]
 
-    hints = [paramaterized_generals(hint) for hint in hints]
+    hints = [origin(hint) for hint in hints]
+
     return hints
 
 def is_instance(value: Any, hint: type | TypeAlias) -> bool:
@@ -69,12 +66,12 @@ def enforce_types(func: Callable) -> Callable:
                     if hint == subclass or hint == Any:
                         break
                 else:
-                    assert any_instance(value, hint), f"Argument {key} must be of type {hint} but {value=} of type={type(value)} provided"
+                    assert any_instance(value, hint), f"Argument {key} must be of type {hint} but value = {value} of type {type(value)} provided"
 
             except IndexError: pass  # -- Ignores The No Given Hint Case -- #
 
         result = func(*args, **kwargs) # -- Performs The Function Normally -- #
-        assert any_instance(result, return_hint), f"Return Value must be of type {return_hint} but {result=} of type={type(result)} provided" # -- Checks For Correct Output Type -- #
+        assert any_instance(result, return_hint), f"Return Value must be of type {return_hint} but value = {value} of type {type(value)} provided" # -- Checks For Correct Output Type -- #
         return result
     
     return wrapper # -- Sends The Checking Function -- #

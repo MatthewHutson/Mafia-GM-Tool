@@ -221,6 +221,11 @@ def quit(data: Game_Data) -> None:
         root.quit()
 
 @enforce_types
+def skip() -> None:
+    if messagebox.askyesno("Confirm Selection", "Are you sure you want to skip the vote?"):
+        root.quit()
+
+@enforce_types
 def terminate() -> None:
     if messagebox.askyesno("Confirm Selection", "Are you sure you want to quit?"):
         sys.exit()
@@ -287,7 +292,7 @@ def setup_menu(entries: Menu_Entry, default_names: list[str]) -> None:
 
 # -- Main Game Menu -- #
 @enforce_types
-def innit_game_menu() -> None:
+def init_game_menu(entries: Menu_Entry, data: Game_Data) -> None:
     tk.Label(root, text = "Game Menu", font = ("Airial", 16), bg = bg_2).pack(side = tk.TOP, fill = "x", pady = 4)
     globals()["alive_margin"] = tk.Frame(root, bg = bg_2)
     globals()["dead_margin"] = tk.Frame(root, bg = bg_2)
@@ -295,6 +300,9 @@ def innit_game_menu() -> None:
     tk.Label(dead_margin, text = "Dead Players").pack(side = tk.TOP, padx = 4, pady = 4, fill = "x", ipady = 4)
     alive_margin.pack(side = tk.LEFT, padx = 4, pady = 4, fill = "y", ipadx = 128)
     dead_margin.pack(side = tk.RIGHT, padx = 4, pady = 4, fill = "y", ipadx = 128)
+
+    pack_alive_and_dead(data, data.vote_role) # -- Prevents Popup before the first night -- #
+    card_index(root, bg_2, main_font, entries, data) # -- Gives Role Card Before Popups Appear -- #
 
 @enforce_types
 def selection_menu(data: Game_Data, entries: Menu_Entry, user: str, target: str = "", can_recurse: bool = True) -> None:
@@ -337,7 +345,7 @@ def selection_menu(data: Game_Data, entries: Menu_Entry, user: str, target: str 
 
     tk.Button(confirm_frame, text = "Confirm Choices", command = lambda: confirm_selection(data, role), bg = "#5D9FF0", activebackground = "#4980C4", fg = "#ffffff", activeforeground = "#ffffff").pack(side = tk.LEFT, ipadx = 16, ipady = 8, padx = 4)
     tk.Button(confirm_frame, text = "End Game", command = lambda: quit(data), bg = "#E03636", activebackground = "#8B2B2B", fg = "#ffffff", activeforeground = "#ffffff").pack(side = tk.RIGHT, ipadx = 16, ipady = 8, pady = 4, padx = 4)
-    
+
     # -- Card Index -- #
     index_access_button = tk.Button(info_frame, text = "Card Index", command = lambda: card_index(root, bg_2, main_font, entries, data), bg = "#C65DF0", activebackground = "#C049C4", fg = "#ffffff", activeforeground = "#ffffff", width = 18)
     index_access_button.pack(side = tk.LEFT, ipady = 8, padx = 4)
@@ -350,6 +358,10 @@ def selection_menu(data: Game_Data, entries: Menu_Entry, user: str, target: str 
     info_frame.pack(side = tk.BOTTOM, fill = "x", ipady = 1)
     confirm_frame.pack(side = tk.BOTTOM, fill = "x", ipady = 1)
     action_frame.pack(side = tk.TOP, fill = "both", padx = 4, pady = 4, expand = True)
+
+    # -- Vote Skip Button -- #
+    if user == "none":
+        tk.Button(action_frame, text = "Skip Vote", command = skip, bg = "#64F05D", activebackground = "#64C449", fg = "#000000", activeforeground = "#000000").pack(side = tk.BOTTOM, ipadx = 16, ipady = 8, padx = 4, pady = 2, anchor = "sw")
 
     root.mainloop()
 
@@ -377,7 +389,7 @@ def selection_menu(data: Game_Data, entries: Menu_Entry, user: str, target: str 
 def voting_menu(data: Game_Data, entries: Menu_Entry) -> str:
     selection_menu(data, entries, "none")
 
-    if data.playing:
+    if data.playing and len(selected_players) > 0:
         return selected_players[0]
     else: 
         return "none"

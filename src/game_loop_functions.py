@@ -6,8 +6,8 @@ from menu.menu_classes import *
 
 # -- Functions -- #
 @enforce_types
-def ability_conditions(role: Role, has_recursed: bool) -> bool:
-    life = role.currently_alive
+def ability_conditions(role: Role, has_recursed: bool, data: Game_Data) -> bool:
+    life = role in data.alive_players.values()
     singular = not ("on_vote" in role.ability_type or "on_death" in role.ability_type)
 
     if has_recursed:
@@ -20,7 +20,7 @@ def ability_conditions(role: Role, has_recursed: bool) -> bool:
 @enforce_types
 def use_abilities(data: Game_Data, can_recurse: bool = True) -> None:
     for name, role in data.priority.items():
-        if ability_conditions(role, can_recurse):
+        if ability_conditions(role, can_recurse, data):
             if not role.ability_cancel or not (can_recurse or "activate_again" in role.ability_type) and not role.recursion_fuck_up:
                 role.used_ability = True
 

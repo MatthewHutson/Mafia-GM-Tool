@@ -61,11 +61,10 @@ def main() -> None:
     game_data.init(a.vote)
 
     # -- Game Loop -- #
-    innit_game_menu()
+    init_game_menu(entries, game_data)
 
     while game_data.playing:
         # -- Game Loop -- #
-        pack_alive_and_dead(game_data, game_data.vote_role) # -- Prevents Popup before the first night -- #
 
         for name, role in game_data.alive_players.items():
             result: bool = selection_coindition(game_data, role, name)
@@ -92,7 +91,7 @@ def main() -> None:
             if game_data.playing:
                 voted_out: str = voting_menu(game_data, entries)
 
-                if game_data.playing:
+                if game_data.playing and voted_out != "none":
                     game_data.players[voted_out].voted_out(game_data.players)
             
                 life_death_sort(game_data)

@@ -2,15 +2,11 @@
 A Program to allocate roles in a game of mafia
 
 # Changes
-Finished The Card Index
-Bug Fix - "Everyone Selects No Targets" - Premature Game End Would Cause No Targets Popup For All Players Before Ending
-Bug Fix - "Shuffle Bug" - Randomise Would Occasionally Create Visual Bugs Involving Incorrect Roles
-Bug Fix - "How Am I Supposed To Hand Cards Out?" - No Targets Popups Could Appear Before Game Master Hands Out Roles
+Added Vote Skip Button
+Big Fix - "Dead Too Soon" - Abilities Would Not Trigger The Night The Corresponding Player Died If They Go After Mafia
 
 # To Do
 Add More Scroll Wheels - Alive and Dead Players
-Fix Creep Sherrif Bug
-Add Vote Skip Button
 Add Timer
 Add All Other Roles
 Add Joke Roles

@@ -5,8 +5,39 @@ from classes_and_types import *
 from random import randint, shuffle
 import tkinter as tk
 from tkinter import messagebox
+from typing import Union
 
 # -- Classes -- #
+class Vertical_Scroll_Frame(tk.Frame):
+    @enforce_types
+    def __init__(self, master: Union[tk.Tk, tk.Toplevel, tk.Frame], bg: str = "#ffffff") -> None:
+        self.scroll_bar = tk.Scrollbar(master, orient = tk.VERTICAL)
+        self.canvas = tk.Canvas(master, yscrollcommand = self.scroll_bar.set, bg = bg)
+        self.scroll_bar.configure(command = self.canvas.yview)
+
+        self.scroll_bar.pack(side = tk.RIGHT, fill = "y", ipadx = 4)
+        self.canvas.pack(side = tk.LEFT, fill = tk.BOTH)
+
+        super().__init__(self.canvas)
+        self.bg = bg
+
+        self.canvas.create_window((0, 0), window = self, anchor = "n")
+        self.initialise()
+
+    # -- Methods -- #
+    @enforce_types
+    def scroll_all(self, event) -> None:
+        self.canvas.config(scrollregion = self.canvas.bbox("all"))
+
+    @enforce_types
+    def scroll_event(self, event) -> None:
+        self.canvas.yview_scroll(int(-1*(event.delta/120)), "units")
+
+    @enforce_types
+    def initialise(self,) -> None:
+        self.canvas.bind("<Configure>", self.scroll_all)
+        self.master.bind("<MouseWheel>", self.scroll_event)
+
 class Role_Icon:
     # -- Constructors -- #
     @enforce_types
@@ -227,7 +258,7 @@ class Role_Row:
         
 class Player_Frame:
     # -- Constructor -- #
-    def __init__(self, user_input: str, main_frame: tk.Frame, main_font: tuple[str, int]) -> None:
+    def __init__(self, user_input: str, main_frame: Union[tk.Frame, Vertical_Scroll_Frame], main_font: tuple[str, int]) -> None:
         self.frame = tk.Frame(main_frame)
         self.name_label = tk.Label(self.frame, text = capitalise_words(user_input), font = main_font).pack(side = tk.LEFT, fill = "x", padx = 4)
         self.frame.pack_propagate(False)
@@ -267,7 +298,7 @@ class Player_Select_Frame(Player_Frame):
 class Player_Role_Frame(Player_Frame):
     # -- Constructor -- #
     @enforce_types
-    def __init__(self, name: str, data: Game_Data, main_frame: tk.Frame, main_font: tuple[str, int], selected_players: list[str], selected_role: Role) -> None:
+    def __init__(self, name: str, data: Game_Data, main_frame: Union[tk.Frame, Vertical_Scroll_Frame], main_font: tuple[str, int], selected_players: list[str], selected_role: Role) -> None:
         super().__init__(name, main_frame, main_font)
         self.data = data
         self.alignment = self.role.true_alignment

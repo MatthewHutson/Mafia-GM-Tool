@@ -2,14 +2,14 @@
 A Program to allocate roles in a game of mafia
 
 # Changes
-Added Vote Skip Button
-Big Fix - "Dead Too Soon" - Abilities Would Not Trigger The Night The Corresponding Player Died If They Go After Mafia
+Added General Class Implementation For Scrollbar Instances
 
 # To Do
-Add More Scroll Wheels - Alive and Dead Players
+Fix Scrollbar implementation
 Add Timer
 Add All Other Roles
 Add Joke Roles
+Make Doccumentation With Harry
 
 # Using The Milly Stand Counter (For Carlos)
 Press the up arrow key or the up button to add 1 to the counter

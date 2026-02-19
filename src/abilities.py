@@ -105,22 +105,24 @@ def telepathy(user: str, data: Game_Data) -> None:
 @add_attributes(targets = 1, target_living = True)
 @enforce_types
 def stalk(user: str, data: Game_Data) -> None:
+    visitors = []
+
     if not data.players[user].poisoned:
         target: str = data.players[user].targets[0]
         visitors = data.players[target].visited_by
 
-        target_str = f"{target} was visited by "
+    target_str = f"{target} was visited by "
         
-        for player in visitors:
-            if player != user:
-                target_str += player + ", "
+    for player in visitors:
+        if player != user:
+            target_str += player + ", "
 
-        if len(visitors) > 0:
-            target_str = target_str[:-2]
-        else:
-            target_str += " nobody"
+    if len(visitors) > 0:
+        target_str = target_str[:-2]
+    else:
+        target_str += " nobody"
 
-        data.players[user].information.append(target_str)
+    data.players[user].information.append(target_str)
 
 @add_attributes(targets = 0, target_living = True)
 @enforce_types

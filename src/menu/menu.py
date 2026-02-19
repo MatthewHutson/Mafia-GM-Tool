@@ -36,7 +36,9 @@ main_font: tuple[str, int] = ("Airial", 10)
 
 # -- Game Menu Global Vars -- #
 alive_margin = None
+alive_canvas = None
 dead_margin = None
+dead_canvas = None
 alive_frames = []
 dead_frames = []
 selected_players = []
@@ -294,10 +296,19 @@ def setup_menu(entries: Menu_Entry, default_names: list[str]) -> None:
 @enforce_types
 def init_game_menu(entries: Menu_Entry, data: Game_Data) -> None:
     tk.Label(root, text = "Game Menu", font = ("Airial", 16), bg = bg_2).pack(side = tk.TOP, fill = "x", pady = 4)
+    
     globals()["alive_margin"] = tk.Frame(root, bg = bg_2)
     globals()["dead_margin"] = tk.Frame(root, bg = bg_2)
+
     tk.Label(alive_margin, text = "Alive Players").pack(side = tk.TOP, padx = 4, pady = 4, fill = "x", ipady = 4)
     tk.Label(dead_margin, text = "Dead Players").pack(side = tk.TOP, padx = 4, pady = 4, fill = "x", ipady = 4)
+    
+    #globals()["alive_canvas"] = Vertical_Scroll_Frame(alive_margin)
+    #globals()["dead_canvas"] = Vertical_Scroll_Frame(dead_margin)
+
+    #alive_canvas.pack(side = tk.TOP, padx = 4, pady = 4, fill = "both")
+    #dead_canvas.pack(side = tk.TOP, padx = 4, pady = 4, fill = "both")
+
     alive_margin.pack(side = tk.LEFT, padx = 4, pady = 4, fill = "y", ipadx = 128)
     dead_margin.pack(side = tk.RIGHT, padx = 4, pady = 4, fill = "y", ipadx = 128)
 

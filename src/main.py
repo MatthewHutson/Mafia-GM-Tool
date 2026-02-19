@@ -65,7 +65,6 @@ def main() -> None:
 
     while game_data.playing:
         # -- Game Loop -- #
-
         for name, role in game_data.alive_players.items():
             result: bool = selection_coindition(game_data, role, name)
             if result:

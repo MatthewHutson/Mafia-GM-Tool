@@ -1,9 +1,8 @@
 {
     "name": "Jester",
-    "ability": "Jester",
+    "ability": "jester",
     "alignment": null,
     "mafia_alternative": false,
     "priority": 9,
-    "max_count": 1,
-    "ability_type": ["on_death"]
+    "max_count": 1
 }

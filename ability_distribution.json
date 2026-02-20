@@ -1,0 +1,94 @@
+{
+    "none": {
+        "p": 25,
+        "ability_type": ["passive"],
+        "attirbutes": {"targets": 0, "target_living": true}
+    },
+    "reveal": {
+        "p": 5,
+        "ability_type": ["repeat"],
+        "attirbutes": {"targets": 1, "target_living": true}
+    },
+    "endure": {
+        "p": 5,
+        "ability_type": ["passive"],
+        "attirbutes": {"targets": 0, "target_living": true}
+    },
+    "protect": {
+        "p": 5,
+        "ability_type": ["repeat"],
+        "attirbutes": {"targets": 1, "target_living": true}
+    },
+    "jester": {
+        "p": 5,
+        "ability_type": ["on_death"],
+        "attirbutes": {"targets": 0, "target_living": true}
+    },
+    "stop_vote": {
+        "p": 5,
+        "ability_type": ["singular", "on_vote"],
+        "attirbutes": {"targets": 1, "target_living": true}
+    },
+    "execute": {
+        "p": 5,
+        "ability_type": ["singular", "on_vote"],
+        "attirbutes": {"targets": 1, "target_living": true}
+    },
+    "poison": {
+        "p": 5,
+        "ability_type": ["repeat"],
+        "attirbutes": {"targets": 1, "target_living": true}
+    },
+    "kill": {
+        "p": 5,
+        "ability_type": ["repeat"],
+        "attirbutes": {"targets": 1, "target_living": true}
+    },
+    "telepathy": {
+        "p": 5,
+        "ability_type": ["repeat"],
+        "attirbutes": {"targets": 1, "target_living": true}
+    },
+    "stalk": {
+        "p": 5,
+        "ability_type": ["repeat"],
+        "attirbutes": {"targets": 1, "target_living": true}
+    },
+    "vengance": {
+        "p": 5,
+        "ability_type": ["on_death"],
+        "attirbutes": {"targets": 0, "target_living": true}
+    },
+    "channel": {
+        "p": 5,
+        "ability_type": ["singular", "on_demand", "recurse_targets", "secondary_ability"],
+        "attirbutes": {"targets": 1, "target_living": false}
+    },
+    "ambush": {
+        "p": 5,
+        "ability_type": ["repeat"],
+        "attirbutes": {"targets": 1, "target_living": true}
+    },
+    "mayor": {
+        "p": 5,
+        "ability_type": ["passive", "game_end"],
+        "attirbutes": {"targets": 0, "target_living": true}
+    },
+    "gamble": {
+        "p": 0,
+        "ability_type": ["on_demand", "secondary_ability"],
+        "attirbutes": {"targets": 0, "target_living": true}
+        
+    },
+    "link": {
+        "p": 0,
+        "ability_type": ["singular"],
+        "attirbutes": {"targets": 0, "target_living": true}
+        
+    },
+    "instant_death": {
+        "p": 5,
+        "ability_type": ["instant"],
+        "attirbutes": {"targets": 0, "target_living": true}
+    }
+}

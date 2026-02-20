@@ -4,6 +4,5 @@
     "alignment": false,
     "mafia_alternative": true,
     "priority": 4,
-    "max_count": 1,
-    "ability_type": ["repeat"]
+    "max_count": 1
 }

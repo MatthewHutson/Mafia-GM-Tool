@@ -11,6 +11,10 @@ def add_attributes(**attributes) -> Callable:
         return function
     return decerator
 
+def add_attributes_function(function: Callable, attributes: dict) -> None:
+    for key, value in attributes.items():
+        setattr(function, key, value)
+
 def origin(hint: type) -> type | TypeAlias:
     if hint != None:
         temp_hint = get_origin(hint)

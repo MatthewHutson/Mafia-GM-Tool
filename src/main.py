@@ -39,12 +39,24 @@ def main() -> None:
     # -- File Handling -- #
     path: str = "Roles"
 
+    with open("ability_distribution.json") as file:
+        abilities: dict = json.load(file)
+
     for item in os.listdir(path):
         with open(path + "/" + item, 'r') as file:
-            data: dict = json.load(file)  
-            data["ability"] = role_functions[data["ability"]]
+            data: dict = json.load(file)
+
+            ability_name = data["ability"]  
+            ability_dict = abilities[ability_name]
+            data["ability"] = role_functions[ability_name]
+
+            add_attributes_function(data["ability"], ability_dict["attirbutes"])
+
+            data["ability_type"] = ability_dict["ability_type"]
             data["_alignment"] = data["alignment"]
+
             del data["alignment"]
+            
             roles[data["name"]] = Role(**data, targets = [], information = [], visited_by = [])
 
     with open("defaults.txt") as file:

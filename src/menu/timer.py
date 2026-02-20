@@ -38,9 +38,11 @@ def ticker(root: tk.Misc, button: tk.Button) -> None:
 
 @enforce_types
 def create_timer(root: tk.Misc, duration: int, font: tuple[str, int], size: tuple[int], padding: tuple[int], side: str) -> None:
+    global remaining_time
     timer = tk.Button(root, text = "Start Timer", command = lambda: timer_button(root, timer, duration), bg = "#F42F5A", highlightbackground = "#D42F6E", activebackground = "#BD2658", fg = "#FFFFFF", activeforeground = "#FFFFFF", font = font, width = size[0], height = size[1])
     timer.pack_propagate(False)
     timer.pack(side = side, padx = padding[0], pady = padding[1])
+    remaining_time = 0
 
 def delete_timer() -> None:
     global timer_active, remaining_time

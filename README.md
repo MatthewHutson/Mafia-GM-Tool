@@ -2,11 +2,7 @@
 A Program to allocate roles in a game of mafia
 
 # Changes
-Fixed Scrollbar implementation
-Removed Unneccesary imports
-Simplfied Utility Functions
-Added Timer
-Fixed Many bugs These Created
+Timer Now Resets Each Menu
 
 # To Do
 Add All Other Roles

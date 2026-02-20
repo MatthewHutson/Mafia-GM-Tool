@@ -200,7 +200,3 @@ def mayor(user: str, data: Game_Data) -> None:
                 data.players[user].solo_win = True
     else:
         data.players[user].solo_win = len(data.players) == data.players[user].alternative_end_count
-
-    
-
-    

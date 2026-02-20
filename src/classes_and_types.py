@@ -14,7 +14,6 @@ class Role:
     mafia_alternative: bool # Switches to Mafia Abiltity When All Normal Mafia Dies #
     priority: int # Order of Execution of Abilities From Lowest To Highest #
     max_count: int
-    ability_type: list[str] # Can contain "singular", "passive", "repeat", "on death", "on vote", "on_demand", "recurse_targets", "activate_again", "game_end" #
     targets: list[object]
     information: list[str]
     visited_by: list[str]
@@ -43,8 +42,14 @@ class Role:
         else: return self._alignment
 
     @property
-    def true_alignment(self) -> bool | None:
+    @enforce_types
+    def true_alignment(self) -> Union[bool, None]:
         return self._alignment
+    
+    @property
+    @enforce_types
+    def ability_type(self) -> list[str]: # Can contain "singular", "passive", "repeat", "on death", "on vote", "on_demand", "recurse_targets", "activate_again", "game_end" #
+        return self.ability.ability_type
     
     @property
     @enforce_types
@@ -147,8 +152,10 @@ class Menu_Entry:
 class Game_Data():
     # -- Attributes -- #
     players: Players
-    mafia_role: Role
-    none_role: Role
+    roles: dict[str, Role]
+    abilities: dict[str, Callable]
+    mafia_role: Role = None
+    none_role: Role = None
     priority: Players = None
     good_aligned: Players = None
     evil_aligned: Players = None
@@ -171,10 +178,12 @@ class Game_Data():
             return None
 
     # -- Methods -- #
-    def init(self, vote_function: Callable) -> None:
+    def init(self) -> None:
+        self.mafia_role = deepcopy(self.roles["Mafia"]) 
+        self.none_role =deepcopy(self.roles["Villager"])
         self.priority = Players(dict(sorted(self.players.items(), key = lambda item: item[1].priority)))
         self.good_aligned = Players({name: role for name, role in self.players.items() if role.alignment})
         self.evil_aligned = Players({name: role for name, role in self.players.items() if not role.alignment})
         self.alive_players = self.players.deepcopy()
         self.dead_players = Players({})
-        self.vote_role: Role = Role("Voting", vote_function, True, False, 999, 999, "passive", [], [], []) # -- Using A Role For Menu Purposes -- #
+        self.vote_role: Role = Role("Voting", self.abilities["vote"], True, False, 999, 999, [], [], []) # -- Using A Role For Menu Purposes -- #

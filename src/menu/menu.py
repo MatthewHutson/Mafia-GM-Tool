@@ -76,9 +76,12 @@ def get_roles_by_players(role_load_priority: dict[int, list[list[Role]]], ascend
 @enforce_types
 def role_boundary_reset(roles: list[list[Role]]) -> None:
     i = 0
-    shuffle(roles)
+    role_temp = roles
+    if len(role_temp) > len(players): role_temp = role_temp[:len(players)]
+
+    shuffle(role_temp)
     for role_icon in role_row_frames.icon_list:
-        role_icon.re_init(roles[i])
+        role_icon.re_init(role_temp[i])
         i += 1
 
     role_row_frames.shuffle()

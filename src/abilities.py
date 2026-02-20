@@ -134,23 +134,14 @@ def channel(user: str, data: Game_Data) -> None:
         del data.players[user].targets[0]
 
         if not data.players[target].currently_alive and not data.players[user].recursion_fuck_up:
-            data.players[user].ability = data.players[target].ability
+            data.players[user].ability = deepcopy(data.players[target].ability)
             data.players[user].channeled_role = data.players[target].name
 
-            data.players[user].ability_type.remove("on_demand")
-            data.players[user].ability_type.remove("recurse_targets")
-            
-            for ability_type in data.players[target].ability_type:
-                if ability_type == "on_death":
-                    data.players[user].ability_type.append("on_death")
-                if ability_type == "on_vote":
-                    data.players[user].ability_type.append("on_vote")
-                if ability_type == "on_demand":
-                    data.players[user].ability_type.append("on_demand")
-                if ability_type == "recurse_targets":
-                    data.players[user].ability_type.append("recurse_targets")
-                if ability_type == "game_end":
-                    data.players[user].ability_type.append("game_end")
+            extra_types = ["singular"]
+
+            for type in extra_types:
+                if type in data.players[user].ability_type:
+                    data.players[user].ability.ability_type.append(type)     
 
             data.players[user].team_win_condition = data.players[target].team_win_condition
 

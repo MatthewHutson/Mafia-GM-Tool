@@ -1,94 +1,80 @@
 {
     "none": {
         "p": 25,
-        "ability_type": ["passive"],
-        "attirbutes": {"targets": 0, "target_living": true}
+        "attributes": {"targets": 0, "target_living": true, "ability_type": ["passive"]}
     },
     "reveal": {
         "p": 5,
-        "ability_type": ["repeat"],
-        "attirbutes": {"targets": 1, "target_living": true}
+        "attributes": {"targets": 1, "target_living": true, "ability_type": ["repeat"]}
     },
     "endure": {
         "p": 5,
-        "ability_type": ["passive"],
-        "attirbutes": {"targets": 0, "target_living": true}
+        "attributes": {"targets": 0, "target_living": true, "ability_type": ["passive"]}
     },
     "protect": {
         "p": 5,
-        "ability_type": ["repeat"],
-        "attirbutes": {"targets": 1, "target_living": true}
+        "attributes": {"targets": 1, "target_living": true, "ability_type": ["repeat"]}
     },
     "jester": {
         "p": 5,
-        "ability_type": ["on_death"],
-        "attirbutes": {"targets": 0, "target_living": true}
+        "attributes": {"targets": 0, "target_living": true, "ability_type": ["on_death"]}
     },
     "stop_vote": {
         "p": 5,
-        "ability_type": ["singular", "on_vote"],
-        "attirbutes": {"targets": 1, "target_living": true}
+        "attributes": {"targets": 1, "target_living": true, "ability_type": ["singular", "on_vote"]}
     },
     "execute": {
         "p": 5,
-        "ability_type": ["singular", "on_vote"],
-        "attirbutes": {"targets": 1, "target_living": true}
+        "attributes": {"targets": 1, "target_living": true, "ability_type": ["singular", "on_vote"]}
     },
     "poison": {
         "p": 5,
-        "ability_type": ["repeat"],
-        "attirbutes": {"targets": 1, "target_living": true}
+        "attributes": {"targets": 1, "target_living": true, "ability_type": ["repeat"]}
     },
     "kill": {
         "p": 5,
-        "ability_type": ["repeat"],
-        "attirbutes": {"targets": 1, "target_living": true}
+        "attributes": {"targets": 1, "target_living": true, "ability_type": ["repeat"]}
     },
     "telepathy": {
         "p": 5,
-        "ability_type": ["repeat"],
-        "attirbutes": {"targets": 1, "target_living": true}
+        "attributes": {"targets": 1, "target_living": true, "ability_type": ["repeat"]}
     },
     "stalk": {
         "p": 5,
-        "ability_type": ["repeat"],
-        "attirbutes": {"targets": 1, "target_living": true}
+        "attributes": {"targets": 1, "target_living": true, "ability_type": ["repeat"]}
     },
     "vengance": {
         "p": 5,
-        "ability_type": ["on_death"],
-        "attirbutes": {"targets": 0, "target_living": true}
+        "attributes": {"targets": 0, "target_living": true, "ability_type": ["on_death"]}
     },
     "channel": {
         "p": 5,
-        "ability_type": ["singular", "on_demand", "recurse_targets", "secondary_ability"],
-        "attirbutes": {"targets": 1, "target_living": false}
+        "attributes": {"targets": 1, "target_living": false, "ability_type": ["singular", "on_demand", "recurse_targets", "secondary_ability"]}
     },
     "ambush": {
         "p": 5,
-        "ability_type": ["repeat"],
-        "attirbutes": {"targets": 1, "target_living": true}
+        "attributes": {"targets": 1, "target_living": true, "ability_type": ["repeat"]}
     },
     "mayor": {
         "p": 5,
-        "ability_type": ["passive", "game_end"],
-        "attirbutes": {"targets": 0, "target_living": true}
+        "attributes": {"targets": 0, "target_living": true, "ability_type": ["passive", "game_end"]}
     },
     "gamble": {
         "p": 0,
-        "ability_type": ["on_demand", "secondary_ability"],
-        "attirbutes": {"targets": 0, "target_living": true}
+        "attributes": {"targets": 0, "target_living": true, "ability_type": ["on_demand", "secondary_ability"]}
         
     },
     "link": {
         "p": 0,
-        "ability_type": ["singular"],
-        "attirbutes": {"targets": 0, "target_living": true}
+        "attributes": {"targets": 0, "target_living": true, "ability_type": ["singular"]}
         
     },
     "instant_death": {
         "p": 5,
-        "ability_type": ["instant"],
-        "attirbutes": {"targets": 0, "target_living": true}
+        "attributes": {"targets": 0, "target_living": true, "ability_type": ["instant"]}
+    },
+    "vote": {
+        "p": 0,
+        "attributes":{"targets": 1, "target_living": true, "ability_type": ["passive"]}
     }
 }

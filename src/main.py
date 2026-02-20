@@ -42,17 +42,16 @@ def main() -> None:
     with open("ability_distribution.json") as file:
         abilities: dict = json.load(file)
 
+    for key, value in abilities.items():
+        ability: Callable = role_functions[key]
+        add_attributes_function(ability, value["attributes"])
+
     for item in os.listdir(path):
         with open(path + "/" + item, 'r') as file:
             data: dict = json.load(file)
 
             ability_name = data["ability"]  
-            ability_dict = abilities[ability_name]
             data["ability"] = role_functions[ability_name]
-
-            add_attributes_function(data["ability"], ability_dict["attirbutes"])
-
-            data["ability_type"] = ability_dict["ability_type"]
             data["_alignment"] = data["alignment"]
 
             del data["alignment"]
@@ -69,8 +68,8 @@ def main() -> None:
     setup_menu(entries, name_data)
 
     # -- Player Organisation -- #
-    game_data = Game_Data(Players(entries.assign_roles()), deepcopy(roles["Mafia"]), deepcopy(roles["Villager"]))
-    game_data.init(a.vote)
+    game_data = Game_Data(Players(entries.assign_roles()), roles, role_functions)
+    game_data.init()
 
     # -- Game Loop -- #
     init_game_menu(entries, game_data)

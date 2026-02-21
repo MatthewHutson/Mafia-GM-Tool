@@ -33,14 +33,23 @@ def use_abilities(data: Game_Data, can_recurse: bool = True) -> None:
 def life_death_sort(data: Game_Data) -> None:
     for name, role in data.players.items():
         if name in data.alive_players.keys():
-            if not role.currently_alive:
-                del data.alive_players[name]
-                data.dead_players[name] = role
+                if not role.currently_alive:
+                    del data.alive_players[name]
+                    data.dead_players[name] = role
+                    if role.alignment:
+                        del data.good_aligned[name]
+                    else:
+                        del data.evil_aligned[name]
+
+        if name in data.dead_players.keys():
+            if role.currently_alive:
+                del data.dead_players[name]
+                data.alive_players[name] = role
                 if role.alignment:
-                    del data.good_aligned[name]
+                    data.good_aligned[name] = role
                 else:
-                    del data.evil_aligned[name]
-    
+                    data.evil_aligned[name] = role
+
     revert_to_mafia(data)
 
 @enforce_types
@@ -48,7 +57,7 @@ def remove_round_data(data: Game_Data) -> None:
     for role in data.players.values():
         if not "singular" in role.ability_type: 
             for i in range(len(role.targets)):
-                del role.targets[0]
+                role.targets.pop(0)
 
         role.recursion_fuck_up = False
         role.poisoned = False

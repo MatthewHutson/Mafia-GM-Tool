@@ -1,6 +1,6 @@
 {
     "name": "Necromancer",
-    "ability": "channel",
+    "ability": "resurrect",
     "alignment": true,
     "mafia_alternative": false,
     "priority": 1,

@@ -152,6 +152,12 @@ def channel(user: str, data: Game_Data) -> None:
             messagebox.showerror("Error", "The Necromancer Cannot Channel an ALive Player!\nThey Shall Regain Their Ability!")
 
 @enforce_types
+def resurrect(user: str, data: Game_Data) -> None:
+    if len(data.players[user].targets) > 0:
+        target = data.players[data.players[user].targets[0]]
+        target.revive()
+
+@enforce_types
 def ambush(user: str, data: Game_Data) -> None:
     target = data.players[user].targets[0]
     try:

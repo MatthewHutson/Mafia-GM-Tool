@@ -2,9 +2,10 @@
 A Program to allocate roles in a game of mafia
 
 # Changes
-Timer Now Resets Each Menu
+Changed How Necromancer Works - Now Ressurects 1 Players
 
 # To Do
+Add The Gambler To Replace Old Necromancer
 Add All Other Roles
 Add Joke Roles
 Make Doccumentation With Harry

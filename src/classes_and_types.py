@@ -73,7 +73,12 @@ class Role:
             return True
                 
         return False
-    
+        
+    @enforce_types
+    def revive(self) -> None:
+        self.currently_alive = True
+        self.just_died = False
+
     @enforce_types
     def on_death_ability(self, data: object) -> None:
         if "on_death" in self.ability_type and not "on_vote" in self.ability_type and self.just_died:

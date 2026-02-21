@@ -47,9 +47,9 @@
         "p": 5,
         "attributes": {"targets": 0, "target_living": true, "ability_type": ["on_death"]}
     },
-    "channel": {
+    "resurrect": {
         "p": 5,
-        "attributes": {"targets": 1, "target_living": false, "ability_type": ["singular", "on_demand", "recurse_targets", "secondary_ability"]}
+        "attributes": {"targets": 1, "target_living": false, "ability_type": ["singular", "on_demand"]}
     },
     "ambush": {
         "p": 5,

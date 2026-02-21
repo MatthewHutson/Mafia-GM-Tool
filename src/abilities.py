@@ -3,7 +3,6 @@ from utils import *
 from classes_and_types import Role, Game_Data
 from game_loop_functions import *
 from time import sleep
-import json
 
 # -- Roles -- #
 @add_attributes(targets = 0, target_living = True)
@@ -186,7 +185,15 @@ def mayor(user: str, data: Game_Data) -> None:
 
 @enforce_types
 def gamble(user: str, data: Game_Data) -> None:
-    pass
+    user: Role = data.players[user]
+    if user.ability_cancel:
+        user.secondary_ability(user, data)
+
+    else:
+        user.secondary_ability = data.random_ability
+        
+        if "instant" in user.secondary_ability.ability_type:
+            user.secondary_ability(user, data)
 
 @enforce_types
 def instant_death(user: str, data: Game_Data) -> None:

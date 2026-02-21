@@ -2,15 +2,16 @@
 A Program to allocate roles in a game of mafia
 
 # Changes
-Changed How Necromancer Works - Now Ressurects 1 Players
+Added Secondary Ability To Player - Useful For Gambler
+Created The Gamble Ability For Gambler
 
 # To Do
-Add The Gambler To Replace Old Necromancer
+Finish Gambler
 Add All Other Roles
 Add Joke Roles
-Make Doccumentation With Harry
+Make Doccumentation With Carlos
 
-# Using The Milly Stand Counter (For Carlos)
+# Using The Milly Stand Counter (For GM)
 Press the up arrow key or the up button to add 1 to the counter
 Press the down arrow key or the down button to remove 1 to the counter
 The Stand Counter Button Will Show The Current Count

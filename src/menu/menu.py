@@ -208,19 +208,24 @@ def life_or_death_selection(data: Game_Data, role: Role) -> bool:
     return correct
 
 @enforce_types
-def confirm_selection(data: Game_Data, role: Role) -> None:
-    correct_lives = life_or_death_selection(data, role)
-    plural_targets: str = f"target{"s" if role.ability.targets > 1 else ""}"
+def confirm_selection(data: Game_Data, role: Role, is_primary_ability: bool) -> None:
+    if is_primary_ability:
+        ability = role.ability
+    else:
+        ability = role.secondary_ability
 
-    if len(selected_players) == role.ability.targets and correct_lives:
+    correct_lives = life_or_death_selection(data, role)
+    plural_targets: str = f"target{"s" if ability.targets > 1 else ""}"
+
+    if len(selected_players) == ability.targets and correct_lives:
         if messagebox.askyesno("Confirm Selection", f"Are you sure you want to select {selected_players}?"):
             root.quit()
     else:
         if role.name != "Voting":
-            if role.ability.target_living:
-                messagebox.showwarning("Warning", f"You must select {role.ability.targets} alive {plural_targets}!")
+            if ability.target_living:
+                messagebox.showwarning("Warning", f"You must select {ability.targets} alive {plural_targets}!")
             else:
-                messagebox.showwarning("Warning", f"You must select {role.ability.targets} dead {plural_targets}!")
+                messagebox.showwarning("Warning", f"You must select {ability.targets} dead {plural_targets}!")
         else:
             messagebox.showwarning("Warning", "You can only vote 1 alive player out!")
 
@@ -327,7 +332,7 @@ def init_game_menu(entries: Menu_Entry, data: Game_Data) -> None:
     card_index(root, bg_2, main_font, entries, data) # -- Gives Role Card Before Popups Appear -- #
 
 @enforce_types
-def selection_menu(data: Game_Data, entries: Menu_Entry, user: str, target: str = "", can_recurse: bool = True) -> None:
+def selection_menu(data: Game_Data, entries: Menu_Entry, user: str, target: str = "", is_primary_ability: bool = True, can_recurse: bool = True) -> None:
     # -- Setup -- #
     global selected_players
     selected_players = []
@@ -342,10 +347,17 @@ def selection_menu(data: Game_Data, entries: Menu_Entry, user: str, target: str 
 
     except: role = data.vote_role
 
+    # -- Handling Secondary Abilitities -- #
+
+    if is_primary_ability:
+        ability = role.ability
+    else:
+        ability = role.secondary_ability
+
     # -- Sub Functions -- #
     @enforce_types
     def enter_pressed(event) -> None:
-        confirm_selection(data, role)
+        confirm_selection(data, role, is_primary_ability)
 
     # -- Subroutine Main -- #
     pack_alive_and_dead(data, role)
@@ -356,9 +368,9 @@ def selection_menu(data: Game_Data, entries: Menu_Entry, user: str, target: str 
         text = "Voting Menu"
     else:
         if target == "":
-            text =  f"{user} is the {role.name}. They need to select {role.ability.targets} target{"s" if role.ability.targets > 1 else ""}"
+            text =  f"{user} is the {role.name} and is using {ability.__name__}. They need to select {ability.targets} target{"s" if ability.targets > 1 else ""}"
         else:
-            text = f"{user} is channeling the power of {role.name}. They need to select {role.ability.targets} target{"s" if role.ability.targets > 1 else ""}"
+            text = f"{user} is using the power of {role.name}. They need to select {ability.targets} target{"s" if ability.targets > 1 else ""}"
 
     action_label = tk.Label(action_frame, font = main_font, text = text)
     confirm_frame = tk.Frame(action_frame, bg = bg_2)
@@ -367,7 +379,7 @@ def selection_menu(data: Game_Data, entries: Menu_Entry, user: str, target: str 
 
     action_label.pack(side = tk.TOP, fill = "x", padx = 4, pady = 4, ipady = 4)
 
-    tk.Button(confirm_frame, text = "Confirm Choices", command = lambda: confirm_selection(data, role), bg = "#5D9FF0", activebackground = "#4980C4", fg = "#ffffff", activeforeground = "#ffffff").pack(side = tk.LEFT, ipadx = 16, ipady = 8, padx = 4)
+    tk.Button(confirm_frame, text = "Confirm Choices", command = lambda: confirm_selection(data, role, is_primary_ability), bg = "#5D9FF0", activebackground = "#4980C4", fg = "#ffffff", activeforeground = "#ffffff").pack(side = tk.LEFT, ipadx = 16, ipady = 8, padx = 4)
     tk.Button(confirm_frame, text = "End Game", command = lambda: menu_quit(data), bg = "#E03636", activebackground = "#8B2B2B", fg = "#ffffff", activeforeground = "#ffffff").pack(side = tk.RIGHT, ipadx = 16, ipady = 8, pady = 4, padx = 4)
 
     # -- Card Index -- #
@@ -407,11 +419,11 @@ def selection_menu(data: Game_Data, entries: Menu_Entry, user: str, target: str 
         data.players[player].visited_by.append(user)
         shuffle(data.players[player].visited_by)
 
-    if "recurse_targets" in role.ability_type and can_recurse and data.playing:
+    if "recurse_targets" in ability.ability_type and can_recurse and data.playing:
         for i in range(len(selected_players)):
             player = selected_players[i]
             if data.players[player].ability.targets > 0 and not data.players[user].recursion_fuck_up:
-                selection_menu(data, entries, user, player, False)
+                selection_menu(data, entries, user, player, is_primary_ability, False)
 
 @enforce_types
 def voting_menu(data: Game_Data, entries: Menu_Entry) -> str:

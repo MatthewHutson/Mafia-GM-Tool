@@ -11,23 +11,31 @@ import abilities as a
 
 # -- Functions -- #
 @enforce_types
-def selection_coindition(data: Game_Data, role: Role, name: str) -> bool:
-    singular = (not ("singular" in role.ability_type and (role.selected_target)))
-    targets = role.ability.targets > 0 
+def selection_coindition(data: Game_Data, role: Role, name: str, is_primary_ability: bool) -> bool:
+    if is_primary_ability:
+        ability = role.ability
+        can_pick_secondary_targets = True
+    else:
+        ability = role.secondary_ability
+        can_pick_secondary_targets = role.can_pick_secondary_targets
+
+    ability_type = ability.ability_type
+    singular = (not ("singular" in ability_type and (role.selected_target)))
+    targets = ability.targets > 0 
 
     universal_conditions = singular and targets and data.playing
     use_ability = True
     dead_targets = True 
 
-    if not role.ability.target_living and len(data.dead_players) == 0:
+    if not ability.target_living and len(data.dead_players) == 0:
         dead_targets = False
 
-    if "on_demand" in role.ability_type and universal_conditions and dead_targets:
-        sleep(1)
-        use_ability = messagebox.askyesno("Ability", f"Does {name}, the {role.name} want to use their ability ({role.ability.__name__})?")
+    if "on_demand" in ability_type and universal_conditions and dead_targets and can_pick_secondary_targets:
+        sleep(0.5)
+        use_ability = messagebox.askyesno("Ability", f"Does {name}, the {role.name} want to use their ability ({ability.__name__})?")
         role.ability_cancel = not use_ability
 
-    return universal_conditions and use_ability and dead_targets
+    return universal_conditions and use_ability and dead_targets and can_pick_secondary_targets
 
 # -- Main -- #
 @enforce_types
@@ -35,15 +43,16 @@ def main() -> None:
     # -- Game Data -- #
     role_functions: dict[str, Callable] = {name : getattr(a, name) for name in dir(a) if callable(getattr(a, name))}
     roles: dict[str, Role] = {}
+    ability_distribution: dict[str, float] = {}
 
     # -- File Handling -- #
     path: str = "Roles"
 
-    with open("ability_distribution.json") as file:
-        abilities: dict = json.load(file)
+    with open("ability_distribution.json") as file: abilities: dict[str, Any] = json.load(file)
 
     for key, value in abilities.items():
         ability: Callable = role_functions[key]
+        ability_distribution[key] = float(value["p"])
         add_attributes_function(ability, value["attributes"])
 
     for item in os.listdir(path):
@@ -68,7 +77,7 @@ def main() -> None:
     setup_menu(entries, name_data)
 
     # -- Player Organisation -- #
-    game_data = Game_Data(Players(entries.assign_roles()), roles, role_functions)
+    game_data = Game_Data(Players(entries.assign_roles()), roles, role_functions, ability_distribution)
     game_data.init()
 
     # -- Game Loop -- #
@@ -77,11 +86,18 @@ def main() -> None:
     while game_data.playing:
         # -- Game Loop -- #
         for name, role in game_data.alive_players.items():
-            result: bool = selection_coindition(game_data, role, name)
-            if result:
-                selection_menu(game_data, entries, name)
-            elif game_data.playing:
-                sleep(1)
+            if "instant" in role.ability_type:
+                role.ability(name, game_data)
+
+            can_pick_primary_target: bool = selection_coindition(game_data, role, name, True)
+            if can_pick_primary_target: selection_menu(game_data, entries, name)
+
+            if "secondary_ability" in role.ability_type:
+                can_pick_secondary_target: bool = selection_coindition(game_data, role, name, False)
+                if can_pick_secondary_target: selection_menu(game_data, entries, name)
+
+            if game_data.playing and not (can_pick_primary_target or can_pick_primary_target):
+                sleep(0.5)
                 messagebox.showinfo("Wake Up", f"Wake Up {name} to use no ability.")
 
         if game_data.playing:

@@ -66,7 +66,7 @@
     },
     "link": {
         "p": 0,
-        "attributes": {"targets": 0, "target_living": true, "ability_type": ["singular"]}
+        "attributes": {"targets": 2, "target_living": true, "ability_type": ["singular"]}
         
     },
     "instant_death": {

@@ -3,6 +3,7 @@ from dataclasses import dataclass
 from utils import *
 from random import shuffle
 from copy import deepcopy
+import numpy as np
 
 # -- Role Class -- #
 @dataclass
@@ -17,6 +18,7 @@ class Role:
     targets: list[object]
     information: list[str]
     visited_by: list[str]
+    secondary_ability: Callable = None
     currently_alive: bool = True
     protected: bool = False
     poisoned: bool = False
@@ -58,6 +60,12 @@ class Role:
             case None: return "Neutral"
             case True: return "Good"
             case False: return "Evil"
+
+    @property
+    @enforce_types
+    def can_pick_secondary_targets(self) -> bool:
+        # -- Checks If The First Ability Was Cancelled and If Secondary Ability Needs Targets -- #
+        return self.ability_cancel and self.secondary_ability.targets > 0 
 
     # -- Methods -- #
     @enforce_types
@@ -159,6 +167,7 @@ class Game_Data():
     players: Players
     roles: dict[str, Role]
     abilities: dict[str, Callable]
+    ablity_distribution: dict[str, float]
     mafia_role: Role = None
     none_role: Role = None
     priority: Players = None
@@ -172,7 +181,8 @@ class Game_Data():
 
     # -- Properties -- #
     @property
-    def next_evil_player(self) -> str | None:
+    @enforce_types
+    def next_evil_player(self) -> Union[str, None]:
         try:
             player = next(iter(self.evil_aligned.keys()))
             if self.players[player].mafia_alternative:
@@ -181,14 +191,39 @@ class Game_Data():
                 return self.next_evil_player
         except: 
             return None
+        
+    @property
+    @enforce_types
+    def random_ability(self) -> Callable:
+        sample: str = np.random.choice(list(self.ablity_distribution.keys()), list(self.ablity_distribution.values()))
+        return self.abilities[sample]
+    
+    @property
+    @enforce_types
+    def priority(self) -> None:
+        return Players(dict(sorted(self.players.items(), key = lambda item: item[1].priority)))
 
     # -- Methods -- #
     def init(self) -> None:
+        # -- Player Info -- #
         self.mafia_role = deepcopy(self.roles["Mafia"]) 
-        self.none_role =deepcopy(self.roles["Villager"])
-        self.priority = Players(dict(sorted(self.players.items(), key = lambda item: item[1].priority)))
+        self.none_role = deepcopy(self.roles["Villager"])
+
+
         self.good_aligned = Players({name: role for name, role in self.players.items() if role.alignment})
         self.evil_aligned = Players({name: role for name, role in self.players.items() if not role.alignment})
+
         self.alive_players = self.players.deepcopy()
         self.dead_players = Players({})
-        self.vote_role: Role = Role("Voting", self.abilities["vote"], True, False, 999, 999, [], [], []) # -- Using A Role For Menu Purposes -- #
+
+        # -- Using A Role For Menu Purposes -- #
+        self.vote_role: Role = Role("Voting", self.abilities["vote"], True, False, 999, 999, [], [], []) 
+        
+        # -- Secondary Ability Handling -- #
+        for role in self.players.values():
+            role.secondary_ability = deepcopy(self.abilities["none"])
+
+        # -- Ability Distribution For Gambler -- #
+        total = sum(self.ablity_distribution.values())
+        self.ablity_distribution = {key: value / total for key, value in self.ablity_distribution.items()}
+

@@ -170,7 +170,6 @@ class Game_Data():
     ablity_distribution: dict[str, float]
     mafia_role: Role = None
     none_role: Role = None
-    priority: Players = None
     good_aligned: Players = None
     evil_aligned: Players = None
     alive_players: Players = None
@@ -200,7 +199,7 @@ class Game_Data():
     
     @property
     @enforce_types
-    def priority(self) -> None:
+    def priority(self) -> Players:
         return Players(dict(sorted(self.players.items(), key = lambda item: item[1].priority)))
 
     # -- Methods -- #

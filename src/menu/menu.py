@@ -368,9 +368,9 @@ def selection_menu(data: Game_Data, entries: Menu_Entry, user: str, target: str 
         text = "Voting Menu"
     else:
         if target == "":
-            text =  f"{user} is the {role.name} and is using {ability.__name__}. They need to select {ability.targets} target{"s" if ability.targets > 1 else ""}"
+            text =  f"{user} is the {role.name} using {ability.__name__}. Select {ability.targets} target{"s" if ability.targets > 1 else ""}"
         else:
-            text = f"{user} is using the power of {role.name}. They need to select {ability.targets} target{"s" if ability.targets > 1 else ""}"
+            text = f"{user} is using the power of {role.name} ({role.ability.__name__}). Select {ability.targets} target{"s" if ability.targets > 1 else ""}"
 
     action_label = tk.Label(action_frame, font = main_font, text = text)
     confirm_frame = tk.Frame(action_frame, bg = bg_2)

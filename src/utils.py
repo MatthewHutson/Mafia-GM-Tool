@@ -75,36 +75,14 @@ def enforce_types(func: Callable) -> Callable:
             except IndexError: pass  # -- Ignores The No Given Hint Case -- #
 
         result = func(*args, **kwargs) # -- Performs The Function Normally -- #
-        assert any_instance(result, return_hint), f"Return Value must be of type {return_hint} but value = {value} of type {type(value)} provided" # -- Checks For Correct Output Type -- #
+        assert any_instance(result, return_hint), f"Return Value must be of type {return_hint} but value = {result} of type {type(result)} provided" # -- Checks For Correct Output Type -- #
         return result
     
     return wrapper # -- Sends The Checking Function -- #
 
-# -- Subroutines -- #
 @enforce_types
-def valid_input_list(input_text: str, failure_text: str, valid_inputs: list[str]) -> str:
-    # -- Makes an input that requires a match in the lsit -- #
-    valid_inputs: list = [string.lower() for string in valid_inputs]
-
-    while (True):
-        try:
-          input_string: str = inputLine(input_text)
-          assert input_string.lower() in valid_inputs
-          return input_string
-        except AssertionError:
-            printLine(failure_text)
-        except:
-            printLine("No input detected!")
-
-@enforce_types
-def printLine(input_string: str) -> None: print("\n" + input_string)
-
-@enforce_types
-def inputLine(input_string: str) -> str: return input("\n" + input_string + ": ")
-
-@enforce_types
-def capitalise_words(input_string: str) -> str:
-    words: list[str] = input_string.split(" ")
+def capitalise_words(input_string: str, split: str = " ") -> str:
+    words: list[str] = input_string.split(split)
     output: str = ""
 
     for word in words:

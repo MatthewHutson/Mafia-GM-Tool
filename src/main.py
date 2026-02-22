@@ -41,19 +41,15 @@ def selection_coindition(data: Game_Data, role: Role, name: str, is_primary_abil
 @enforce_types
 def main() -> None:
     # -- Game Data -- #
-    role_functions: dict[str, Callable] = {name : getattr(a, name) for name in dir(a) if callable(getattr(a, name))}
+    role_functions: dict[str, a.Ability] = {ability.__name__: ability() for ability in a.Ability.__subclasses__()}
     roles: dict[str, Role] = {}
     ability_distribution: dict[str, float] = {}
 
     # -- File Handling -- #
     path: str = "Roles"
 
-    with open("ability_distribution.json") as file: abilities: dict[str, Any] = json.load(file)
-
-    for key, value in abilities.items():
-        ability: Callable = role_functions[key]
-        ability_distribution[key] = float(value["p"])
-        add_attributes_function(ability, value["attributes"])
+    for key, value in role_functions.items():
+        ability_distribution[key] = float(value.p)
 
     for item in os.listdir(path):
         with open(path + "/" + item, 'r') as file:

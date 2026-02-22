@@ -2,8 +2,9 @@
 A Program to allocate roles in a game of mafia
 
 # Changes
-Added Secondary Ability To Player - Useful For Gambler
-Created The Gamble Ability For Gambler
+Bug Fixes
+Changed Every Role To A More Well Defined Class
+Removed The ability_distribution json file as that data is now included in the classes
 
 # To Do
 Finish Gambler

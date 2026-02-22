@@ -2,9 +2,8 @@
 A Program to allocate roles in a game of mafia
 
 # Changes
-Bug Fixes
-Changed Every Role To A More Well Defined Class
-Removed The ability_distribution json file as that data is now included in the classes
+Bug Fix - "Pathetic Ambush Attempt" - Ambush Did Nothing When There Was 1 Target
+Bug Fix - "... visited b" - Filtered Users With Any Number of " "'s when reading visitors (caused by ambusher)
 
 # To Do
 Finish Gambler

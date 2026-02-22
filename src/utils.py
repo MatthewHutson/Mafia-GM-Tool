@@ -91,3 +91,24 @@ def capitalise_words(input_string: str, split: str = " ") -> str:
 
     output = output[0:-1]
     return output
+
+@enforce_types
+def valid_input_list(input_text: str, failure_text: str, valid_inputs: list[str]) -> str:
+    # -- Makes an input that requires a match in the lsit -- #
+    valid_inputs: list = [string.lower() for string in valid_inputs]
+
+    while (True):
+        try:
+          input_string: str = inputLine(input_text)
+          assert input_string.lower() in valid_inputs
+          return input_string
+        except AssertionError:
+            printLine(failure_text)
+        except:
+            printLine("No input detected!")
+
+@enforce_types
+def printLine(input_string: str) -> None: print("\n" + input_string)
+
+@enforce_types
+def inputLine(input_string: str) -> str: return input("\n" + input_string + ": ")

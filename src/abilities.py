@@ -3,6 +3,7 @@ from utils import *
 from classes_and_types import Role, Game_Data
 from game_loop_functions import *
 from time import sleep
+from re import fullmatch
 
 # -- Base Class -- #
 class Ability():
@@ -89,7 +90,6 @@ class link(Ability):
     def __init__(self) -> None:
         super().__init__(2, 0, ["singular"], True)
         
-    
     # -- Ability -- #
     @enforce_types
     def ability(self, user: str, data: Game_Data) -> None:
@@ -110,7 +110,6 @@ class jester(Ability):
     def __init__(self) -> None:
         super().__init__(0, 5, ["on_death"], True)
         
-    
     # -- Ability -- #
     @enforce_types
     def ability(self, user: str, data: Game_Data) -> None:
@@ -122,7 +121,6 @@ class stop_vote(Ability):
     def __init__(self) -> None:
         super().__init__(1, 5, ["singular", "on_vote"], True)
         
-    
     # -- Ability -- #
     @enforce_types
     def ability(self, user: str, data: Game_Data) -> None:
@@ -139,7 +137,6 @@ class execute(Ability):
     def __init__(self) -> None:
         super().__init__(1, 5, ["singular", "on_vote"], True)
         
-    
     # -- Ability -- #
     @enforce_types
     def ability(self, user: str, data: Game_Data) -> None:
@@ -154,7 +151,6 @@ class poison(Ability):
     @enforce_types
     def __init__(self) -> None:
         super().__init__(1, 5, ["repeat"], True)
-        
     
     # -- Ability -- #
     @enforce_types
@@ -168,7 +164,6 @@ class kill(Ability):
     def __init__(self) -> None:
         super().__init__(1, 5, ["repeat"], True)
         
-    
     # -- Ability -- #
     @enforce_types
     def ability(self, user: str, data: Game_Data) -> None:
@@ -180,7 +175,6 @@ class telepathy(Ability):
     @enforce_types
     def __init__(self) -> None:
         super().__init__(1, 5, ["repeat"], True)
-        
     
     # -- Ability -- #
     @enforce_types
@@ -199,7 +193,6 @@ class stalk(Ability):
     def __init__(self) -> None:
         super().__init__(1, 5, ["repeat"], True)
         
-    
     # -- Ability -- #
     @enforce_types
     def ability(self, user: str, data: Game_Data) -> None:
@@ -208,8 +201,22 @@ class stalk(Ability):
         if not data.players[user].poisoned:
             target: str = data.players[user].targets[0]
             visitors = data.players[target].visited_by
+        else:
+            visitors = []
 
         target_str = f"{target} was visited by "
+        count = 0
+
+        # -- Filtering For " " and Self Cases -- #
+        for i in range(len(visitors)):
+            visitor = visitors[count]
+
+            if fullmatch(" ", visitor) or visitor == user:
+                visitors.remove(visitor)
+            else:
+                count += 1
+
+        print(visitors)
             
         for player in visitors:
             if player != user:
@@ -218,7 +225,7 @@ class stalk(Ability):
         if len(visitors) > 0:
             target_str = target_str[:-2]
         else:
-            target_str += " nobody"
+            target_str += "nobody"
 
         data.players[user].information.append(target_str)
 
@@ -226,7 +233,6 @@ class vengance(Ability):
     @enforce_types
     def __init__(self) -> None:
         super().__init__(0, 5, ["on_death"], True)
-        
     
     # -- Ability -- #
     @enforce_types
@@ -245,8 +251,7 @@ class vengance(Ability):
 class resurrect(Ability):
     @enforce_types
     def __init__(self) -> None:
-        super().__init__(1, 5, ["singular", "on_demand"], False)
-        
+        super().__init__(1, 5, ["singular", "on_demand"], False)  
     
     # -- Ability -- #
     @enforce_types
@@ -260,31 +265,42 @@ class ambush(Ability):
     def __init__(self) -> None:
         super().__init__(1, 5, ["repeat"], True)
         
-    
     # -- Ability -- #
     @enforce_types
     def ability(self, user: str, data: Game_Data) -> None:
         if not data.players[user].poisoned:
             target = data.players[user].targets[0]
+            visitors = deepcopy(data.players[target].visited_by)
+
             try:
-                new_target = data.players[target].visited_by[0]
-                bystanders = deepcopy(data.players[target].visited_by[1:])
-
-                bystanders.remove(user)
-
-                data.players[user].targets = [new_target]
-                kill(user, data)
-
-                for player in bystanders:
-                    data.players[player].information.append(f"{user} attempted to ambush {new_target}!")
+                visitors.remove(user)
             except:
                 pass
+
+            try:
+                new_target = visitors[0]
+                bystanders = deepcopy(visitors)
+
+                bystanders.remove(new_target)
+
+                data.players[user].targets = [new_target]
+                kill()(user, data)
+            except:
+                pass
+
+            try:
+                bystanders.remove(user)
+            except:
+                pass
+
+            for player in bystanders:
+                data.players[player].information.append(f"{user} attempted to ambush {new_target}!")
+
 
 class mayor(Ability):
     @enforce_types
     def __init__(self) -> None:
         super().__init__(0, 5, ["passive", "game_end"], True)
-        
     
     # -- Ability -- #
     @enforce_types
@@ -302,7 +318,6 @@ class gamble(Ability):
     def __init__(self) -> None:
         super().__init__(0, 0, ["on_demand", "secondary_ability"], True)
         
-    
     # -- Ability -- #
     @enforce_types
     def ability(self, user: str, data: Game_Data) -> None:
@@ -321,7 +336,6 @@ class instant_death(Ability):
     def __init__(self) -> None:
         super().__init__(1, 5, ["instant"], True)
         
-    
     # -- Ability -- #
     @enforce_types
     def ability(self, user: str, data: Game_Data) -> None:

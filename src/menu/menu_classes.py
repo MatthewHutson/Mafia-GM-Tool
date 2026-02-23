@@ -37,7 +37,6 @@ class Vertical_Scroll_Frame(tk.Frame):
     def initialise(self) -> None:
         self.canvas.bind("<Configure>", self.scroll_all)
         self.canvas.master.bind("<MouseWheel>", self.scroll_event)
-        
 
 class Role_Icon:
     # -- Constructors -- #
@@ -299,12 +298,12 @@ class Player_Select_Frame(Player_Frame):
 class Player_Role_Frame(Player_Frame):
     # -- Constructor -- #
     @enforce_types
-    def __init__(self, name: str, data: Game_Data, main_frame: Union[tk.Frame, Vertical_Scroll_Frame], main_font: tuple[str, int], selected_players: list[str], selected_role: Role) -> None:
+    def __init__(self, name: str, data: Game_Data, main_frame: Union[tk.Frame, Vertical_Scroll_Frame], main_font: tuple[str, int], selected_players: list[str], selected_role: Role, number_of_targets: int) -> None:
         super().__init__(name, main_frame, main_font)
         self.data = data
         self.alignment = self.role.true_alignment
         self.selected_players = selected_players
-        self.number_of_targets = selected_role.ability.targets
+        self.number_of_targets = number_of_targets
         self.selected_role_name = selected_role.name
         self.selected = False
         self.current_role_icon = None
@@ -390,7 +389,7 @@ class Player_Role_Frame(Player_Frame):
             self.selected = not self.selected
 
         elif len(self.selected_players) >= self.number_of_targets:
-            messagebox.showwarning("Warning", f"{self.selected_role_name} can only select {self.number_of_targets} target{"s" if self.number_of_targets > 1 else ""}!")
+            messagebox.showwarning("Warning", f"{self.selected_role_name} can only select {self.number_of_targets} target{"s" if self.number_of_targets != 1 else ""}!")
         
         self.forget()
         self.select_icon = tk.Button(self.frame, text = "Select", bg = self.selected_bg, activebackground = "#4980C4", fg = "#FFFFFF", activeforeground = "#FFFFFF", width = 6, height = 4, command = self.select)

@@ -19,7 +19,9 @@ def ability_conditions(role: Role, has_recursed: bool, data: Game_Data) -> bool:
 
 @enforce_types
 def use_abilities(data: Game_Data, can_recurse: bool = True) -> None:
-    for name, role in data.priority.items():
+    priority: Players = data.priority
+
+    for name, role in priority.items():
         if ability_conditions(role, can_recurse, data):
             if not (can_recurse or "secondary_ability" in role.ability_type) and not role.recursion_fuck_up:
                 role.used_ability = True
@@ -28,6 +30,12 @@ def use_abilities(data: Game_Data, can_recurse: bool = True) -> None:
 
     if can_recurse:
         use_abilities(data, False)
+
+        for role in priority.values():
+            if "late" in role.ability.ability_type:
+                role.ability(name, data)
+            if "late" in role.secondary_ability.ability_type:
+                role.secondary_ability(name, data)
 
 @enforce_types
 def life_death_sort(data: Game_Data) -> None:

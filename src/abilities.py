@@ -9,7 +9,7 @@ from re import fullmatch
 class none(Ability):
     @enforce_types
     def __init__(self) -> None:
-        super().__init__(0, 25, ["passive"], True)
+        super().__init__(0, 15, ["passive"], True)
     
     # -- Ability -- #
     @enforce_types
@@ -66,7 +66,7 @@ class protect(Ability):
 class link(Ability):
     @enforce_types
     def __init__(self) -> None:
-        super().__init__(2, 0, ["singular"], True, 4)
+        super().__init__(2, 5, ["singular"], True, 4)
         
     # -- Ability -- #
     @enforce_types
@@ -137,6 +137,11 @@ class poison(Ability):
             target: str = data.players[user].targets[0]
             data.players[target].poisoned = True
 
+            if data.players[target].ability == self:
+                # -- Prevents Unfair Poison Clashes -- #
+                targets_target: str = data.players[target].targets[0]
+                data.players[targets_target].poisoned = False
+
 class kill(Ability):
     @enforce_types
     def __init__(self) -> None:
@@ -169,7 +174,7 @@ class telepathy(Ability):
 class stalk(Ability):
     @enforce_types
     def __init__(self) -> None:
-        super().__init__(1, 5, ["repeat"], True)
+        super().__init__(1, 10, ["repeat"], True)
         
     # -- Ability -- #
     @enforce_types
@@ -281,7 +286,7 @@ class ambush(Ability):
 class mayor(Ability):
     @enforce_types
     def __init__(self) -> None:
-        super().__init__(0, 5, ["passive", "game_end"], True, 10)
+        super().__init__(0, 0, ["passive", "game_end"], True, 10)
     
     # -- Ability -- #
     @enforce_types
@@ -297,7 +302,7 @@ class mayor(Ability):
 class gamble(Ability):
     @enforce_types
     def __init__(self) -> None:
-        super().__init__(0, 0, ["on_demand", "secondary_ability"], True, 8)
+        super().__init__(0, 0, ["alternate", "secondary_ability"], True, 8)
         
     # -- Ability -- #
     @enforce_types
@@ -308,8 +313,12 @@ class gamble(Ability):
 
         else:
             role.secondary_ability = data.random_ability
-            role.information.append(f"Show {user} that they got {role.secondary_ability.__name__}")
-            role.ability.priority = role.secondary_ability.priority
+
+            new_role: Role = data.get_role_by_ability(role.secondary_ability)
+            new_card: str = data.get_card_by_role(new_role)
+
+            role.information.append(f"They rolled {new_role.name}, which has the card {new_card}!")
+            role.ability.priority = role.secondary_ability.priority + 0.5
 
             if "instant" in role.secondary_ability.ability_type:
                 role.secondary_ability(user, data)
@@ -317,10 +326,10 @@ class gamble(Ability):
 class instant_death(Ability):
     @enforce_types
     def __init__(self) -> None:
-        super().__init__(1, 5, ["instant"], True)
+        super().__init__(1, 5, ["late"], True)
         
     # -- Ability -- #
     @enforce_types
     def ability(self, user: str, data: Game_Data) -> None:
         if not data.players[user].poisoned:
-            data.players[user].die()
+            data.players[user].die(data.players)

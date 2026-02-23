@@ -179,7 +179,7 @@ def start_confirm(entries: Menu_Entry) -> None:
             get_data(root, entries)
 
 @enforce_types
-def pack_alive_and_dead(data: Game_Data, active_role: Role) -> None:
+def pack_alive_and_dead(data: Game_Data, active_role: Role, number_of_targets: int) -> None:
     for i in range(len(alive_frames)):
         frame = alive_frames[0]
         alive_frames.remove(frame)
@@ -191,11 +191,11 @@ def pack_alive_and_dead(data: Game_Data, active_role: Role) -> None:
         frame.delete()
 
     for name, Role in data.alive_players.items():
-        player_frame = Player_Role_Frame(name, data, alive_canvas, main_font, selected_players, active_role)
+        player_frame = Player_Role_Frame(name, data, alive_canvas, main_font, selected_players, active_role, number_of_targets)
         alive_frames.append(player_frame)
 
     for name, Role in data.dead_players.items():
-        player_frame = Player_Role_Frame(name, data, dead_canvas, main_font, selected_players, active_role)
+        player_frame = Player_Role_Frame(name, data, dead_canvas, main_font, selected_players, active_role, number_of_targets)
         dead_frames.append(player_frame)
 
 @enforce_types
@@ -328,7 +328,7 @@ def init_game_menu(entries: Menu_Entry, data: Game_Data) -> None:
     alive_margin.pack(side = tk.LEFT, padx = 4, pady = 4, fill = "y", ipadx = 128)
     dead_margin.pack(side = tk.RIGHT, padx = 4, pady = 4, fill = "y", ipadx = 128)
 
-    pack_alive_and_dead(data, data.vote_role) # -- Prevents Popup before the first night -- #
+    pack_alive_and_dead(data, data.vote_role, 0) # -- Prevents Popup before the first night -- #
     card_index(root, bg_2, main_font, entries, data) # -- Gives Role Card Before Popups Appear -- #
 
 @enforce_types
@@ -360,7 +360,7 @@ def selection_menu(data: Game_Data, entries: Menu_Entry, user: str, target: str 
         confirm_selection(data, role, is_primary_ability)
 
     # -- Subroutine Main -- #
-    pack_alive_and_dead(data, role)
+    pack_alive_and_dead(data, role, ability.targets)
     action_frame = tk.Frame(root, bg = bg_2)
 
 

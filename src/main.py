@@ -6,48 +6,56 @@ from tkinter import messagebox
 from time import sleep
 from classes_and_types import *
 from menu.menu import *
+from menu.card_index import card_init
 from game_loop_functions import *
 import abilities as a
 
 # -- Functions -- #
 @enforce_types
-def on_demand(data: Game_Data, role: Role, name: str, previous_conditions: bool) -> bool:
-    if "on_demand" in role.ability_type and previous_conditions:
+def on_demand(data: Game_Data, role: Role, ability: Ability, name: str) -> None:
+    if "on_demand" in ability.ability_type and (not ("singular" in ability.ability_type and (role.selected_target))):
         sleep(0.5)
-        use_ability = messagebox.askyesno("Ability", f"Does {name}, the {role.name} want to use their ability ({role.ability.__name__}) on demand?")
+        use_ability = messagebox.askyesno("Ability", f"Does {name}, the {role.name} want to use their ability ({ability.__name__}) on demand?")
         role.ability_cancel = not use_ability
-        return use_ability
-    else: 
-        return True
+        role.secondary_ability_cancel = not use_ability
+
+@enforce_types
+def alternate(data: Game_Data, role: Role, ability: Ability, name: str) -> None:
+    if "alternate" in ability.ability_type and (not ("singular" in ability.ability_type and (role.selected_target))):
+        sleep(0.5)
+        use_ability = messagebox.askyesno("Ability", f"Does {name}, the {role.name} want to usre their primary ability ({ability.__name__}) instead of their secondary ability ({role.secondary_ability.__name__})?")
+        role.ability_cancel = not use_ability
+        role.secondary_ability_cancel = use_ability
 
 @enforce_types
 def selection_coindition(data: Game_Data, role: Role, name: str, is_primary_ability: bool) -> bool:
     if is_primary_ability:
         ability = role.ability
-        can_pick_secondary_targets = True
+        use_ability = not role.ability_cancel
     else:
         ability = role.secondary_ability
-        can_pick_secondary_targets = role.can_pick_secondary_targets
+        use_ability = not role.secondary_ability_cancel
+
+    on_demand(data, role, ability, name)
+    alternate(data, role, ability, name)
+
 
     ability_type = ability.ability_type
     singular = (not ("singular" in ability_type and (role.selected_target)))
     targets = ability.targets > 0 
 
-    universal_conditions = singular and targets and data.playing
     dead_targets = True 
 
     if not ability.target_living and len(data.dead_players) == 0:
         dead_targets = False
 
-    use_ability = on_demand(data, role, name, universal_conditions and dead_targets and can_pick_secondary_targets)
-
-    return universal_conditions and use_ability and dead_targets and can_pick_secondary_targets
+    return singular and data.playing and use_ability and dead_targets and targets
 
 # -- Main -- #
 @enforce_types
 def main() -> None:
     # -- Game Data -- #
-    role_functions: dict[str, a.Ability] = {ability.__name__: ability() for ability in a.Ability.__subclasses__()}
+    role_functions: dict[str, a.Ability] = {ability.__name__: ability() for ability in Ability.__subclasses__()}
     roles: dict[str, Role] = {}
     ability_distribution: dict[str, float] = {}
 
@@ -79,7 +87,7 @@ def main() -> None:
     setup_menu(entries, name_data)
 
     # -- Player Organisation -- #
-    game_data = Game_Data(Players(entries.assign_roles()), roles, role_functions, ability_distribution)
+    game_data = Game_Data(Players(entries.assign_roles()), roles, role_functions, ability_distribution, card_init())
     game_data.init()
 
     # -- Game Loop -- #
@@ -88,21 +96,18 @@ def main() -> None:
     while game_data.playing:
         # -- Game Loop -- #
         for name, role in game_data.alive_players.items():
-            if "instant" in role.ability_type:
-                role.ability(name, game_data)
-
             can_pick_primary_target: bool = selection_coindition(game_data, role, name, True)
             if can_pick_primary_target: selection_menu(game_data, entries, name)
 
             if "secondary_ability" in role.ability_type:
                 can_pick_secondary_target: bool = selection_coindition(game_data, role, name, False)
-                if can_pick_secondary_target: selection_menu(game_data, entries, name)
+                if can_pick_secondary_target: selection_menu(game_data, entries, name, is_primary_ability = False)
+            else:
+                can_pick_secondary_target = False
 
-            if game_data.playing and not (can_pick_primary_target or can_pick_primary_target):
+            if game_data.playing and not (can_pick_primary_target or can_pick_secondary_target):
                 sleep(0.5)
-
-                if on_demand(data=game_data, role=role, name=name, previous_conditions=True) and not "on_demand" in role.ability_type:
-                    messagebox.showinfo("Wake Up", f"Wake Up {name} to use no ability.")
+                messagebox.showinfo("Wake Up", f"Wake Up {name} to use no ability.")
 
         if game_data.playing:
             use_abilities(game_data)
@@ -111,7 +116,7 @@ def main() -> None:
 
             remove_round_data(game_data)
 
-            pack_alive_and_dead(game_data, game_data.vote_role)
+            pack_alive_and_dead(game_data, game_data.vote_role, 0)
             use_death_abilities(game_data)
             life_death_sort(game_data)
             remove_round_data(game_data)
@@ -130,7 +135,7 @@ def main() -> None:
                 life_death_sort(game_data)
 
                 if game_data.playing:
-                    pack_alive_and_dead(game_data, game_data.vote_role)
+                    pack_alive_and_dead(game_data, game_data.vote_role, 0)
 
         check_for_victory(game_data)
 

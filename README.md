@@ -2,12 +2,11 @@
 A Program to allocate roles in a game of mafia
 
 # Changes
-Moved Priority to Abilities
-Added a requirements.txt file
-Minor Changes
+Added New Ability Tags
+Added The Gambler - "99% of Gamblers Quit Before Getting To Defeat The Mafia"
+Many Technical Changes To Make This Work
 
 # To Do
-Finish Gambler
 Add All Other Roles
 Add Joke Roles (Perhaps)
 Make Doccumentation With Carlos

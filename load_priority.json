@@ -1,7 +1,8 @@
 {
     "4": [
         ["Mafia"], 
-        ["Sheriff"], ["Soldier"], 
+        ["Sheriff"], 
+        ["Soldier"], 
         ["Villager", "Doctor"]
     ],
     "5": [
@@ -19,7 +20,7 @@
         ["Lawyer", "Executioner"], 
         ["Creep", "Necromancer"],
         ["Poisoner", "Psychic"], 
-        ["Cupid", "Bomber", "Jester", "Mayor"]
+        ["Cupid", "Bomber", "Gambler", "Jester", "Mayor"]
     ],
     "9": [
         ["Mafia"], 
@@ -29,7 +30,7 @@
         ["Lawyer", "Executioner"], 
         ["Creep", "Necromancer"],
         ["Poisoner", "Psychic", "Ambusher"], 
-        ["Cupid", "Bomber"], 
+        ["Cupid", "Bomber", "Gambler"], 
         ["Jester", "Mayor"]
     ],
     "10":[
@@ -40,7 +41,7 @@
         ["Lawyer", "Executioner"], 
         ["Creep", "Necromancer"],
         ["Poisoner", "Psychic", "Ambusher"],  
-        ["Cupid", "Bomber"], 
+        ["Cupid", "Bomber",  "Gambler"], 
         ["Jester"], 
         ["Mayor"]
     ]

@@ -28,6 +28,10 @@ class Ability():
     def __call__(self, user: str, data: object) -> None:
         self.ability(user, data)
 
+    @enforce_types
+    def __eq__(self, ability2: object) -> bool:
+        return type(ability2) == type(self)
+
 # -- Role Class -- #
 @dataclass
 class Role:
@@ -40,7 +44,7 @@ class Role:
     targets: list[object]
     information: list[str]
     visited_by: list[str]
-    secondary_ability: Callable = None
+    secondary_ability: Ability = None
     new_mafia = False # For Mafia Alternative Handling
     currently_alive: bool = True
     protected: bool = False
@@ -54,6 +58,7 @@ class Role:
     was_voted_out: bool = False
     just_died: bool = False
     ability_cancel: bool = False # For "on_demand"
+    secondary_ability_cancel: bool = True # For "on_demand" Secondary Abilities
     recursion_fuck_up: bool = False
     channeled_role: str = None
     team_win_condition: bool = False
@@ -88,7 +93,7 @@ class Role:
     @enforce_types
     def can_pick_secondary_targets(self) -> bool:
         # -- Checks If The First Ability Was Cancelled and If Secondary Ability Needs Targets -- #
-        return self.ability_cancel and self.secondary_ability.targets > 0 
+        return (not self.ability_cancel or self.secondary_ability_cancel) and self.secondary_ability.targets > 0 
     
     @property
     @enforce_types
@@ -114,6 +119,10 @@ class Role:
     def revive(self) -> None:
         self.currently_alive = True
         self.just_died = False
+
+    @enforce_types
+    def __str__(self) -> str:
+        return f"Role: {self.name}, Alignment: {self.named_alignment}, Primary Ability: {self.ability.__name__}, Secondary Ability: {self.secondary_ability.__name__}, Alive: {self.currently_alive}"
 
     @enforce_types
     def on_death_ability(self, data: object) -> None:
@@ -196,6 +205,7 @@ class Game_Data():
     roles: dict[str, Role]
     abilities: dict[str, Callable]
     ablity_distribution: dict[str, float]
+    card_dict: dict[str, object]
     mafia_role: Role = None
     none_role: Role = None
     good_aligned: Players = None
@@ -221,9 +231,9 @@ class Game_Data():
         
     @property
     @enforce_types
-    def random_ability(self) -> Callable:
-        sample: str = np.random.choice(list(self.ablity_distribution.keys()), list(self.ablity_distribution.values()))
-        return self.abilities[sample]
+    def random_ability(self) -> Ability:
+        sample: str = np.random.choice(np.array(list(self.ablity_distribution.keys())), size = 1, p = np.array(list(self.ablity_distribution.values())))
+        return self.abilities[sample[0]]
     
     @property
     @enforce_types
@@ -244,7 +254,7 @@ class Game_Data():
         self.dead_players = Players({})
 
         # -- Using A Role For Menu Purposes -- #
-        self.vote_role: Role = Role("Voting", self.abilities["vote"], True, False, 999, 999, [], [], []) 
+        self.vote_role: Role = Role("Voting", self.abilities["vote"], True, False, 999, [], [], []) 
         
         # -- Secondary Ability Handling -- #
         for role in self.players.values():
@@ -254,3 +264,13 @@ class Game_Data():
         total = sum(self.ablity_distribution.values())
         self.ablity_distribution = {key: value / total for key, value in self.ablity_distribution.items()}
 
+    @enforce_types
+    def get_role_by_ability(self, ability: Ability) -> Union[Role, None]:
+        for role in self.roles.values():
+            if role.ability == ability:
+                return role
+        return None
+    
+    @enforce_types
+    def get_card_by_role(self, role: Role) -> str:
+        return self.card_dict[role.name]

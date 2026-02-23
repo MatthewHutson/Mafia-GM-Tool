@@ -3,6 +3,5 @@
     "ability": "poison",
     "alignment": false,
     "mafia_alternative": true,
-    "priority": 0,
     "max_count": 1
 }

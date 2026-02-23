@@ -11,6 +11,16 @@ import abilities as a
 
 # -- Functions -- #
 @enforce_types
+def on_demand(data: Game_Data, role: Role, name: str, previous_conditions: bool) -> bool:
+    if "on_demand" in role.ability_type and previous_conditions:
+        sleep(0.5)
+        use_ability = messagebox.askyesno("Ability", f"Does {name}, the {role.name} want to use their ability ({role.ability.__name__}) on demand?")
+        role.ability_cancel = not use_ability
+        return use_ability
+    else: 
+        return True
+
+@enforce_types
 def selection_coindition(data: Game_Data, role: Role, name: str, is_primary_ability: bool) -> bool:
     if is_primary_ability:
         ability = role.ability
@@ -24,16 +34,12 @@ def selection_coindition(data: Game_Data, role: Role, name: str, is_primary_abil
     targets = ability.targets > 0 
 
     universal_conditions = singular and targets and data.playing
-    use_ability = True
     dead_targets = True 
 
     if not ability.target_living and len(data.dead_players) == 0:
         dead_targets = False
 
-    if "on_demand" in ability_type and universal_conditions and dead_targets and can_pick_secondary_targets:
-        sleep(0.5)
-        use_ability = messagebox.askyesno("Ability", f"Does {name}, the {role.name} want to use their ability ({ability.__name__})?")
-        role.ability_cancel = not use_ability
+    use_ability = on_demand(data, role, name, universal_conditions and dead_targets and can_pick_secondary_targets)
 
     return universal_conditions and use_ability and dead_targets and can_pick_secondary_targets
 
@@ -94,7 +100,9 @@ def main() -> None:
 
             if game_data.playing and not (can_pick_primary_target or can_pick_primary_target):
                 sleep(0.5)
-                messagebox.showinfo("Wake Up", f"Wake Up {name} to use no ability.")
+
+                if on_demand(data=game_data, role=role, name=name, previous_conditions=True) and not "on_demand" in role.ability_type:
+                    messagebox.showinfo("Wake Up", f"Wake Up {name} to use no ability.")
 
         if game_data.playing:
             use_abilities(game_data)

@@ -5,20 +5,43 @@ from random import shuffle
 from copy import deepcopy
 import numpy as np
 
+# -- Ability Template Class -- #
+class Ability():
+    @enforce_types
+    def __init__(self, targets: int, p: Union[int, float], ability_type: list[str], target_living: bool, priority: int = 255) -> None:
+        self.targets: int = targets
+        self.p: int | float = p
+        self.ability_type: list[str] = ability_type
+        self.target_living: bool = target_living
+        self.priority: int = priority
+    
+    @property
+    @enforce_types
+    def __name__(self) -> str:
+        return capitalise_words(type(self).__name__, "_")
+
+    # -- Methods -- #
+    def ability(self, user: str, data: object) -> None:
+        ...
+
+    @enforce_types
+    def __call__(self, user: str, data: object) -> None:
+        self.ability(user, data)
+
 # -- Role Class -- #
 @dataclass
 class Role:
     # -- Attributes - #
     name: str
-    ability: Callable
+    ability: Ability
     _alignment: bool # True Being Good, False Being Evil #
     mafia_alternative: bool # Switches to Mafia Abiltity When All Normal Mafia Dies #
-    priority: int # Order of Execution of Abilities From Lowest To Highest #
     max_count: int
     targets: list[object]
     information: list[str]
     visited_by: list[str]
     secondary_ability: Callable = None
+    new_mafia = False # For Mafia Alternative Handling
     currently_alive: bool = True
     protected: bool = False
     poisoned: bool = False
@@ -66,6 +89,11 @@ class Role:
     def can_pick_secondary_targets(self) -> bool:
         # -- Checks If The First Ability Was Cancelled and If Secondary Ability Needs Targets -- #
         return self.ability_cancel and self.secondary_ability.targets > 0 
+    
+    @property
+    @enforce_types
+    def priority(self) -> int: # Order of Execution of Abilities From Lowest To Highest #
+        return self.ability.priority
 
     # -- Methods -- #
     @enforce_types

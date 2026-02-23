@@ -2,13 +2,14 @@
 A Program to allocate roles in a game of mafia
 
 # Changes
-Bug Fix - "Pathetic Ambush Attempt" - Ambush Did Nothing When There Was 1 Target
-Bug Fix - "... visited b" - Filtered Users With Any Number of " "'s when reading visitors (caused by ambusher)
+Moved Priority to Abilities
+Added a requirements.txt file
+Minor Changes
 
 # To Do
 Finish Gambler
 Add All Other Roles
-Add Joke Roles
+Add Joke Roles (Perhaps)
 Make Doccumentation With Carlos
 
 # Using The Milly Stand Counter (For GM)

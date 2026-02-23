@@ -1,6 +1,5 @@
 # -- Imports -- #
 from typing import get_type_hints, get_origin, get_args, Callable, TypeAlias, Any, Protocol, Union
-import tkinter
 
 # -- Decerators -- #
 def add_attributes(**attributes) -> Callable:

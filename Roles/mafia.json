@@ -3,6 +3,5 @@
     "ability": "kill",
     "alignment": false,
     "mafia_alternative": false,
-    "priority": 5,
     "max_count": 1
 }

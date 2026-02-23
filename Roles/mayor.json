@@ -3,7 +3,6 @@
     "ability": "mayor",
     "alignment": true,
     "mafia_alternative": false,
-    "priority": 10,
     "max_count": 10,
     "alternative_end_count": 3,
     "team_win_condition": true

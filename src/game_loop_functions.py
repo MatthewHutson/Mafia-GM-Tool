@@ -21,7 +21,7 @@ def ability_conditions(role: Role, has_recursed: bool, data: Game_Data) -> bool:
 def use_abilities(data: Game_Data, can_recurse: bool = True) -> None:
     for name, role in data.priority.items():
         if ability_conditions(role, can_recurse, data):
-            if not role.ability_cancel or not (can_recurse or "secondary_ability" in role.ability_type) and not role.recursion_fuck_up:
+            if not (can_recurse or "secondary_ability" in role.ability_type) and not role.recursion_fuck_up:
                 role.used_ability = True
 
             role.ability(name, data)

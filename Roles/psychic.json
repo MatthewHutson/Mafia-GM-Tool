@@ -3,6 +3,5 @@
     "ability": "telepathy",
     "alignment": false,
     "mafia_alternative": true,
-    "priority": 4,
     "max_count": 1
 }

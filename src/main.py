@@ -15,7 +15,7 @@ import abilities as a
 def on_demand(data: Game_Data, role: Role, ability: Ability, name: str) -> None:
     if "on_demand" in ability.ability_type and (not ("singular" in ability.ability_type and (role.selected_target))):
         sleep(0.5)
-        use_ability = messagebox.askyesno("Ability", f"Does {name}, the {role.name} want to use their ability ({ability.__name__}) on demand?")
+        use_ability = messagebox.askyesno("Ability", f"Does {name}, the {role.name} want to use their ability ({ability.__name__})?")
         role.ability_cancel = not use_ability
         role.secondary_ability_cancel = not use_ability
 
@@ -31,14 +31,8 @@ def alternate(data: Game_Data, role: Role, ability: Ability, name: str) -> None:
 def selection_coindition(data: Game_Data, role: Role, name: str, is_primary_ability: bool) -> bool:
     if is_primary_ability:
         ability = role.ability
-        use_ability = not role.ability_cancel
     else:
         ability = role.secondary_ability
-        use_ability = not role.secondary_ability_cancel
-
-    on_demand(data, role, ability, name)
-    alternate(data, role, ability, name)
-
 
     ability_type = ability.ability_type
     singular = (not ("singular" in ability_type and (role.selected_target)))
@@ -48,6 +42,15 @@ def selection_coindition(data: Game_Data, role: Role, name: str, is_primary_abil
 
     if not ability.target_living and len(data.dead_players) == 0:
         dead_targets = False
+
+    if singular and data.playing and dead_targets and targets:
+        on_demand(data, role, ability, name)
+        alternate(data, role, ability, name)
+    
+    if is_primary_ability:
+        use_ability = not role.ability_cancel
+    else:
+        use_ability = not role.secondary_ability_cancel
 
     return singular and data.playing and use_ability and dead_targets and targets
 
@@ -113,6 +116,7 @@ def main() -> None:
             use_abilities(game_data)
             information(game_data)
             life_death_sort(game_data)
+            information(game_data, False)
 
             remove_round_data(game_data)
 

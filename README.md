@@ -2,9 +2,10 @@
 A Program to allocate roles in a game of mafia
 
 # Changes
-Added New Ability Tags
-Added The Gambler - "99% of Gamblers Quit Before Getting To Defeat The Mafia"
-Many Technical Changes To Make This Work
+Made Poisoning The Necromancer Revive the Target As Evil
+Made Mafia Alternatives Be Able To Reverse If Mafia Is Ressurected
+Made Lawyer and Executioner Now Aim To Survive If Condition Ended By Murder
+Bug Fixes
 
 # To Do
 Add All Other Roles

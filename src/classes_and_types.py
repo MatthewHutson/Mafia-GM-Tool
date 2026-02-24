@@ -215,19 +215,19 @@ class Game_Data():
     playing: bool = True
     good_win: bool = False
     evil_win: bool = False
+    evil_count: int = 0
 
     # -- Properties -- #
     @property
     @enforce_types
     def next_evil_player(self) -> Union[str, None]:
-        try:
-            player = next(iter(self.evil_aligned.keys()))
-            if self.players[player].mafia_alternative:
-                return player
-            else:
-                return self.next_evil_player
-        except: 
+        if self.evil_count >= len(self.evil_aligned):
             return None
+        else:
+            player = list(self.evil_aligned)[self.evil_count]
+            self.evil_count += 1
+            return player
+            
         
     @property
     @enforce_types
@@ -245,7 +245,6 @@ class Game_Data():
         # -- Player Info -- #
         self.mafia_role = deepcopy(self.roles["Mafia"]) 
         self.none_role = deepcopy(self.roles["Villager"])
-
 
         self.good_aligned = Players({name: role for name, role in self.players.items() if role.alignment})
         self.evil_aligned = Players({name: role for name, role in self.players.items() if not role.alignment})

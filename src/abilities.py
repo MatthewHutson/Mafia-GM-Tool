@@ -94,6 +94,21 @@ class jester(Ability):
         if data.players[user].was_voted_out: 
             data.players[user].solo_win = True
 
+class survive(Ability):
+    # -- For Neutral Roles Who Lose Their Win Condition When Their Target Is Killed -- #
+    @enforce_types
+    def __init__(self) -> None:
+        super().__init__(0, 0, ["passive", "on_death", "singular"], True)
+    
+    # -- Ability -- #
+    @enforce_types
+    def ability(self, user: str, data: Game_Data) -> None:
+        if not data.players[user].targets[0].currently_alive:
+            data.players[user].solo_win = data.players[user].currently_alive
+        else:
+            ability_swap(data, user)
+
+
 class stop_vote(Ability):
     @enforce_types
     def __init__(self) -> None:
@@ -108,7 +123,7 @@ class stop_vote(Ability):
                 data.players[user].solo_win = False
 
             if not data.players[data.players[user].targets[0]].currently_alive and data.players[user].solo_win:
-                role_switch(data, user, Role("Villager", none, True, False, 999, 999, "passive", [], [], []))
+                ability_swap(data, user)
 
 class execute(Ability):
     @enforce_types
@@ -123,7 +138,7 @@ class execute(Ability):
                 data.players[user].solo_win = True
 
             if not (data.players[data.players[user].targets[0]].currently_alive or data.players[user].solo_win):
-                role_switch(data, user, Role("Villager", none, True, False, 999, 999, "passive", [], [], []))
+                ability_swap(data, user)
 
 class poison(Ability):
     @enforce_types
@@ -239,9 +254,19 @@ class resurrect(Ability):
     # -- Ability -- #
     @enforce_types
     def ability(self, user: str, data: Game_Data) -> None:
-        if len(data.players[user].targets) > 0 and not data.players[user].poisoned and not data.players[user].ability_cancel:
+        if len(data.players[user].targets) > 0 and not data.players[user].ability_cancel:
             target = data.players[data.players[user].targets[0]]
             target.revive()
+
+            target.information.append("You have Been Ressurected")
+
+            if data.players[user].poisoned and target.true_alignment == True:
+                target._alignment = False
+                target.mafia_alternative = True
+                target.information.append("You Are Now Evil!")
+
+                for role in data.evil_aligned.values():
+                    role.information.append(f"{data.players[user].targets[0]} has been resurrected! They are now evil!")
 
         elif data.players[user].ability_cancel:
             data.players[user].used_ability = False

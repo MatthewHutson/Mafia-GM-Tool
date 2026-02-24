@@ -39,6 +39,8 @@ def use_abilities(data: Game_Data, can_recurse: bool = True) -> None:
 
 @enforce_types
 def life_death_sort(data: Game_Data) -> None:
+    init_evil_alternative(data) # -- Ensures Mafia Evil Roles Will Have Kill Switch -- #
+    init_neutral_alternative(data) # -- Same Idea For Neutral Roles -- #
     for name, role in data.players.items():
         if name in data.alive_players.keys():
                 if not role.currently_alive:
@@ -112,14 +114,23 @@ def check_for_victory(data: Game_Data) -> None:
 
 @enforce_types
 def revert_to_mafia(data: Game_Data) -> None:
-    mafia_alive = False
+    mafia_count = 0
     for role in data.alive_players.values():
-        mafia_alive = mafia_alive or role.name == "Mafia"
+        if role.ability == data.mafia_role.ability and not role.alignment:
+            mafia_count += 1
 
-    if not mafia_alive:
+    if mafia_count == 0:
         next_evil_player = data.next_evil_player
         if next_evil_player != None:
-            role_switch(data, next_evil_player, data.mafia_role)
+            ability_swap(data, next_evil_player)
+
+    elif mafia_count > 1:
+        for name, role in data.evil_aligned.items():
+            if role.ability == data.mafia_role.ability:
+                ability_swap(data, name)
+
+        data.evil_count = 0
+        revert_to_mafia(data)
 
 @enforce_types
 def role_switch(data: Game_Data, player: str, new_role: Role) -> None:
@@ -127,12 +138,19 @@ def role_switch(data: Game_Data, player: str, new_role: Role) -> None:
     role = players[player]
     information = role.information
     players[player] = deepcopy(new_role)
+    players[player].ability = deepcopy(new_role.ability)
     data.priority[player] = players[player]
     players[player].linked = role.linked
     players[player].linked_to = role.linked_to
     players[player].linker = role.linker
     players[player].information = information
 
+@enforce_types
+def ability_swap(data: Game_Data, player: str) -> None:
+    players = data.players
+    role = players[player]
+    role.ability, role.secondary_ability = role.secondary_ability, role.ability
+    
 @enforce_types
 def use_vote_abiltities(data: Game_Data) -> None:
     for user, role in data.players.items():
@@ -143,3 +161,15 @@ def use_vote_abiltities(data: Game_Data) -> None:
 def use_death_abilities(data: Game_Data) -> None:
     for role in data.players.values():
         role.on_death_ability(data)
+
+@enforce_types
+def init_evil_alternative(data: Game_Data) -> None:
+    for role in data.evil_aligned.values():
+        if role.secondary_ability == data.none_role.ability:
+            role.secondary_ability = deepcopy(data.mafia_role.ability)
+
+@enforce_types
+def init_neutral_alternative(data: Game_Data) -> None:
+    for role in data.good_aligned.values():
+        if role.true_alignment == None and role.secondary_ability == data.none_role.ability:
+            role.secondary_ability = deepcopy(data.abilities["survive"])

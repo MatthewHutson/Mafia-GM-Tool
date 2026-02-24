@@ -435,7 +435,7 @@ def voting_menu(data: Game_Data, entries: Menu_Entry) -> str:
         return "none"
 
 @enforce_types
-def information(data: Game_Data) -> None:
+def information(data: Game_Data, tell_nothing: bool = True) -> None:
     for player, role in data.alive_players.items():
         info: str = "\n"
         count: int = 0
@@ -446,5 +446,5 @@ def information(data: Game_Data) -> None:
         
         if info != "\n":
             messagebox.showinfo("Info", f"{player} is told: {info}")
-        else:
+        elif tell_nothing:
             messagebox.showinfo("Info", f"{player} is told nothing!")

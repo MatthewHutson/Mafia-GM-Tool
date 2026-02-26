@@ -52,6 +52,7 @@ def selection_coindition(data: Game_Data, role: Role, name: str, is_primary_abil
     else:
         use_ability = not role.secondary_ability_cancel
 
+    role.ability_cancel = not (singular and data.playing and use_ability and dead_targets and targets)
     return singular and data.playing and use_ability and dead_targets and targets
 
 # -- Main -- #

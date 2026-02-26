@@ -48,7 +48,7 @@ class endure(Ability):
     # -- Ability -- #
     @enforce_types
     def ability(self, user: str, data: Game_Data) -> None:
-        if not data.players[user].poisoned: 
+        if not data.players[user].poisoned:
             data.players[user].protected = True
 
 class protect(Ability):
@@ -91,23 +91,7 @@ class jester(Ability):
     # -- Ability -- #
     @enforce_types
     def ability(self, user: str, data: Game_Data) -> None:
-        if data.players[user].was_voted_out: 
-            data.players[user].solo_win = True
-
-class survive(Ability):
-    # -- For Neutral Roles Who Lose Their Win Condition When Their Target Is Killed -- #
-    @enforce_types
-    def __init__(self) -> None:
-        super().__init__(0, 0, ["passive", "on_death", "singular"], True)
-    
-    # -- Ability -- #
-    @enforce_types
-    def ability(self, user: str, data: Game_Data) -> None:
-        if not data.players[user].targets[0].currently_alive:
-            data.players[user].solo_win = data.players[user].currently_alive
-        else:
-            ability_swap(data, user)
-
+        data.players[user].solo_win = data.players[user].was_voted_out
 
 class stop_vote(Ability):
     @enforce_types
@@ -117,13 +101,10 @@ class stop_vote(Ability):
     # -- Ability -- #
     @enforce_types
     def ability(self, user: str, data: Game_Data) -> None:
-        if not data.players[user].solo_win:
-            data.players[user].solo_win = True
-            if data.players[data.players[user].targets[0]].was_voted_out:
-                data.players[user].solo_win = False
+        data.players[user].solo_win = not data.players[data.players[user].targets[0]].was_voted_out
 
-            if not data.players[data.players[user].targets[0]].currently_alive and data.players[user].solo_win:
-                ability_swap(data, user)
+        if not (data.players[data.players[user].targets[0]].currently_alive or data.players[data.players[user].targets[0]].was_voted_out):
+            data.players[user].solo_win = data.players[user].currently_alive
 
 class execute(Ability):
     @enforce_types
@@ -133,12 +114,10 @@ class execute(Ability):
     # -- Ability -- #
     @enforce_types
     def ability(self, user: str, data: Game_Data) -> None:
-        if not data.players[user].solo_win:
-            if data.players[data.players[user].targets[0]].was_voted_out:
-                data.players[user].solo_win = True
+        data.players[user].solo_win = data.players[data.players[user].targets[0]].was_voted_out
 
-            if not (data.players[data.players[user].targets[0]].currently_alive or data.players[user].solo_win):
-                ability_swap(data, user)
+        if not (data.players[data.players[user].targets[0]].currently_alive or data.players[data.players[user].targets[0]].was_voted_out):
+            data.players[user].solo_win = data.players[user].currently_alive
 
 class poison(Ability):
     @enforce_types

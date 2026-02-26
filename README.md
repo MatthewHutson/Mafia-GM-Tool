@@ -2,10 +2,8 @@
 A Program to allocate roles in a game of mafia
 
 # Changes
-Made Poisoning The Necromancer Revive the Target As Evil
-Made Mafia Alternatives Be Able To Reverse If Mafia Is Ressurected
-Made Lawyer and Executioner Now Aim To Survive If Condition Ended By Murder
-Bug Fixes
+Bug Fix - "Can't Die Twice" - Necromancer Would Keep trying to ressurect the ressurected target
+Bug Fix - "passive = none" - Fixed A bug where passive roles would not trigger due to changes made to fix prior bug
 
 # To Do
 Add All Other Roles

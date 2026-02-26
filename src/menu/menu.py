@@ -448,3 +448,5 @@ def information(data: Game_Data, tell_nothing: bool = True) -> None:
             messagebox.showinfo("Info", f"{player} is told: {info}")
         elif tell_nothing:
             messagebox.showinfo("Info", f"{player} is told nothing!")
+
+        role.information = []

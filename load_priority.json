@@ -17,10 +17,10 @@
         ["Sheriff"], 
         ["Soldier"], 
         ["Doctor"], 
-        ["Lawyer", "Executioner"], 
+        ["Lawyer", "Executioner", "Jester"], 
         ["Creep", "Necromancer"],
         ["Poisoner", "Psychic"], 
-        ["Cupid", "Bomber", "Gambler", "Jester", "Mayor"]
+        ["Cupid", "Bomber", "Gambler", "Mayor"]
     ],
     "9": [
         ["Mafia"], 

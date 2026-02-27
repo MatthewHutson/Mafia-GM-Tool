@@ -228,10 +228,11 @@ class Game_Data():
             self.evil_count += 1
             return player
             
-        
     @property
     @enforce_types
     def random_ability(self) -> Ability:
+        total = sum(self.ablity_distribution.values())
+        self.ablity_distribution = {key: value / total for key, value in self.ablity_distribution.items()}
         sample: str = np.random.choice(np.array(list(self.ablity_distribution.keys())), size = 1, p = np.array(list(self.ablity_distribution.values())))
         return self.abilities[sample[0]]
     
@@ -258,10 +259,6 @@ class Game_Data():
         # -- Secondary Ability Handling -- #
         for role in self.players.values():
             role.secondary_ability = deepcopy(self.abilities["none"])
-
-        # -- Ability Distribution For Gambler -- #
-        total = sum(self.ablity_distribution.values())
-        self.ablity_distribution = {key: value / total for key, value in self.ablity_distribution.items()}
 
     @enforce_types
     def get_role_by_ability(self, ability: Ability) -> Union[Role, None]:

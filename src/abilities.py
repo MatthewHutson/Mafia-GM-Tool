@@ -2,6 +2,7 @@
 from utils import *
 from classes_and_types import Role, Game_Data, Ability
 from game_loop_functions import *
+from random import choice
 from time import sleep
 from re import fullmatch
 
@@ -156,14 +157,19 @@ class telepathy(Ability):
     # -- Ability -- #
     @enforce_types
     def ability(self, user: str, data: Game_Data) -> None:
+        target: str = data.players[user].targets[0]
+
         if not data.players[user].poisoned:
-            target: str = data.players[user].targets[0]
             role: Role = data.players[target]
             is_lover: bool = role.linked
+        else:
+            role: Role = choice(data.roles)
+            is_lover: bool = True
+        
+        data.players[user].information.append(f"{target} is {role.name}!")
 
-            data.players[user].information.append(f"{target} is {role.name}!")
-            if is_lover:
-                data.players[user].information.append(f"{target} is linked to another player!")
+        if is_lover:
+            data.players[user].information.append(f"{target} is linked to another player!")
 
 class stalk(Ability):
     @enforce_types
@@ -258,33 +264,27 @@ class ambush(Ability):
     # -- Ability -- #
     @enforce_types
     def ability(self, user: str, data: Game_Data) -> None:
+        target = data.players[user].targets[0]
+        visitors = deepcopy(data.players[target].visited_by)
+
+        try:
+            visitors.remove(user)
+        except:
+            pass
+
+
         if not data.players[user].poisoned:
-            target = data.players[user].targets[0]
-            visitors = deepcopy(data.players[target].visited_by)
-
-            try:
-                visitors.remove(user)
-            except:
-                pass
-
             try:
                 new_target = visitors[0]
-                bystanders = deepcopy(visitors)
-
-                bystanders.remove(new_target)
+                visitors = visitors[1:]
 
                 data.players[user].targets = [new_target]
                 kill()(user, data)
             except:
                 pass
 
-            try:
-                bystanders.remove(user)
-            except:
-                pass
-
-            for player in bystanders:
-                data.players[player].information.append(f"{user} attempted to ambush {new_target}!")
+        for player in visitors:
+            data.players[player].information.append(f"{user} attempted to ambush {new_target}!")
 
 
 class mayor(Ability):
@@ -314,7 +314,6 @@ class gamble(Ability):
         role: Role = data.players[user]
         if role.ability_cancel:
             role.secondary_ability(user, data)
-
         else:
             role.secondary_ability = data.random_ability
 
@@ -337,3 +336,31 @@ class instant_death(Ability):
     def ability(self, user: str, data: Game_Data) -> None:
         if not data.players[user].poisoned:
             data.players[user].die(data.players)
+
+class magnet(Ability):
+    @enforce_types
+    def __init__(self) -> None:
+        super().__init__(1, 5, [""], True)
+        
+    # -- Ability -- #
+    @enforce_types
+    def ability(self, user: str, data: Game_Data) -> None:
+        role: Role = data.players[user]
+        targets = []
+
+        if not role.poisoned:
+            targets.append(role.targets[0])
+            target: Role = data.players[targets[0]]
+
+            if targets[0].ability == poison:
+                target.targets[0].poisioned = True # -- If We do Drunk, Change This -- #
+                role.poisoned = True
+
+        if role.poisoned:
+            targets = []
+            for role in data.alive_players.values() and role.ability != self:
+                if role.ability.target_living:
+                    targets.append(role.name)
+
+        for target in targets:
+            target.targets = [user]

@@ -2,8 +2,9 @@
 A Program to allocate roles in a game of mafia
 
 # Changes
-Bug Fix - "Can't Die Twice" - Necromancer Would Keep trying to ressurect the ressurected target
-Bug Fix - "passive = none" - Fixed A bug where passive roles would not trigger due to changes made to fix prior bug
+Config Changes
+Adding A Few Mor Suggestions
+Working on a new role
 
 # To Do
 Add All Other Roles

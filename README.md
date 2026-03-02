@@ -2,11 +2,11 @@
 A Program to allocate roles in a game of mafia
 
 # Changes
-Config Changes
-Adding A Few Mor Suggestions
-Working on a new role
+Added a launch.json file
+that's it
 
 # To Do
+Finish The Magnet
 Add All Other Roles
 Add Joke Roles (Perhaps)
 Make Doccumentation With Carlos

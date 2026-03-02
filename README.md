@@ -2,8 +2,7 @@
 A Program to allocate roles in a game of mafia
 
 # Changes
-Added a launch.json file
-that's it
+Quick bug fixes - ability equals override and magnet ability (role not made yet)
 
 # To Do
 Finish The Magnet

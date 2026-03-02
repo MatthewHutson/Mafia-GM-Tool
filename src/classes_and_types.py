@@ -29,8 +29,11 @@ class Ability():
         self.ability(user, data)
 
     @enforce_types
-    def __eq__(self, ability2: object) -> bool:
-        return type(ability2) == type(self)
+    def __eq__(self, ability2: Union[object, type]) -> bool:
+        if type(ability2) == type:
+            return type(self) == ability2
+        else:
+            return type(ability2) == type(self)
 
 # -- Role Class -- #
 @dataclass

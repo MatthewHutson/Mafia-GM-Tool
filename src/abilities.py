@@ -342,6 +342,13 @@ class magnet(Ability):
     def __init__(self) -> None:
         super().__init__(1, 5, [""], True)
         
+    # -- Extra Methods -- #
+    @enforce_types
+    def poison_consideration(role: Role, target: Role) -> None:
+        if isinstance(role.ability, poison):
+            target.targets[0].poisioned = False # -- If We do Drunk, Change This -- #
+            role.poisoned = True
+
     # -- Ability -- #
     @enforce_types
     def ability(self, user: str, data: Game_Data) -> None:
@@ -351,16 +358,15 @@ class magnet(Ability):
         if not role.poisoned:
             targets.append(role.targets[0])
             target: Role = data.players[targets[0]]
-
-            if targets[0].ability == poison:
-                target.targets[0].poisioned = True # -- If We do Drunk, Change This -- #
-                role.poisoned = True
+            self.poison_consideration(role, target)
 
         if role.poisoned:
             targets = []
-            for role in data.alive_players.values() and role.ability != self:
+            for target_role in data.alive_players.values() and target_role.ability != self:
                 if role.ability.target_living:
-                    targets.append(role.name)
+                    targets.append(target_role.name)
+                    self.poison_consideration(role, target)
+                        
 
         for target in targets:
             target.targets = [user]

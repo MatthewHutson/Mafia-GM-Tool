@@ -8,7 +8,7 @@ from menu.menu_classes import *
 @enforce_types
 def ability_conditions(role: Role, has_recursed: bool, data: Game_Data) -> bool:
     life = role in data.alive_players.values()
-    not_cancel = (not role.ability_cancel or "passive" in role.ability_type)
+    not_cancel = (not role.ability_cancel or "passive" in role.ability_type or "alternate" in role.ability_type)
     singular = not ("singular" in role.ability_type and (role.used_ability))
     normal_activation = not ("on_vote" in role.ability_type or "on_death" in role.ability_type)
 

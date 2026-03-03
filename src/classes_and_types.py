@@ -14,6 +14,7 @@ class Ability():
         self.ability_type: list[str] = ability_type
         self.target_living: bool = target_living
         self.priority: int = priority
+        self.used_ability: bool = False
     
     @property
     @enforce_types
@@ -55,17 +56,16 @@ class Role:
     linked: bool = False
     linker: str = None
     linked_to: str = None
-    used_ability: bool = False
     selected_target = False
     solo_win: bool = False
     was_voted_out: bool = False
     just_died: bool = False
     ability_cancel: bool = False # For "on_demand"
-    secondary_ability_cancel: bool = True # For "on_demand" Secondary Abilities
     recursion_fuck_up: bool = False
     channeled_role: str = None
     team_win_condition: bool = False
     alternative_end_count: int = 0
+    made_choice: bool = False
     
     # -- Properties -- #
     @property
@@ -102,6 +102,26 @@ class Role:
     @enforce_types
     def priority(self) -> int: # Order of Execution of Abilities From Lowest To Highest #
         return self.ability.priority
+    
+    @property
+    @enforce_types
+    def used_ability(self) -> bool:
+        return self.ability.used_ability
+    
+    @used_ability.setter
+    @enforce_types
+    def used_ability(self, value: bool) -> None:
+        self.ability.used_ability = value
+
+    @property
+    @enforce_types
+    def used_secondary_ability(self) -> bool:
+        return self.secondary_ability.used_ability
+    
+    @used_secondary_ability.setter
+    @enforce_types
+    def used_ability(self, value: bool) -> None:
+        self.secondary_ability.used_ability = value
 
     # -- Methods -- #
     @enforce_types
@@ -231,13 +251,14 @@ class Game_Data():
             self.evil_count += 1
             return player
             
-    @property
     @enforce_types
-    def random_ability(self) -> Ability:
-        total = sum(self.ablity_distribution.values())
-        self.ablity_distribution = {key: value / total for key, value in self.ablity_distribution.items()}
-        sample: str = np.random.choice(np.array(list(self.ablity_distribution.keys())), size = 1, p = np.array(list(self.ablity_distribution.values())))
+    def random_ability(self, used_abilities: list[Role] = []) -> Ability:
+        temp_dist: dict = {role: probabiloty for role, probabiloty in self.ablity_distribution.items() if not role in used_abilities}
+        total = sum(temp_dist.values())
+        temp_dist = {key: value / total for key, value in temp_dist.items()}
+        sample: str = np.random.choice(np.array(list(temp_dist.keys())), size = 1, p = np.array(list(temp_dist.values())))
         return self.abilities[sample[0]]
+    
     
     @property
     @enforce_types

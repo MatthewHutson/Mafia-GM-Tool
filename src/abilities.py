@@ -10,7 +10,7 @@ from re import fullmatch
 class none(Ability):
     @enforce_types
     def __init__(self) -> None:
-        super().__init__(0, 15, ["passive"], True)
+        super().__init__(0, 20, ["passive"], True)
     
     # -- Ability -- #
     @enforce_types
@@ -44,7 +44,7 @@ class reveal(Ability):
 class endure(Ability):
     @enforce_types
     def __init__(self) -> None:
-        super().__init__(0, 10, ["passive"], True, 2)
+        super().__init__(0, 5, ["passive"], True, 2)
     
     # -- Ability -- #
     @enforce_types
@@ -174,7 +174,7 @@ class telepathy(Ability):
 class stalk(Ability):
     @enforce_types
     def __init__(self) -> None:
-        super().__init__(1, 10, ["repeat"], True)
+        super().__init__(1, 5, ["repeat"], True)
         
     # -- Ability -- #
     @enforce_types
@@ -198,8 +198,6 @@ class stalk(Ability):
                 visitors.remove(visitor)
             else:
                 count += 1
-
-        print(visitors)
             
         for player in visitors:
             if player != user:
@@ -245,7 +243,7 @@ class resurrect(Ability):
 
             target.information.append("You have Been Ressurected")
 
-            if data.players[user].poisoned and target.true_alignment == True:
+            if (data.players[user].poisoned or not data.players[user].alignment) and target.true_alignment == True:
                 target._alignment = False
                 target.mafia_alternative = True
                 target.information.append("You Are Now Evil!")
@@ -272,7 +270,6 @@ class ambush(Ability):
         except:
             pass
 
-
         if not data.players[user].poisoned:
             try:
                 new_target = visitors[0]
@@ -297,7 +294,7 @@ class mayor(Ability):
     def ability(self, user: str, data: Game_Data) -> None:
         if data.playing:
             if not data.players[user].solo_win:
-                sleep(1)
+                sleep(0.5)
                 if messagebox.askyesno("Mayor", "Has The Mayor Revealed Themselves?"):
                     data.players[user].solo_win = True
         else:
@@ -306,16 +303,22 @@ class mayor(Ability):
 class gamble(Ability):
     @enforce_types
     def __init__(self) -> None:
-        super().__init__(0, 0, ["alternate", "secondary_ability"], True, 8)
+        super().__init__(0, 0, ["alternate", "secondary_ability", "passive"], True, 8)
+        self.used_abilities: list[Role] = []
         
     # -- Ability -- #
     @enforce_types
     def ability(self, user: str, data: Game_Data) -> None:
         role: Role = data.players[user]
+        print(role.ability_cancel)
         if role.ability_cancel:
             role.secondary_ability(user, data)
+
+            if role.secondary_ability != none or role.secondary_ability:
+                self.used_abilities.append(role.secondary_ability)
+
         else:
-            role.secondary_ability = data.random_ability
+            role.secondary_ability = data.random_ability(self.used_abilities)
 
             new_role: Role = data.get_role_by_ability(role.secondary_ability)
             new_card: str = data.get_card_by_role(new_role)

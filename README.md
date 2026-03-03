@@ -2,10 +2,13 @@
 A Program to allocate roles in a game of mafia
 
 # Changes
-Quick bug fixes - ability equals override and magnet ability (role not made yet)
+Bug Fix - Gambler Would Not Trigger Properly
+Made Gambler incapable of rolling ana bility after using it.
+Technical Changes
 
 # To Do
 Finish The Magnet
+Test Gambler Rigerously
 Add All Other Roles
 Add Joke Roles (Perhaps)
 Make Doccumentation With Carlos

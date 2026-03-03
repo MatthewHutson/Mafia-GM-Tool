@@ -18,6 +18,7 @@ def on_demand(data: Game_Data, role: Role, ability: Ability, name: str) -> None:
         use_ability = messagebox.askyesno("Ability", f"Does {name}, the {role.name} want to use their ability ({ability.__name__})?")
         role.ability_cancel = not use_ability
         role.secondary_ability_cancel = not use_ability
+        role.made_choice = True
 
 @enforce_types
 def alternate(data: Game_Data, role: Role, ability: Ability, name: str) -> None:
@@ -26,6 +27,7 @@ def alternate(data: Game_Data, role: Role, ability: Ability, name: str) -> None:
         use_ability = messagebox.askyesno("Ability", f"Does {name}, the {role.name} want to usre their primary ability ({ability.__name__}) instead of their secondary ability ({role.secondary_ability.__name__})?")
         role.ability_cancel = not use_ability
         role.secondary_ability_cancel = use_ability
+        role.made_choice = True
 
 @enforce_types
 def selection_coindition(data: Game_Data, role: Role, name: str, is_primary_ability: bool) -> bool:
@@ -38,21 +40,24 @@ def selection_coindition(data: Game_Data, role: Role, name: str, is_primary_abil
     singular = (not ("singular" in ability_type and (role.selected_target)))
     targets = ability.targets > 0 
 
+    role.made_choice = False
+
     dead_targets = True 
 
     if not ability.target_living and len(data.dead_players) == 0:
         dead_targets = False
 
-    if singular and data.playing and dead_targets and targets:
+    if singular and data.playing and dead_targets:
         on_demand(data, role, ability, name)
         alternate(data, role, ability, name)
     
     if is_primary_ability:
         use_ability = not role.ability_cancel
+        role.ability_cancel = not (singular and data.playing and use_ability and dead_targets)
     else:
         use_ability = not role.secondary_ability_cancel
+        role.secondary_ability_cancel = not (singular and data.playing and use_ability and dead_targets)
 
-    role.ability_cancel = not (singular and data.playing and use_ability and dead_targets and targets)
     return singular and data.playing and use_ability and dead_targets and targets
 
 # -- Main -- #
@@ -109,7 +114,7 @@ def main() -> None:
             else:
                 can_pick_secondary_target = False
 
-            if game_data.playing and not (can_pick_primary_target or can_pick_secondary_target):
+            if game_data.playing and not (can_pick_primary_target or can_pick_secondary_target) and not role.made_choice:
                 sleep(0.5)
                 messagebox.showinfo("Wake Up", f"Wake Up {name} to use no ability.")
 

@@ -69,7 +69,7 @@ def enforce_types(func: Callable) -> Callable:
                     if hint == subclass or hint == Any:
                         break
                 else:
-                    assert any_instance(value, hint), f"Argument {key} must be of type {hint} but value = {value} of type {type(value)} provided"
+                    assert any_instance(value, hint), f"Argument {key} for {func.__name__} must be of type {hint} but value = {value} of type {type(value)} provided"
 
             except IndexError: pass  # -- Ignores The No Given Hint Case -- #
 

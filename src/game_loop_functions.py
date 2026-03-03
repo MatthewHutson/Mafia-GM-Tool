@@ -154,6 +154,11 @@ def use_vote_abiltities(data: Game_Data) -> None:
     for user, role in data.players.items():
         if "on_vote" in role.ability_type:
             role.ability(user, data)
+        if "on_vote" in role.secondary_ability:
+            try:
+                role.ability(user, data)
+            except:
+                pass # -- Deals With Gambler Getting Neutrals Before Then Selecting Targets -- #
 
 @enforce_types
 def use_death_abilities(data: Game_Data) -> None:

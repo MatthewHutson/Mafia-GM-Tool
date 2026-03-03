@@ -13,7 +13,7 @@ class Ability():
         self.p: int | float = p
         self.ability_type: list[str] = ability_type
         self.target_living: bool = target_living
-        self.priority: int = priority
+        self.priority: float = priority
         self.used_ability: bool = False
     
     @property
@@ -61,6 +61,7 @@ class Role:
     was_voted_out: bool = False
     just_died: bool = False
     ability_cancel: bool = False # For "on_demand"
+    secondary_ability_cancel: bool = True
     recursion_fuck_up: bool = False
     channeled_role: str = None
     team_win_condition: bool = False
@@ -100,7 +101,7 @@ class Role:
     
     @property
     @enforce_types
-    def priority(self) -> int: # Order of Execution of Abilities From Lowest To Highest #
+    def priority(self) -> float: # Order of Execution of Abilities From Lowest To Highest #
         return self.ability.priority
     
     @property
@@ -152,7 +153,12 @@ class Role:
         if "on_death" in self.ability_type and not "on_vote" in self.ability_type and self.just_died:
             user = list(data.players.keys())[list(data.players.values()).index(self)]
             self.ability(user, data)
-            self.just_died = False
+            
+        if "on_death" in self.secondary_ability.ability_type and not "on_vote" in self.secondary_ability.ability_type and self.just_died:
+            user = list(data.players.keys())[list(data.players.values()).index(self)]
+            self.secondary_ability(user, data)
+
+        self.just_died = False
 
     @enforce_types
     def voted_out(self, players: dict[str, object], recurse: bool = True) -> None:
@@ -229,6 +235,7 @@ class Game_Data():
     abilities: dict[str, Callable]
     ablity_distribution: dict[str, float]
     card_dict: dict[str, object]
+    menu_entries: Menu_Entry
     mafia_role: Role = None
     none_role: Role = None
     good_aligned: Players = None
@@ -249,16 +256,7 @@ class Game_Data():
         else:
             player = list(self.evil_aligned)[self.evil_count]
             self.evil_count += 1
-            return player
-            
-    @enforce_types
-    def random_ability(self, used_abilities: list[Role] = []) -> Ability:
-        temp_dist: dict = {role: probabiloty for role, probabiloty in self.ablity_distribution.items() if not role in used_abilities}
-        total = sum(temp_dist.values())
-        temp_dist = {key: value / total for key, value in temp_dist.items()}
-        sample: str = np.random.choice(np.array(list(temp_dist.keys())), size = 1, p = np.array(list(temp_dist.values())))
-        return self.abilities[sample[0]]
-    
+            return player 
     
     @property
     @enforce_types
@@ -294,3 +292,11 @@ class Game_Data():
     @enforce_types
     def get_card_by_role(self, role: Role) -> str:
         return self.card_dict[role.name]
+    
+    @enforce_types
+    def random_ability(self, used_abilities: list[Role] = []) -> Ability:
+        temp_dist: dict = {role: probabiloty for role, probabiloty in self.ablity_distribution.items() if not role in used_abilities}
+        total = sum(temp_dist.values())
+        temp_dist = {key: value / total for key, value in temp_dist.items()}
+        sample: str = np.random.choice(np.array(list(temp_dist.keys())), size = 1, p = np.array(list(temp_dist.values())))
+        return self.abilities[sample[0]]

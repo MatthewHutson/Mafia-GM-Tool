@@ -96,7 +96,7 @@ def main() -> None:
     setup_menu(entries, name_data)
 
     # -- Player Organisation -- #
-    game_data = Game_Data(Players(entries.assign_roles()), roles, role_functions, ability_distribution, card_init())
+    game_data = Game_Data(Players(entries.assign_roles()), roles, role_functions, ability_distribution, card_init(), entries)
     game_data.init()
 
     # -- Game Loop -- #
@@ -182,4 +182,4 @@ if __name__ == "__main__":
     playing: bool = True
     while playing == True:
         main()
-        playing = messagebox.askyesno("Restart", "Do you want to play another round?")
+        playing = messagebox.askyesno("Game Over", "Do you want to play another round?")

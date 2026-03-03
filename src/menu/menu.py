@@ -199,11 +199,11 @@ def pack_alive_and_dead(data: Game_Data, active_role: Role, number_of_targets: i
         dead_frames.append(player_frame)
 
 @enforce_types
-def life_or_death_selection(data: Game_Data, role: Role) -> bool:
+def life_or_death_selection(data: Game_Data, ability: Ability, role: Role) -> bool:
     correct: bool = True
 
     for player in selected_players:
-        correct = correct and data.players[player].currently_alive == role.ability.target_living
+        correct = correct and data.players[player].currently_alive == ability.target_living
 
     return correct
 
@@ -213,8 +213,9 @@ def confirm_selection(data: Game_Data, role: Role, is_primary_ability: bool) -> 
         ability = role.ability
     else:
         ability = role.secondary_ability
+        print("test")
 
-    correct_lives = life_or_death_selection(data, role)
+    correct_lives = life_or_death_selection(data, ability, role)
     plural_targets: str = f"target{"s" if ability.targets > 1 else ""}"
 
     if len(selected_players) == ability.targets and correct_lives:

@@ -19,7 +19,7 @@
         ["Doctor"], 
         ["Lawyer", "Executioner", "Jester"], 
         ["Creep", "Necromancer"],
-        ["Poisoner", "Psychic"], 
+        ["Poisoner", "Psychic", "Magnet"], 
         ["Cupid", "Bomber", "Gambler", "Mayor"]
     ],
     "9": [
@@ -29,7 +29,7 @@
         ["Doctor"], 
         ["Lawyer", "Executioner"], 
         ["Creep", "Necromancer"],
-        ["Poisoner", "Psychic", "Ambusher"], 
+        ["Poisoner", "Psychic", "Ambusher", "Magnet"], 
         ["Cupid", "Bomber", "Gambler"], 
         ["Jester", "Mayor"]
     ],

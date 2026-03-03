@@ -38,8 +38,8 @@ class reveal(Ability):
         target: str = data.players[user].targets[0]
         alignment: bool = data.players[user].poisoned ^ data.players[target].alignment
 
-        if alignment: data.players[user].information.append(f"{target} is GOOD!")
-        else: data.players[user].information.append(f"{target} is EVIL!")
+        if alignment: data.players[user].information.append(f"Their target is GOOD!")
+        else: data.players[user].information.append(f"Their target is EVIL!")
 
 class endure(Ability):
     @enforce_types
@@ -220,7 +220,7 @@ class vengance(Ability):
     def ability(self, user: str, data: Game_Data) -> None:
         if not data.players[user].was_voted_out:
             data.players[user].ability.targets = 1
-            selection_menu(data, user)
+            selection_menu(data, data.menu_entries, user)
 
             target = data.players[user].targets[0]
             role = data.players[target]
@@ -232,7 +232,7 @@ class vengance(Ability):
 class resurrect(Ability):
     @enforce_types
     def __init__(self) -> None:
-        super().__init__(1, 5, ["singular", "on_demand"], False, 1)  
+        super().__init__(1, 5, ["singular", "on_demand"], False, )  
     
     # -- Ability -- #
     @enforce_types
@@ -310,7 +310,6 @@ class gamble(Ability):
     @enforce_types
     def ability(self, user: str, data: Game_Data) -> None:
         role: Role = data.players[user]
-        print(role.ability_cancel)
         if role.ability_cancel:
             role.secondary_ability(user, data)
 
@@ -319,11 +318,17 @@ class gamble(Ability):
 
         else:
             role.secondary_ability = data.random_ability(self.used_abilities)
+            role.secondary_ability.used_ability = False
+            self.used_ability = False
 
-            new_role: Role = data.get_role_by_ability(role.secondary_ability)
-            new_card: str = data.get_card_by_role(new_role)
+            if role.secondary_ability == instant_death:
+                role.information.append(f"They rolled {role.secondary_ability.__name__}!")
+            else:
+                new_role: Role = data.get_role_by_ability(role.secondary_ability)
+                new_card: str = data.get_card_by_role(new_role)
 
-            role.information.append(f"They rolled {new_role.name}, which has the card {new_card}!")
+                role.information.append(f"They rolled {new_role.name}, which has the card {new_card}!")
+
             role.ability.priority = role.secondary_ability.priority + 0.5
 
             if "instant" in role.secondary_ability.ability_type:
@@ -343,11 +348,11 @@ class instant_death(Ability):
 class magnet(Ability):
     @enforce_types
     def __init__(self) -> None:
-        super().__init__(1, 5, [""], True)
+        super().__init__(1, 5, [""], True, 1)
         
     # -- Extra Methods -- #
     @enforce_types
-    def poison_consideration(role: Role, target: Role) -> None:
+    def poison_consideration(self, role: Role, target: Role) -> None:
         if isinstance(role.ability, poison):
             target.targets[0].poisioned = False # -- If We do Drunk, Change This -- #
             role.poisoned = True
@@ -365,11 +370,16 @@ class magnet(Ability):
 
         if role.poisoned:
             targets = []
-            for target_role in data.alive_players.values() and target_role.ability != self:
-                if role.ability.target_living:
+            for target_role in data.alive_players.values():
+                if role.ability.target_living and target_role.ability != self:
                     targets.append(target_role.name)
                     self.poison_consideration(role, target)
                         
-
         for target in targets:
-            target.targets = [user]
+            target_role = data.players[target]
+
+            if target_role.ability.target_living:
+                if role.ability.targets == 1:
+                    target_role.targets = [user]
+                elif role.ability.targets == 2:
+                    target_role.targets = [user, target]

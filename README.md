@@ -2,8 +2,9 @@
 A Program to allocate roles in a game of mafia
 
 # Changes
-Bug Fix - Gambler Would Not Trigger Properly
-Made Gambler incapable of rolling ana bility after using it.
+Added The Magnet - "Wrong Target Buddy"
+Bug Fixes - "Gambler Breaks Everything"
+Changed Card Index
 Technical Changes
 
 # To Do

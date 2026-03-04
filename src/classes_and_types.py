@@ -295,8 +295,9 @@ class Game_Data():
     
     @enforce_types
     def random_ability(self, used_abilities: list[Role] = []) -> Ability:
-        temp_dist: dict = {role: probabiloty for role, probabiloty in self.ablity_distribution.items() if not role in used_abilities}
+        temp_dist: dict = {ability: probability for ability, probability in self.ablity_distribution.items() if not ability in used_abilities}
         total = sum(temp_dist.values())
         temp_dist = {key: value / total for key, value in temp_dist.items()}
-        sample: str = np.random.choice(np.array(list(temp_dist.keys())), size = 1, p = np.array(list(temp_dist.values())))
+        sample: list[str] = np.random.choice(np.array(list(temp_dist.keys())), size = 1, p = np.array(list(temp_dist.values())))
+        return self.abilities["resurrect"]
         return self.abilities[sample[0]]

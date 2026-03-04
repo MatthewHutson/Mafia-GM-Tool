@@ -237,22 +237,29 @@ class resurrect(Ability):
     # -- Ability -- #
     @enforce_types
     def ability(self, user: str, data: Game_Data) -> None:
-        if len(data.players[user].targets) > 0 and not data.players[user].ability_cancel:
-            target = data.players[data.players[user].targets[0]]
+        user_role: Role = data.players[user]
+
+        if user_role.ability == self: # -- Gambler Check -- #
+            ability_cancel = user_role.ability_cancel
+        else:
+            ability_cancel = user_role.secondary_ability_cancel
+
+        if len(user_role.targets) > 0 and not ability_cancel:
+            target = data.players[user_role.targets[0]]
             target.revive()
 
             target.information.append("You have Been Ressurected")
 
-            if (data.players[user].poisoned or not data.players[user].alignment) and target.true_alignment == True:
+            if (user_role.poisoned or not user_role.alignment) and target.true_alignment == True:
                 target._alignment = False
                 target.mafia_alternative = True
                 target.information.append("You Are Now Evil!")
 
                 for role in data.evil_aligned.values():
-                    role.information.append(f"{data.players[user].targets[0]} has been resurrected! They are now evil!")
+                    role.information.append(f"{user_role.targets[0]} has been resurrected! They are now evil!")
 
-        elif data.players[user].ability_cancel:
-            data.players[user].used_ability = False
+        elif ability_cancel:
+           user_role.used_ability = False
 
 class ambush(Ability):
     @enforce_types

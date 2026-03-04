@@ -152,13 +152,18 @@ def ability_swap(data: Game_Data, player: str) -> None:
 @enforce_types
 def use_vote_abiltities(data: Game_Data) -> None:
     for user, role in data.players.items():
-        if "on_vote" in role.ability_type:
-            role.ability(user, data)
-        if "on_vote" in role.secondary_ability:
-            try:
+        try:
+            if "on_vote" in role.ability_type:
                 role.ability(user, data)
-            except:
-                pass # -- Deals With Gambler Getting Neutrals Before Then Selecting Targets -- #
+        except: 
+            pass
+
+        if role.secondary_ability != None:
+            if "on_vote" in role.secondary_ability.ability_type:
+                    try:
+                        role.ability(user, data)
+                    except IndexError: # -- Dealing With Gambler Drawing Neutrals And Not Being Able To Pick Targets
+                        pass
 
 @enforce_types
 def use_death_abilities(data: Game_Data) -> None:

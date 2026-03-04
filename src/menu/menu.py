@@ -213,7 +213,6 @@ def confirm_selection(data: Game_Data, role: Role, is_primary_ability: bool) -> 
         ability = role.ability
     else:
         ability = role.secondary_ability
-        print("test")
 
     correct_lives = life_or_death_selection(data, ability, role)
     plural_targets: str = f"target{"s" if ability.targets > 1 else ""}"
@@ -349,7 +348,6 @@ def selection_menu(data: Game_Data, entries: Menu_Entry, user: str, target: str 
     except: role = data.vote_role
 
     # -- Handling Secondary Abilitities -- #
-
     if is_primary_ability:
         ability = role.ability
     else:

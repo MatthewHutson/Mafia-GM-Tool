@@ -299,5 +299,4 @@ class Game_Data():
         total = sum(temp_dist.values())
         temp_dist = {key: value / total for key, value in temp_dist.items()}
         sample: list[str] = np.random.choice(np.array(list(temp_dist.keys())), size = 1, p = np.array(list(temp_dist.values())))
-        return self.abilities["resurrect"]
         return self.abilities[sample[0]]

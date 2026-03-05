@@ -108,7 +108,7 @@ def main() -> None:
             can_pick_primary_target: bool = selection_coindition(game_data, role, name, True)
             if can_pick_primary_target: selection_menu(game_data, entries, name)
 
-            if "secondary_ability" in role.ability_type and not ("alternate" in role.ability_type and role.ability_cancel):
+            if "secondary_ability" in role.ability_type and not ("alternate" in role.ability_type and not role.ability_cancel):
                 can_pick_secondary_target: bool = selection_coindition(game_data, role, name, False)
                 if can_pick_secondary_target: selection_menu(game_data, entries, name, is_primary_ability = False)
             else:

@@ -72,7 +72,7 @@ def enforce_types(func: Callable) -> Callable:
                     assert any_instance(value, hint), f"Argument {key} for {func.__name__} must be of type {hint} but value = {value} of type {type(value)} provided"
 
             except IndexError: pass  # -- Ignores The No Given Hint Case -- #
-
+        
         result = func(*args, **kwargs) # -- Performs The Function Normally -- #
         assert any_instance(result, return_hint), f"Return Value must be of type {return_hint} but value = {result} of type {type(result)} provided" # -- Checks For Correct Output Type -- #
         return result

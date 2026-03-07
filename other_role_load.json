@@ -1,6 +1,7 @@
 {
     "6": [
-        ["Laywer", "Executioner"],
+        ["Lawyer"],
+        ["Executioner"],
         ["Creep"],
         ["Necromancer"],
         ["Gambler"],
@@ -8,13 +9,13 @@
         ["Bomber"]
     ],
     "8": [
-        ["Laywer", "Executioner"],
+        ["Lawyer"],
+        ["Executioner"],
         ["Creep"],
         ["Necromancer"],
         ["Gambler"],
         ["Mayor"],
-        ["Bomber"],
-        ["Cupid"],
+        ["Cupid", "Bomber"],
         ["Jester"]
     ]
 }

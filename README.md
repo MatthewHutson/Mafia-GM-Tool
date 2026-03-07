@@ -2,8 +2,11 @@
 A Program to allocate roles in a game of mafia
 
 # Changes
-Created New Json files for the new role load system
-created the functions to load these files into the system
+Fully Implemented New Roel Laod System
+Changed Defaults So That I Am Main GM
+Bug Fixes
+Needless To Say, Config Changes - Removed Most Mutual Exclusives Per Game Feedback
+Max Players Is Now 13 As A Result Of Changes
 
 # To Do
 Add All Other Roles

@@ -3,7 +3,7 @@
         ["Mafia"], 
         ["Sheriff"], 
         ["Soldier"], 
-        ["Villager", "Doctor", "Gambler"]
+        ["Villager", "Doctor"]
     ],
     "5": [
         ["Mafia"], 

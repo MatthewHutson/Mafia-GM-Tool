@@ -2,13 +2,10 @@
 A Program to allocate roles in a game of mafia
 
 # Changes
-Bug Fix - Fixed Crashing Issue
-Bug Fix - Program Crashes If Tabs Are Forced Closed
-Removed Testing Print Statement
+Created New Json files for the new role load system
+created the functions to load these files into the system
 
 # To Do
-FIX GAMBLER NECRO BUGS
-REDO role selection again
 Add All Other Roles
 Add Joke Roles (Perhaps)
 Make Doccumentation With Carlos

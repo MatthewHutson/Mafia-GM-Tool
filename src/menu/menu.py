@@ -43,7 +43,7 @@ selected_players = []
 @enforce_types
 def new_load_system() -> None:
     global role_player_dict, max_players, role_adjust_boundaries
-    role_load_priority: dict[int, list[list[Role]]] = {}
+    role_load_priority: dict[int, list[list[str]]] = {}
 
     with open("load_priority.json", 'r') as file:
         data: dict = json.load(file)
@@ -53,6 +53,24 @@ def new_load_system() -> None:
     role_player_dict = role_load_priority
     max_players = len(list(role_load_priority.values())[-1])
     role_adjust_boundaries = list(role_load_priority.keys())
+
+    # -- Load System Version 3 -- #
+    evil_player_dict: dict[int, list[list[str]]] = {}
+    other_role_dict: dict[int, list[list[str]]] = {}
+
+    with open("evil_role_load.json", 'r') as file:
+        data: dict = json.load(file)
+        for key, value in data.items():
+            evil_player_dict[int(key)] = value
+
+    with open("other_role_load.json", 'r') as file:
+        data: dict = json.load(file)
+        for key, value in data.items():
+            other_role_dict[int(key)] = value
+
+    with open("guarenteed_role_load.json", 'r') as file:
+        data: dict = json.load(file)
+        guarenteed_players: list[str] = data["4"]
 
 @enforce_types
 def get_roles_by_players(role_load_priority: dict[int, list[list[Role]]], ascending: bool = True) -> list[list[Role]]:

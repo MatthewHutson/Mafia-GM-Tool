@@ -1,0 +1,14 @@
+{
+    "4": [
+        ["Mafia"]
+    ],
+
+    "7": [
+        ["Mafia"],
+        ["Poisoner", "Psychic", "Magnet"]
+    ],
+    "9": [
+        ["Mafia"],
+        ["Poisoner", "Psychic", "Magnet", "Ambusher"]
+    ]
+}

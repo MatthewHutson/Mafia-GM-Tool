@@ -2,9 +2,7 @@
 A Program to allocate roles in a game of mafia
 
 # Changes
-Removed Redundant Files
-Removed An Bug Handling Stuff In Menus
-Added Card Lookup For Psychic
+Fixed A New Version Of Shuffle Bug - Altered The Number Of Roles Generated To Be Correct
 
 # To Do
 Add All Other Roles

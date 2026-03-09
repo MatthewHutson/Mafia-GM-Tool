@@ -73,7 +73,7 @@ def new_load_system() -> None:
 
 @enforce_types
 def get_roles_by_players() -> list[list[Role]]:
-    return get_roles(len(players) + 1)
+    return get_roles(len(players))
 
 @enforce_types
 def get_roles(player_count: int) -> list[list[Role]]:
@@ -85,6 +85,7 @@ def get_roles(player_count: int) -> list[list[Role]]:
         if player_count >= max:
             count += 1
             roles = deepcopy(role_list)
+
 
     for role_list in guarenteed_roles:
         if count <= player_count:

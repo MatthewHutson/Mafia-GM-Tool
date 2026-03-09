@@ -166,7 +166,7 @@ class telepathy(Ability):
             role: Role = choice(data.roles)
             is_lover: bool = True
         
-        data.players[user].information.append(f"{target} is {role.name}!")
+        data.players[user].information.append(f"{target} is {role.name}, which is {data.get_card_by_role(role)}!")
 
         if is_lover:
             data.players[user].information.append(f"{target} is linked to another player!")

@@ -2,11 +2,9 @@
 A Program to allocate roles in a game of mafia
 
 # Changes
-Fully Implemented New Roel Laod System
-Changed Defaults So That I Am Main GM
-Bug Fixes
-Needless To Say, Config Changes - Removed Most Mutual Exclusives Per Game Feedback
-Max Players Is Now 13 As A Result Of Changes
+Removed Redundant Files
+Removed An Bug Handling Stuff In Menus
+Added Card Lookup For Psychic
 
 # To Do
 Add All Other Roles

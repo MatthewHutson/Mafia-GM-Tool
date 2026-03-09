@@ -148,9 +148,8 @@ def add_player(players: list[Player_Select_Frame], roles: list[list[Role]], entr
 
         role_boundary_reset(roles)
 
-    except IndexError as e:
-        #messagebox.showwarning("Warning", "You Have Reached The Maximum Number of Players!")
-        raise e
+    except IndexError:
+        messagebox.showwarning("Warning", "You Have Reached The Maximum Number of Players!")
     except NameError:
         messagebox.showwarning("Warning", "A Player With This Name Already Exists!")
     except ValueError:

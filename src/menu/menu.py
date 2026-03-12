@@ -54,12 +54,12 @@ def new_load_system() -> None:
     with open("evil_role_load.json", 'r') as file:
         data: dict = json.load(file)
         for key, value in data.items():
-            evil_role_dict[int(key)] = value
+            evil_role_dict[int(key) - 1] = value
 
     with open("other_role_load.json", 'r') as file:
         data: dict = json.load(file)
         for key, value in data.items():
-            other_role_dict[int(key)] = value
+            other_role_dict[int(key) - 1] = value
 
     with open("guarenteed_role_load.json", 'r') as file:
         data: dict = json.load(file)
@@ -82,10 +82,11 @@ def get_roles(player_count: int) -> list[list[Role]]:
     count = 0
     
     for max, role_list in evil_role_dict.items():
-        if player_count >= max:
+        if player_count > max:
             count += 1
             roles = deepcopy(role_list)
 
+    if player_count == 3: roles = [["Mafia"]]
 
     for role_list in guarenteed_roles:
         if count <= player_count:
@@ -102,11 +103,12 @@ def get_roles(player_count: int) -> list[list[Role]]:
     shuffle(remaining_roles)
     i = 0
 
-    while (count <= player_count):
-        roles.append(remaining_roles[i])
+    if player_count >= len(guarenteed_roles):
+        while (count <= player_count) and i < len(remaining_roles):
+            roles.append(remaining_roles[i])
 
-        i += 1
-        count += 1
+            i += 1
+            count += 1
 
     shuffle(roles)
 

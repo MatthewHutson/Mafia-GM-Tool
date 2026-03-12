@@ -2,9 +2,12 @@
 A Program to allocate roles in a game of mafia
 
 # Changes
-Fixed A New Version Of Shuffle Bug - Altered The Number Of Roles Generated To Be Correct
+Fixed Bugs Involving Loading Roles 1 At A Time With New Load System
 
 # To Do
+Check For Mroe Bugs
+Potentially Re-Balance Small Player Role Collections
+
 Add All Other Roles
 Add Joke Roles (Perhaps)
 Make Doccumentation With Carlos

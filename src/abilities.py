@@ -67,7 +67,7 @@ class protect(Ability):
 class link(Ability):
     @enforce_types
     def __init__(self) -> None:
-        super().__init__(2, 5, ["singular"], True, 4)
+        super().__init__(2, 0, ["singular"], True, 4)
         
     # -- Ability -- #
     @enforce_types
@@ -355,7 +355,7 @@ class instant_death(Ability):
 class magnet(Ability):
     @enforce_types
     def __init__(self) -> None:
-        super().__init__(1, 5, [""], True, 1)
+        super().__init__(1, 5, ["repeat"], True, 1)
         
     # -- Extra Methods -- #
     @enforce_types
@@ -390,3 +390,31 @@ class magnet(Ability):
                     target_role.targets = [user]
                 elif role.ability.targets == 2:
                     target_role.targets = [user, target]
+
+class index(Ability):
+    @enforce_types
+    def __init__(self) -> None:
+        super().__init__(0, 5, ["passive"], True, 11)
+        self.seen_roles: set[str] = set([])
+
+    # -- Ability -- #
+    @enforce_types
+    def ability(self, user: str, data: Game_Data) -> None:
+        all_roles: set[str] = set(data.roles.keys())
+        normal_roles: set[str] = set([role.name for role in data.players.values()])
+
+        user_role: Role = data.players[user]
+        self.seen_roles.add(user_role.name)
+
+        if user_role.poisoned:
+            selected_set: set[str] = all_roles - normal_roles - self.seen_roles
+        else:
+            selected_set: set[str] = normal_roles - self.seen_roles
+
+        selected_role: str = choice(list(selected_set))
+
+        self.seen_roles.add(selected_role)
+    
+        card = data.get_card_by_role(data.roles[selected_role])
+        user_role.information.append(f"{selected_role} is in the game with card {card}!")
+        

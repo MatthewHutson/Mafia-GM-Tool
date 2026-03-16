@@ -2,12 +2,10 @@
 A Program to allocate roles in a game of mafia
 
 # Changes
-Fixed Bugs Involving Loading Roles 1 At A Time With New Load System
+Added Librarian - Can Deduce What Roles Are In The Game Slowly
+Replaced Cupid With Librarian In Gambler Pool
 
 # To Do
-Check For Mroe Bugs
-Potentially Re-Balance Small Player Role Collections
-
 Add All Other Roles
 Add Joke Roles (Perhaps)
 Make Doccumentation With Carlos

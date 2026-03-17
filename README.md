@@ -2,8 +2,7 @@
 A Program to allocate roles in a game of mafia
 
 # Changes
-Added Librarian - Can Deduce What Roles Are In The Game Slowly
-Replaced Cupid With Librarian In Gambler Pool
+Bug Fix - Librarian Stops When Set Is Empty
 
 # To Do
 Add All Other Roles

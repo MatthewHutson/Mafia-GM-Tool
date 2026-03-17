@@ -411,10 +411,11 @@ class index(Ability):
         else:
             selected_set: set[str] = normal_roles - self.seen_roles
 
-        selected_role: str = choice(list(selected_set))
+        if len(selected_set) > 0:
+            selected_role: str = choice(list(selected_set))
 
-        self.seen_roles.add(selected_role)
-    
-        card = data.get_card_by_role(data.roles[selected_role])
-        user_role.information.append(f"{selected_role} is in the game with card {card}!")
+            self.seen_roles.add(selected_role)
+        
+            card = data.get_card_by_role(data.roles[selected_role])
+            user_role.information.append(f"{selected_role} is in the game with card {card}!")
         

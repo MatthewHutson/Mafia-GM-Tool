@@ -8,6 +8,7 @@ from classes_and_types import *
 from menu.menu import *
 from menu.card_index import card_init
 from game_loop_functions import *
+from game import game
 import abilities as a
 
 # -- Functions -- #
@@ -98,67 +99,7 @@ def main() -> None:
     game_data = Game_Data(Players(entries.assign_roles()), roles, role_functions, ability_distribution, card_init(), entries)
     game_data.init()
 
-    # -- Game Loop -- #
-    all_roles: set[str] = set(game_data.roles.keys())
-    playing_roles: set[str] = set([role.name for role in game_data.players.values()])
-    out_of_game_roles: list[str] = list(all_roles - playing_roles)[:2]
-    evil_cards: list[str] = [game_data.get_card_by_role(role) for role in list(game_data.evil_aligned.values())]
-    outside_cards: list[str] = [game_data.get_card_by_role(game_data.roles[role]) for role in out_of_game_roles]
-
-    sleep(0.5)
-    messagebox.showinfo("Sleepy Time", f"Wake up, {list(game_data.evil_aligned.keys())} and show them {out_of_game_roles} with cards {evil_cards + outside_cards}!")
-    sleep(0.5)
-    messagebox.showinfo("Sleepy Time", f"Wake up, {list(game_data.evil_aligned.keys())} and show them {out_of_game_roles} with cards {evil_cards + outside_cards}!")
-
-    init_game_menu(entries, game_data)
-
-    while game_data.playing:
-        # -- Game Loop -- #
-        for name, role in game_data.alive_players.items():
-            role.made_choice = False
-            can_pick_primary_target: bool = selection_coindition(game_data, role, name, True)
-            if can_pick_primary_target: selection_menu(game_data, entries, name)
-
-            if "secondary_ability" in role.ability_type and not ("alternate" in role.ability_type and not role.ability_cancel):
-                can_pick_secondary_target: bool = selection_coindition(game_data, role, name, False)
-                if can_pick_secondary_target: selection_menu(game_data, entries, name, is_primary_ability = False)
-            else:
-                can_pick_secondary_target = False
-
-            if game_data.playing and not (can_pick_primary_target or can_pick_secondary_target) and not role.made_choice:
-                sleep(0.5)
-                messagebox.showinfo("Wake Up", f"Wake Up {name} to use no ability.")
-
-        if game_data.playing:
-            use_abilities(game_data)
-            information(game_data)
-            life_death_sort(game_data)
-            information(game_data, False)
-
-            remove_round_data(game_data)
-
-            pack_alive_and_dead(game_data, game_data.vote_role, 0)
-            use_death_abilities(game_data)
-            life_death_sort(game_data)
-            remove_round_data(game_data)
-
-            check_for_victory(game_data)
-
-            if game_data.playing:
-                voted_out: str = voting_menu(game_data, entries)
-
-                if game_data.playing and voted_out != "none":
-                    game_data.players[voted_out].voted_out(game_data.players)
-            
-                life_death_sort(game_data)
-                use_vote_abiltities(game_data)
-                use_death_abilities(game_data)
-                life_death_sort(game_data)
-
-                if game_data.playing:
-                    pack_alive_and_dead(game_data, game_data.vote_role, 0)
-
-        check_for_victory(game_data)
+    game(game_data, entries)
 
     for name, role in game_data.players.items():
         if "game_end" in role.ability_type:

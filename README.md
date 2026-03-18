@@ -2,7 +2,10 @@
 A Program to allocate roles in a game of mafia
 
 # Changes
-Revealed Mayor Cannot Be Protected By Doctor Ability
+Turned The Main Game Loop Into A Seperate Function In game.py File.
+Moved Other Functions from main to game.py
+Bug Fix - "Why Would You Bluff An Evil Role?"
+Made It More Difficult For Sleepy Time To End Early And Placed In In The "nap_time" Function In game.py
 
 # To Do
 Shuffle Villagers In (For Repeated Roles) Or Create A Repeated Role?

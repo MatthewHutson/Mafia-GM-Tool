@@ -3,6 +3,7 @@ from utils import *
 from menu.menu_classes import *
 from menu.mimi_stand_counter import counter_init
 from menu.card_index import card_index, destroy_card_index
+from menu.settings import display_settings, remove_instances
 from menu.timer import create_timer, delete_timer
 from tkinter import messagebox
 from copy import deepcopy
@@ -63,7 +64,7 @@ def new_load_system() -> None:
 
     with open("guarenteed_role_load.json", 'r') as file:
         data: dict = json.load(file)
-        guarenteed_roles = data["4"]
+        guarenteed_roles = data["3"]
 
     # -- Managing Player Count -- #
     max_mafia: int = len(list(evil_role_dict.values())[-1])
@@ -215,6 +216,7 @@ def start_confirm(entries: Menu_Entry) -> None:
         messagebox.showerror("Error", "You Need at Least 4 Players to Start!")
     else:
         if messagebox.askyesno("Confirm Choice", "Do you wish to start the game?"):
+            remove_instances()
             get_data(root, entries)
 
 @enforce_types
@@ -247,6 +249,16 @@ def life_or_death_selection(data: Game_Data, ability: Ability, role: Role) -> bo
     return correct
 
 @enforce_types
+def no_double_down(data: Game_Data, role: Role, ability: Ability) -> bool:
+    if isinstance(role.previous_targets, list) and data.settings["Double Down"] == 0:
+        for target in selected_players:
+            if target in role.previous_targets and not ability.can_pick_same_target:
+                messagebox.showwarning("Warning", f"You Cannot Pick The Same Target Twice!")
+                return False
+    
+    return True
+
+@enforce_types
 def confirm_selection(data: Game_Data, role: Role, is_primary_ability: bool) -> None:
     if is_primary_ability:
         ability = role.ability
@@ -256,10 +268,12 @@ def confirm_selection(data: Game_Data, role: Role, is_primary_ability: bool) -> 
     correct_lives = life_or_death_selection(data, ability, role)
     plural_targets: str = f"target{"s" if ability.targets > 1 else ""}"
 
-    if len(selected_players) == ability.targets and correct_lives:
+    can_pick_that_target: bool = no_double_down(data, role, ability)
+
+    if len(selected_players) == ability.targets and correct_lives and can_pick_that_target:
         if messagebox.askyesno("Confirm Selection", f"Are you sure you want to select {selected_players}?"):
             root.quit()
-    else:
+    elif can_pick_that_target:
         if role.name != "Voting":
             if ability.target_living:
                 messagebox.showwarning("Warning", f"You must select {ability.targets} alive {plural_targets}!")
@@ -278,7 +292,9 @@ def menu_quit(data: Game_Data) -> None:
 
 @enforce_types
 def skip() -> None:
+    global selected_players
     if messagebox.askyesno("Confirm Selection", "Are you sure you want to skip the vote?"):
+        selected_players = []
         root.quit()
 
 @enforce_types
@@ -315,16 +331,22 @@ def setup_menu(entries: Menu_Entry, default_names: list[str]) -> None:
     input_frame.pack_propagate(False)
     input_frame.pack(side = tk.TOP, anchor = "w", ipadx = 158, ipady = 20)
 
-    # -- Settings Buttons -- #
+    # -- Menu Progression Buttons -- #
     start = tk.Button(settings_frame, text = "Start", command = lambda: start_confirm(entries), bg = "#5D9FF0", activebackground = "#4980C4", fg = "#ffffff", activeforeground = "#ffffff")
     exit = tk.Button(settings_frame, text = "Quit", command = terminate, bg = "#E03636", activebackground = "#8B2B2B", fg = "#ffffff", activeforeground = "#ffffff")
-    random_button = tk.Button(settings_frame, text = "Randomise", command = role_boundary_reset_for_icons, bg = "#48f748", activebackground = "#55E036", fg = "#000000", activeforeground = "#000000")
     start.pack(side = tk.RIGHT, ipady = 3, ipadx = 16, padx = 4)
     exit.pack(side = tk.RIGHT, ipady = 3, ipadx = 16, padx = 4)
-    random_button.pack(side = tk.RIGHT, ipady = 3, ipadx = 16, padx = 4)
 
     # -- Mimi Stand Counter -- #
     counter_init(root, settings_frame, (8, 3), (4, 0), tk.LEFT)
+
+    # -- Settings Button -- #
+    random_button = tk.Button(settings_frame, text = "Settings", command = lambda: display_settings(root, bg_2, main_font, entries), bg = "#CACACA", activebackground = "#AFAFAF", fg = "#000000", activeforeground = "#000000")
+    random_button.pack(side = tk.RIGHT, ipady = 3, ipadx = 8, padx = 4)
+
+    # -- Randomise Button -- #
+    random_button = tk.Button(settings_frame, text = "Randomise", command = role_boundary_reset_for_icons, bg = "#48f748", activebackground = "#55E036", fg = "#000000", activeforeground = "#000000")
+    random_button.pack(side = tk.RIGHT, ipady = 3, ipadx = 8, padx = 4)
 
     # -- Card Index -- #
     index_access_button = tk.Button(settings_frame, text = "Card Index", command = lambda: card_index(root, bg_2, main_font, entries), bg = "#C65DF0", activebackground = "#C049C4", fg = "#ffffff", activeforeground = "#ffffff")

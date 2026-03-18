@@ -64,14 +64,20 @@ def life_death_sort(data: Game_Data) -> None:
 def remove_round_data(data: Game_Data) -> None:
     for role in data.players.values():
         if not "singular" in role.ability_type: 
-            for i in range(len(role.targets)):
-                role.targets.pop(0)
+            targets = role.targets
+            for i in range(len(targets)):
+                targets.pop(0)
 
         role.recursion_fuck_up = False
         role.poisoned = False
         role.protected = False
         role.information = []
         role.visited_by = []
+
+@enforce_types
+def update_all_targets(data: Game_Data) -> None:
+    for role in data.players.values():
+        role.update_targets()
 
 @enforce_types
 def select_player(user: str, players: Players) -> None: # -- Outdated To Be Replaced -- #

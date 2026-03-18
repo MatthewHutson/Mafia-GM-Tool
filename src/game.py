@@ -104,6 +104,7 @@ def game(data: Game_Data, entries: Menu_Entry) -> None:
             life_death_sort(data)
             information(data, False)
 
+            update_all_targets(data)
             remove_round_data(data)
 
             pack_alive_and_dead(data, data.vote_role, 0)

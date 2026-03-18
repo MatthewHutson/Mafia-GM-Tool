@@ -8,13 +8,14 @@ import numpy as np
 # -- Ability Template Class -- #
 class Ability():
     @enforce_types
-    def __init__(self, targets: int, p: Union[int, float], ability_type: list[str], target_living: bool, priority: int = 255) -> None:
+    def __init__(self, targets: int, p: Union[int, float], ability_type: list[str], target_living: bool = True, priority: int = 255, can_pick_same_target: bool = False) -> None:
         self.targets: int = targets
         self.p: int | float = p
         self.ability_type: list[str] = ability_type
         self.target_living: bool = target_living
         self.priority: float = priority
         self.used_ability: bool = False
+        self.can_pick_same_target: bool = can_pick_same_target
     
     @property
     @enforce_types
@@ -45,7 +46,7 @@ class Role:
     _alignment: bool # True Being Good, False Being Evil #
     mafia_alternative: bool # Switches to Mafia Abiltity When All Normal Mafia Dies #
     max_count: int
-    targets: list[object]
+    current_targets: list[object]
     information: list[str]
     visited_by: list[str]
     secondary_ability: Ability = None
@@ -67,6 +68,7 @@ class Role:
     team_win_condition: bool = False
     alternative_end_count: int = 0
     made_choice: bool = False
+    previous_targets: list = None
     
     # -- Properties -- #
     @property
@@ -124,6 +126,16 @@ class Role:
     def used_ability(self, value: bool) -> None:
         self.secondary_ability.used_ability = value
 
+    @property
+    @enforce_types
+    def targets(self) -> list[str]:
+        return self.current_targets
+    
+    @targets.setter
+    @enforce_types
+    def targets(self, value: list[str]) -> None:
+        self.current_targets = value
+
     # -- Methods -- #
     @enforce_types
     def die(self, players: dict[str, object], recurse: bool = True) -> bool:
@@ -171,6 +183,10 @@ class Role:
     def __eq__(self, value) -> bool:
         return self.name == str(value)
     
+    @enforce_types
+    def update_targets(self) -> None:
+        self.previous_targets = deepcopy(self.targets)
+    
 # -- Type Definitions -- #
 class Players(dict[str, Role]):
     @enforce_types
@@ -206,6 +222,7 @@ class Players(dict[str, Role]):
 class Menu_Entry:
     players: list[str]
     roles: list[Role]
+    settings: dict[Any]
 
     # -- Properties -- #
     @property
@@ -236,6 +253,7 @@ class Game_Data():
     ablity_distribution: dict[str, float]
     card_dict: dict[str, object]
     menu_entries: Menu_Entry
+    settings: dict[str, Any] = None
     mafia_role: Role = None
     none_role: Role = None
     good_aligned: Players = None
@@ -274,6 +292,8 @@ class Game_Data():
 
         self.alive_players = self.players.deepcopy()
         self.dead_players = Players({})
+
+        self.settings = {name: data["value"] for name, data in self.menu_entries.settings.items()}
 
         # -- Using A Role For Menu Purposes -- #
         self.vote_role: Role = Role("Voting", self.abilities["vote"], True, False, 999, [], [], []) 

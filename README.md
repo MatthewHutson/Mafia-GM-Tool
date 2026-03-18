@@ -2,12 +2,13 @@
 A Program to allocate roles in a game of mafia
 
 # Changes
-Turned The Main Game Loop Into A Seperate Function In game.py File.
-Moved Other Functions from main to game.py
-Bug Fix - "Why Would You Bluff An Evil Role?"
-Made It More Difficult For Sleepy Time To End Early And Placed In In The "nap_time" Function In game.py
+Added The Settings Menu (settings.py)
+Added The Early End Settign - Toggle To Determine If Jester And Executioner End The Game Immediately
+Added The Double Down Setting - Toggle To Allow Any Role To Pick Their Previous Target Again
+Fixed Creep Bug - Poisoned Creep Crashes Game
 
 # To Do
+Add Drunk
 Shuffle Villagers In (For Repeated Roles) Or Create A Repeated Role?
 Chanceller (Hitler) - Evil Mayor (Could False Claim Mayor)?
 Possible Third Evil Player?

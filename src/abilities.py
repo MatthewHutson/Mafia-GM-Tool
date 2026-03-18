@@ -10,7 +10,7 @@ from re import fullmatch
 class none(Ability):
     @enforce_types
     def __init__(self) -> None:
-        super().__init__(0, 20, ["passive"], True)
+        super().__init__(targets = 0, p = 20, ability_type = ["passive"])
     
     # -- Ability -- #
     @enforce_types
@@ -20,7 +20,7 @@ class none(Ability):
 class vote(Ability):
     @enforce_types
     def __init__(self) -> None:
-        super().__init__(1, 0, ["repeat"], True)
+        super().__init__(targets = 1, p = 0, ability_type = ["repeat"], can_pick_same_target = True)
     
     # -- Ability -- #
     @enforce_types
@@ -30,7 +30,7 @@ class vote(Ability):
 class reveal(Ability):
     @enforce_types
     def __init__(self) -> None:
-        super().__init__(1, 5, ["repeat"], True, 9)
+        super().__init__(targets = 1, p = 5, ability_type = ["repeat"], priority = 9, can_pick_same_target = True)
     
     # -- Ability -- #
     @enforce_types
@@ -44,7 +44,7 @@ class reveal(Ability):
 class endure(Ability):
     @enforce_types
     def __init__(self) -> None:
-        super().__init__(0, 5, ["passive"], True, 2)
+        super().__init__(targets = 0, p = 5, ability_type = ["passive"], priority = 2)
     
     # -- Ability -- #
     @enforce_types
@@ -55,7 +55,7 @@ class endure(Ability):
 class protect(Ability):
     @enforce_types
     def __init__(self) -> None:
-        super().__init__(1, 5, ["repeat"], True, 3)
+        super().__init__(targets = 1, p = 5, ability_type = ["repeat"], priority = 3)
 
     # -- Extra Methods -- #
     @enforce_types
@@ -74,7 +74,7 @@ class protect(Ability):
 class link(Ability):
     @enforce_types
     def __init__(self) -> None:
-        super().__init__(2, 0, ["singular"], True, 4)
+        super().__init__(targets = 2, p = 0, ability_type = ["singular"], priority = 4)
         
     # -- Ability -- #
     @enforce_types
@@ -94,17 +94,20 @@ class link(Ability):
 class jester(Ability):
     @enforce_types
     def __init__(self) -> None:
-        super().__init__(0, 5, ["on_death"], True)
+        super().__init__(targets = 0, p = 5, ability_type = ["on_death"])
         
     # -- Ability -- #
     @enforce_types
     def ability(self, user: str, data: Game_Data) -> None:
         data.players[user].solo_win = data.players[user].was_voted_out
 
+        if data.settings["Early End"] == 1 and data.players[user].solo_win:
+            data.playing = False
+
 class stop_vote(Ability):
     @enforce_types
     def __init__(self) -> None:
-        super().__init__(1, 5, ["singular", "on_vote"], True)
+        super().__init__(targets = 1, p = 5, ability_type = ["singular", "on_vote"])
         
     # -- Ability -- #
     @enforce_types
@@ -117,12 +120,15 @@ class stop_vote(Ability):
 class execute(Ability):
     @enforce_types
     def __init__(self) -> None:
-        super().__init__(1, 5, ["singular", "on_vote"], True)
+        super().__init__(targets = 1, p = 5, ability_type = ["singular", "on_vote"])
         
     # -- Ability -- #
     @enforce_types
     def ability(self, user: str, data: Game_Data) -> None:
         data.players[user].solo_win = data.players[data.players[user].targets[0]].was_voted_out
+
+        if data.settings["Early End"] == 1 and data.players[user].solo_win:
+            data.playing = False
 
         if not (data.players[data.players[user].targets[0]].currently_alive or data.players[data.players[user].targets[0]].was_voted_out):
             data.players[user].solo_win = data.players[user].currently_alive
@@ -130,7 +136,7 @@ class execute(Ability):
 class poison(Ability):
     @enforce_types
     def __init__(self) -> None:
-        super().__init__(1, 5, ["repeat"], True, 0)
+        super().__init__(targets = 1, p = 5, ability_type = ["repeat"], priority = 0)
     
     # -- Ability -- #
     @enforce_types
@@ -147,7 +153,7 @@ class poison(Ability):
 class kill(Ability):
     @enforce_types
     def __init__(self) -> None:
-        super().__init__(1, 5, ["repeat"], True, 5)
+        super().__init__(targets = 1, p = 5, ability_type = ["repeat"], priority = 5, can_pick_same_target = True)
         
     # -- Ability -- #
     @enforce_types
@@ -159,7 +165,7 @@ class kill(Ability):
 class telepathy(Ability):
     @enforce_types
     def __init__(self) -> None:
-        super().__init__(1, 5, ["repeat"], True, 4)
+        super().__init__(targets = 1, p = 5, ability_type = ["repeat"], priority = 4, can_pick_same_target = True)
     
     # -- Ability -- #
     @enforce_types
@@ -191,15 +197,15 @@ class telepathy(Ability):
 class stalk(Ability):
     @enforce_types
     def __init__(self) -> None:
-        super().__init__(1, 5, ["repeat"], True)
+        super().__init__(targets = 1, p = 5, ability_type = ["repeat"], can_pick_same_target = True)
         
     # -- Ability -- #
     @enforce_types
     def ability(self, user: str, data: Game_Data) -> None:
         visitors = []
+        target: str = data.players[user].targets[0]
 
         if not data.players[user].poisoned:
-            target: str = data.players[user].targets[0]
             visitors = data.players[target].visited_by
         else:
             visitors = []
@@ -230,7 +236,7 @@ class stalk(Ability):
 class vengance(Ability):
     @enforce_types
     def __init__(self) -> None:
-        super().__init__(0, 5, ["on_death"], True)
+        super().__init__(targets = 0, p = 5, ability_type = ["on_death"], can_pick_same_target = True)
     
     # -- Ability -- #
     @enforce_types
@@ -249,7 +255,7 @@ class vengance(Ability):
 class resurrect(Ability):
     @enforce_types
     def __init__(self) -> None:
-        super().__init__(1, 5, ["singular", "on_demand"], False, )  
+        super().__init__(targets = 1, p = 5, ability_type = ["singular", "on_demand"], target_living = False)  
     
     # -- Ability -- #
     @enforce_types
@@ -281,7 +287,7 @@ class resurrect(Ability):
 class ambush(Ability):
     @enforce_types
     def __init__(self) -> None:
-        super().__init__(1, 5, ["repeat"], True, 4)
+        super().__init__(targets = 1, p = 5, ability_type = ["repeat"], priority = 4, can_pick_same_target = True)
         
     # -- Ability -- #
     @enforce_types
@@ -310,7 +316,7 @@ class ambush(Ability):
 class mayor(Ability):
     @enforce_types
     def __init__(self) -> None:
-        super().__init__(0, 0, ["passive", "game_end"], True, 10)
+        super().__init__(targets = 0, p = 0, ability_type = ["passive", "game_end"], priority = 10)
     
     # -- Ability -- #
     @enforce_types
@@ -326,7 +332,7 @@ class mayor(Ability):
 class gamble(Ability):
     @enforce_types
     def __init__(self) -> None:
-        super().__init__(0, 0, ["alternate", "secondary_ability", "passive"], True, 8)
+        super().__init__(targets = 0, p = 0, ability_type = ["alternate", "secondary_ability", "passive"], priority = 8)
         self.used_abilities: list[Role] = []
         
     # -- Ability -- #
@@ -360,7 +366,7 @@ class gamble(Ability):
 class instant_death(Ability):
     @enforce_types
     def __init__(self) -> None:
-        super().__init__(1, 5, ["late"], True)
+        super().__init__(targets = 1, p = 5, ability_type = ["late"])
         
     # -- Ability -- #
     @enforce_types
@@ -371,7 +377,7 @@ class instant_death(Ability):
 class magnet(Ability):
     @enforce_types
     def __init__(self) -> None:
-        super().__init__(1, 5, ["repeat"], True, 1)
+        super().__init__(targets = 1, p = 5, ability_type = ["repeat"], priority = 1)
         
     # -- Extra Methods -- #
     @enforce_types
@@ -410,7 +416,7 @@ class magnet(Ability):
 class index(Ability):
     @enforce_types
     def __init__(self) -> None:
-        super().__init__(0, 5, ["passive"], True, 11)
+        super().__init__(targets = 0, p = 5, ability_type = ["passive"], priority = 11)
         self.seen_roles: set[str] = set(["Soldier", "Doctor", "Mafia", "Sherrif"])
 
     # -- Ability -- #

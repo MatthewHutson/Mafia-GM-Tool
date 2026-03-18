@@ -1,6 +1,5 @@
 # -- Imports -- #
 from utils import *
-from menu.menu_classes import *
 from tkinter import messagebox
 import tkinter as tk
 from tkinter import font
@@ -9,7 +8,7 @@ from tkinter import font
 milly_stand_counter: int = 0
 
 # -- Functions -- #
-@ enforce_types
+@enforce_types
 def display_count() -> None:
     messagebox.showinfo("Stand Counter", f"Mimi has stood up {milly_stand_counter} time{"s" if milly_stand_counter != 1 else ""}!")
 

@@ -7,6 +7,7 @@ from time import sleep
 from classes_and_types import *
 from menu.menu import *
 from menu.card_index import card_init
+from menu.settings import load_settings
 from game_loop_functions import *
 from game import game
 import abilities as a
@@ -84,13 +85,13 @@ def main() -> None:
 
             del data["alignment"]
             
-            roles[data["name"]] = Role(**data, targets = [], information = [], visited_by = [])
+            roles[data["name"]] = Role(**data, current_targets = [], information = [], visited_by = [])
 
     with open("defaults.txt") as file:
         string_data: str = file.readline()
         name_data: list[str] = string_data.split(", ")
 
-    entries = Menu_Entry([], list(roles.values()))
+    entries = Menu_Entry([], list(roles.values()), load_settings())
 
     # -- Menu -- #
     setup_menu(entries, name_data)

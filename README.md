@@ -2,10 +2,7 @@
 A Program to allocate roles in a game of mafia
 
 # Changes
-Librarian Now Cannot Draw Guarenteed Roles
-Evil Players Are Shown 2 Roles To Bluff
-Soldier Is No Longer Guarenteed
-Potential Poison Bug Fix
+Revealed Mayor Cannot Be Protected By Doctor Ability
 
 # To Do
 Shuffle Villagers In (For Repeated Roles) Or Create A Repeated Role?

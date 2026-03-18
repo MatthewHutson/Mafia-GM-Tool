@@ -56,12 +56,19 @@ class protect(Ability):
     @enforce_types
     def __init__(self) -> None:
         super().__init__(1, 5, ["repeat"], True, 3)
+
+    # -- Extra Methods -- #
+    @enforce_types
+    def check_for_mayor_case(self, target: str, data: Game_Data) -> bool:
+        target_role: Role = data.players[target]
+        return not (target_role.name == "Mayor" and target_role.solo_win)
     
     # -- Ability -- #
     @enforce_types
     def ability(self, user: str, data: Game_Data) -> None:
         target: str = data.players[user].targets[0]
-        if not data.players[user].poisoned: 
+
+        if not data.players[user].poisoned and self.check_for_mayor_case(target, data): 
             data.players[target].protected = True
 
 class link(Ability):
@@ -158,18 +165,28 @@ class telepathy(Ability):
     @enforce_types
     def ability(self, user: str, data: Game_Data) -> None:
         target: str = data.players[user].targets[0]
+        user_role = data.players[user]
 
-        if not data.players[user].poisoned:
+        if not user_role.poisoned:
             role: Role = data.players[target]
             is_lover: bool = role.linked
         else:
             role: Role = choice(data.roles)
             is_lover: bool = True
         
-        data.players[user].information.append(f"{target} is {role.name}, which is {data.get_card_by_role(role)}!")
+        user_role.information.append(f"{target} is {role.name}, which is {data.get_card_by_role(role)}!")
 
         if is_lover:
-            data.players[user].information.append(f"{target} is linked to another player!")
+            user_role.information.append(f"{target} is linked to another player!")
+
+        if user_role.name == "Psychic":
+            mafia_roles: list[Role] = [role for role in data.evil_aligned.values() if not role.name == "Psychic"]
+
+            for roles in mafia_roles:
+                role.information.append(f"{target} is {role.name}, which is {data.get_card_by_role(role)}!")
+
+                if is_lover:
+                    role.information.append(f"{target} is linked to another player!")
 
 class stalk(Ability):
     @enforce_types
@@ -187,8 +204,8 @@ class stalk(Ability):
         else:
             visitors = []
 
-        target_str = f"{target} was visited by "
-        count = 0
+        target_str: str = f"{target} was visited by "
+        count: int = 0
 
         # -- Filtering For " " and Self Cases -- #
         for i in range(len(visitors)):

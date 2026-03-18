@@ -6,6 +6,7 @@
         ["Necromancer"],
         ["Gambler"],
         ["Mayor"],
+        ["Soldier"], 
         ["Bomber"]
     ],
     "8": [
@@ -17,6 +18,7 @@
         ["Mayor"],
         ["Cupid", "Bomber"],
         ["Jester"],
+        ["Soldier"], 
         ["Librarian"]
     ]
 }

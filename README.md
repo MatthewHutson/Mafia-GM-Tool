@@ -2,11 +2,17 @@
 A Program to allocate roles in a game of mafia
 
 # Changes
-Bug Fix - Librarian Stops When Set Is Empty
+Librarian Now Cannot Draw Guarenteed Roles
+Evil Players Are Shown 2 Roles To Bluff
+Soldier Is No Longer Guarenteed
+Potential Poison Bug Fix
 
 # To Do
-Add All Other Roles
-Add Joke Roles (Perhaps)
+Shuffle Villagers In (For Repeated Roles)?
+Chanceller (Hitler) - Evil Mayor (Could False Claim Mayor)?
+Add More Roles?
+Add Joke Roles?
+
 Make Doccumentation With Carlos
 
 # Using The Milly Stand Counter (For GM)

@@ -99,6 +99,15 @@ def main() -> None:
     game_data.init()
 
     # -- Game Loop -- #
+    all_roles: set[str] = set(game_data.roles.keys())
+    playing_roles: set[str] = set([role.name for role in game_data.players.values()])
+    out_of_game_roles: list[str] = list(all_roles - playing_roles)[:2]
+    cards: list[str] = [game_data.get_card_by_role(game_data.roles[role]) for role in out_of_game_roles]
+
+    messagebox.showinfo("Sleepy Time", f"Wake up, {list(game_data.evil_aligned.keys())} and show them {out_of_game_roles} with cards {cards}!")
+    sleep(0.5)
+    messagebox.showinfo("Sleepy Time", f"Wake up, {list(game_data.evil_aligned.keys())} and show them {out_of_game_roles} with cards {cards}!")
+
     init_game_menu(entries, game_data)
 
     while game_data.playing:
@@ -186,3 +195,4 @@ if __name__ == "__main__":
             playing = messagebox.askyesno("Game Over", "Do you want to play another round?")
         except Exception as e:
             playing = False
+            #raise e

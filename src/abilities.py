@@ -132,7 +132,7 @@ class poison(Ability):
             target: str = data.players[user].targets[0]
             data.players[target].poisoned = True
 
-            if data.players[target].ability == self:
+            if data.players[target].ability == self or data.players[target].secondary_ability == self:
                 # -- Prevents Unfair Poison Clashes -- #
                 targets_target: str = data.players[target].targets[0]
                 data.players[targets_target].poisoned = False
@@ -290,7 +290,6 @@ class ambush(Ability):
         for player in visitors:
             data.players[player].information.append(f"{user} attempted to ambush {new_target}!")
 
-
 class mayor(Ability):
     @enforce_types
     def __init__(self) -> None:
@@ -395,7 +394,7 @@ class index(Ability):
     @enforce_types
     def __init__(self) -> None:
         super().__init__(0, 5, ["passive"], True, 11)
-        self.seen_roles: set[str] = set([])
+        self.seen_roles: set[str] = set(["Soldier", "Doctor", "Mafia", "Sherrif"])
 
     # -- Ability -- #
     @enforce_types

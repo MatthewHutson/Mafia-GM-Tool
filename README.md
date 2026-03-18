@@ -8,8 +8,9 @@ Soldier Is No Longer Guarenteed
 Potential Poison Bug Fix
 
 # To Do
-Shuffle Villagers In (For Repeated Roles)?
+Shuffle Villagers In (For Repeated Roles) Or Create A Repeated Role?
 Chanceller (Hitler) - Evil Mayor (Could False Claim Mayor)?
+Possible Third Evil Player?
 Add More Roles?
 Add Joke Roles?
 

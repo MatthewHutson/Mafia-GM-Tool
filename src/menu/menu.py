@@ -64,7 +64,7 @@ def new_load_system() -> None:
 
     with open("guarenteed_role_load.json", 'r') as file:
         data: dict = json.load(file)
-        guarenteed_roles = data["3"]
+        guarenteed_roles = list(data.values())[0]
 
     # -- Managing Player Count -- #
     max_mafia: int = len(list(evil_role_dict.values())[-1])
@@ -80,18 +80,16 @@ def get_roles_by_players() -> list[list[Role]]:
 def get_roles(player_count: int) -> list[list[Role]]:
     # -- Part Of Role Load System V3 -- #
     roles: list[list[Role]] = []
-    count = 0
     
     for max, role_list in evil_role_dict.items():
-        if player_count > max:
-            count += 1
+        if player_count >= max:
             roles = deepcopy(role_list)
 
-    if player_count == 3: roles = [["Mafia"]]
+    role_count: int = len(roles)
 
     for role_list in guarenteed_roles:
-        if count <= player_count:
-            count += 1
+        if role_count <= player_count:
+            role_count += 1
             roles.append(role_list)
 
     other_role_boundaries: list[int] = list(other_role_dict.keys())
@@ -104,12 +102,12 @@ def get_roles(player_count: int) -> list[list[Role]]:
     shuffle(remaining_roles)
     i = 0
 
-    if player_count >= len(guarenteed_roles):
-        while (count <= player_count) and i < len(remaining_roles):
+    if player_count >= len(role_list):
+        while (role_count <= player_count) and i < len(remaining_roles):
             roles.append(remaining_roles[i])
 
             i += 1
-            count += 1
+            role_count += 1
 
     shuffle(roles)
 
@@ -152,7 +150,7 @@ def add_player(players: list[Player_Select_Frame], roles: list[list[Role]], entr
 
         role_boundary_reset(roles)
 
-    except IndexError:
+    except IndexError as e:
         messagebox.showwarning("Warning", "You Have Reached The Maximum Number of Players!")
     except NameError:
         messagebox.showwarning("Warning", "A Player With This Name Already Exists!")

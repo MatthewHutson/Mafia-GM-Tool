@@ -2,10 +2,7 @@
 A Program to allocate roles in a game of mafia
 
 # Changes
-Added The Settings Menu (settings.py)
-Added The Early End Settign - Toggle To Determine If Jester And Executioner End The Game Immediately
-Added The Double Down Setting - Toggle To Allow Any Role To Pick Their Previous Target Again
-Fixed Creep Bug - Poisoned Creep Crashes Game
+Fixed Bug When Trying TO Load 1 Player At A Time
 
 # To Do
 Add Drunk

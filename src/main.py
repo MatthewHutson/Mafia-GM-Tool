@@ -91,7 +91,7 @@ def main() -> None:
         string_data: str = file.readline()
         name_data: list[str] = string_data.split(", ")
 
-    entries = Menu_Entry([], list(roles.values()), load_settings())
+    entries = Menu_Entry([], list(roles.values()), deepcopy(list(roles.keys())), [], [], load_settings())
 
     # -- Menu -- #
     setup_menu(entries, name_data)

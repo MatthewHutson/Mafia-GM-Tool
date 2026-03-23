@@ -41,6 +41,8 @@ role_row_frames = Role_Row(role_frame)
 
 main_font: tuple[str, int] = ("Airial", 10)
 
+global_entries: Menu_Entry = None
+
 # -- Game Menu Global Vars -- #
 alive_frames = []
 dead_frames = []
@@ -49,7 +51,7 @@ selected_players = []
 @enforce_types
 def new_load_system() -> None:
     # -- Load System Version 3 -- #
-    global max_players, evil_role_dict, guarenteed_roles, other_role_dict
+    global max_players, evil_role_dict, guarenteed_roles, other_role_dict, global_entries
 
     # -- Loading The Files -- #
     with open("evil_role_load.json", 'r') as file:
@@ -66,11 +68,14 @@ def new_load_system() -> None:
         data: dict = json.load(file)
         guarenteed_roles = list(data.values())[0]
 
+    global_entries.all_roles_lists = list(evil_role_dict.values())[-1] + guarenteed_roles + list(other_role_dict.values())[-1]
+
     # -- Managing Player Count -- #
     max_mafia: int = len(list(evil_role_dict.values())[-1])
     max_guarenteed_roles: int = len(guarenteed_roles)
     max_other_roles: int = len(list(other_role_dict.values())[-1])
     max_players = max_mafia + max_guarenteed_roles + max_other_roles
+
 
 @enforce_types
 def get_roles_by_players() -> list[list[Role]]:
@@ -115,6 +120,11 @@ def get_roles(player_count: int) -> list[list[Role]]:
 
 @enforce_types
 def role_boundary_reset(roles: list[list[Role]]) -> None:
+    global global_entries
+
+    if global_entries != None:
+        global_entries.current_roles_lists = []
+
     i = 0
     role_temp = roles
 
@@ -303,6 +313,10 @@ def terminate() -> None:
 # -- Setup Menu -- #
 @enforce_types
 def setup_menu(entries: Menu_Entry, default_names: list[str]) -> None:
+    # -- Globals Handling -- #
+    global global_entries
+    global_entries = entries
+
     # -- File Handling -- #
     new_load_system()
     role_row_frames.get_role_reset_function(role_boundary_reset_for_icons)

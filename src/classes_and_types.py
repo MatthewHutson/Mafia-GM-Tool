@@ -222,12 +222,46 @@ class Players(dict[str, Role]):
 class Menu_Entry:
     players: list[str]
     roles: list[Role]
+    all_roles: list[str]
+    current_roles_lists: list[list[str]]
+    all_roles_lists: list[list[str]]
     settings: dict[Any]
 
     # -- Properties -- #
     @property
     def role_dict(self) -> Players:
         return Players({role.name: role for role in self.roles})
+    
+    @property
+    @enforce_types
+    def non_active_roles(self) -> list[list[str]]:
+        inactive_roles: list[list[str]] = []
+
+        for role in self.all_roles:
+            in_game = False
+
+            for role_list in self.current_roles_lists:
+                in_game = in_game or (role in role_list)
+                if in_game: break
+            
+            if not in_game:
+                for role_list in self.all_roles_lists:
+                    if role in role_list:
+                        inactive_roles.append(role_list)
+        
+        return deepcopy(inactive_roles)
+    
+    @property
+    def non_active_non_evil_roles(self) -> list[list[str]]:
+        role_list = self.non_active_roles
+        new_roles = []
+
+        for roles in role_list:
+            if self.role_dict[roles[0]].alignment:
+                new_roles.append(roles)
+
+        return new_roles
+
 
     # -- Methods -- #
     @enforce_types

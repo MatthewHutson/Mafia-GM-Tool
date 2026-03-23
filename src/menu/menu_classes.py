@@ -42,9 +42,6 @@ class Role_Icon:
     # -- Constructors -- #
     @enforce_types
     def __init__(self, roles: list[str], main_font: tuple[str, int], entries: Menu_Entry, size: tuple[int] = (16, 4), padding: tuple[int] = (2, 0), command: Any = None) -> None:
-        self.roles = [entries.role_dict[role] for role in roles]
-        self.role_names = roles
-        self.index = 0
         self.font = main_font
         self.entries = entries
         self.size = size
@@ -53,17 +50,21 @@ class Role_Icon:
         self.frame = None
         self.frames = None
 
-        if command == None: self.command = self.cycle
+        if command == None: self.command = self.change_role
         else: self.command = command
 
+        self.re_init(roles)
+
     @enforce_types
-    def re_init(self, roles: list[str]) -> None:
+    def re_init(self, roles: list[list[str]]) -> None:
         self.roles = [self.entries.role_dict[role] for role in roles]
+        self.role_names = roles
         self.index = len(self.roles) - 1
-        try:
-            self.command()
-        except:
-            pass
+
+        self.entries.current_roles_lists.append(roles)
+
+        if self.command == self.change_role:
+            self.cycle()
 
     # -- Property -- #
     @property
@@ -117,23 +118,46 @@ class Role_Icon:
     @enforce_types
     def delete(self) -> None:
         self.forget()
+        self.entries.current_roles_lists.remove(self.roles)
         del self
 
     @enforce_types
     def forget(self) -> None:
         if self.label != None:
             self.label.pack_forget()
+        
+    @enforce_types
+    def change_role(self) -> None:
+        if self.alignment != False:
+            current_role = [role.name for role in self.roles]
+            new_roles = self.entries.non_active_non_evil_roles
+            self.entries.current_roles_lists.remove(current_role)
+            shuffle(new_roles)
+
+            try:
+                new_role_names: list[str] = new_roles[0]
+            except:
+                new_role_names = current_role
+
+            self.roles = [self.entries.role_dict[role] for role in new_role_names]
+            self.role_names = new_role_names
+            self.cycle()
+
+            self.entries.current_roles_lists.append(deepcopy(new_role_names))
+        else:
+            self.cycle()
 
     @enforce_types
     def cycle(self) -> None:
         self.index += 1
         self.index = self.index % len(self.roles)
 
-        for frame in self.frames:
-            frame.forget()
+        if self.frames != None:
+            for frame in self.frames:
+                frame.forget()
 
-        for frame in self.frames:
-            frame.pack(self.frame, self.frames)
+            for frame in self.frames:
+                frame.pack(self.frame, self.frames)
 
     @enforce_types
     def shuffle(self) -> None:
@@ -199,7 +223,6 @@ class Role_Row:
 
         self.icons[-1].append(icon)
         self.pack()
-
             
     @enforce_types
     def remove_item(self, row: int, index: int, reset: bool = True, delete: bool = True) -> None:

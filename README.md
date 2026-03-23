@@ -2,9 +2,10 @@
 A Program to allocate roles in a game of mafia
 
 # Changes
-Fixed Bug When Trying TO Load 1 Player At A Time
+Made It Possible To Select New Roles In Game Manually Rather Than Through Shuffle
 
 # To Do
+Make It Impossbie To Shuffle Out Guarenteed Roles
 Add Drunk
 Shuffle Villagers In (For Repeated Roles) Or Create A Repeated Role?
 Chanceller (Hitler) - Evil Mayor (Could False Claim Mayor)?

@@ -74,8 +74,7 @@ def new_load_system() -> None:
     max_mafia: int = len(list(evil_role_dict.values())[-1])
     max_guarenteed_roles: int = len(guarenteed_roles)
     max_other_roles: int = len(list(other_role_dict.values())[-1])
-    max_players = max_mafia + max_guarenteed_roles + max_other_roles
-
+    max_players = max_mafia + max_guarenteed_roles + max_other_roles - 2
 
 @enforce_types
 def get_roles_by_players() -> list[list[Role]]:

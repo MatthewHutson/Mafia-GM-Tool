@@ -69,7 +69,10 @@ class Role_Icon:
     # -- Property -- #
     @property
     def role(self) -> Role:
-        return self.roles[self.index]
+        if self.index < len(self.roles):
+            return self.roles[self.index]
+        else:
+            return self.roles[-1]
 
     @property
     def name(self) -> str:
@@ -132,18 +135,25 @@ class Role_Icon:
             current_role = [role.name for role in self.roles]
             new_roles = self.entries.non_active_non_evil_roles
             self.entries.current_roles_lists.remove(current_role)
-            shuffle(new_roles)
 
-            try:
+            if len(new_roles) > 0:
                 new_role_names: list[str] = new_roles[0]
-            except:
+            else:
                 new_role_names = current_role
+
+            self.entries.all_roles_lists.remove(new_role_names)
 
             self.roles = [self.entries.role_dict[role] for role in new_role_names]
             self.role_names = new_role_names
-            self.cycle()
 
-            self.entries.current_roles_lists.append(deepcopy(new_role_names))
+            if len(new_role_names) > 1:
+                self.cycle()
+            else:
+                self.refresh()
+
+            self.entries.current_roles_lists.append(new_role_names)
+            self.entries.all_roles_lists.append(new_role_names)
+
         else:
             self.cycle()
 
@@ -151,7 +161,10 @@ class Role_Icon:
     def cycle(self) -> None:
         self.index += 1
         self.index = self.index % len(self.roles)
+        self.refresh()
 
+    @enforce_types
+    def refresh(self) -> None:
         if self.frames != None:
             for frame in self.frames:
                 frame.forget()

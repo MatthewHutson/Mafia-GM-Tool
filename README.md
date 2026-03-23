@@ -2,7 +2,8 @@
 A Program to allocate roles in a game of mafia
 
 # Changes
-Made It Possible To Select New Roles In Game Manually Rather Than Through Shuffle
+Artificially Reduced The Max Players To Number Of Compatible Roles - 2
+Made The New Selection Cyclic Rather Than Random On Press
 
 # To Do
 Make It Impossbie To Shuffle Out Guarenteed Roles

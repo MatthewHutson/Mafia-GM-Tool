@@ -235,7 +235,8 @@ class Menu_Entry:
     @property
     @enforce_types
     def non_active_roles(self) -> list[list[str]]:
-        inactive_roles: list[list[str]] = []
+        inactive_roles_lists: list[list[str]] = []
+        inactive_roles: list[str] = []
 
         for role in self.all_roles:
             in_game = False
@@ -245,11 +246,15 @@ class Menu_Entry:
                 if in_game: break
             
             if not in_game:
-                for role_list in self.all_roles_lists:
-                    if role in role_list:
-                        inactive_roles.append(role_list)
-        
-        return deepcopy(inactive_roles)
+                inactive_roles.append(role)
+
+        for role_list in self.all_roles_lists:
+            for role in inactive_roles:
+                if role in role_list:
+                    inactive_roles_lists.append(role_list)
+                    break
+
+        return inactive_roles_lists
     
     @property
     def non_active_non_evil_roles(self) -> list[list[str]]:

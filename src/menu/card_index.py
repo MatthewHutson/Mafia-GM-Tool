@@ -50,7 +50,7 @@ def card_index(root: tk.Tk, bg: str, font: tuple[str, int], entries: Menu_Entry,
             except KeyError:
                 continue
 
-        frame = tk.Frame(main_frame)
+        frame = tk.Frame(main_frame.canvas)
         role_icon = Role_Icon([role_name], font, entries, (10, 2), (2, 2), none)
         card_label = tk.Label(frame, text = card, bg = bg)
 

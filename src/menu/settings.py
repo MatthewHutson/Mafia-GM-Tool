@@ -15,7 +15,7 @@ class Setting:
         self.data: dict = data
 
         # -- Tkinter Objects -- #
-        self.frame = tk.Frame(master)
+        self.frame = tk.Frame(master.canvas)
         self.nameplate = tk.Label(self.frame, text = self.name, bg = bg2)
         self.description_button = tk.Button(self.frame, text = "Info", command = self.description_popup, bg = "#5D9FF0", activebackground = "#4980C4", fg = "#FFFFFF", activeforeground= "#FFFFFF")
         self.gen_choice_widget()
@@ -53,7 +53,7 @@ class Setting:
 
     @enforce_types
     def pack(self) -> None:
-        self.frame.pack(side = tk.TOP, padx = 2, pady = 2, anchor = "ne", ipady = 8, ipadx = 32)
+        self.frame.pack(side = tk.TOP, padx = 2, pady = 2, anchor = "ne", ipady = 8, fill = "x")
         self.nameplate.pack(side = tk.LEFT, padx = 2, fill = "both", expand = True)
         self.choice_widget.pack(side = tk.RIGHT, padx = 2, fill = "y", ipadx = 4)
         self.description_button.pack(side = tk.RIGHT, padx = 2, fill = "y", ipadx = 12)
@@ -97,7 +97,7 @@ def display_settings(root: tk.Tk, bg: str, font: tuple[str, int], entries: Menu_
     settings: dict = entries.settings
     root = tk.Toplevel()
     root.resizable(False, True)
-    root.geometry("256x384")
+    root.geometry("318x384")
     root.title("Game Settings")
 
     root.protocol("WM_DELETE_WINDOW", remove_instances())

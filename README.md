@@ -2,10 +2,7 @@
 A Program to allocate roles in a game of mafia
 
 # Changes
-Made Executioner Not End Game Early For Balance Consideration
-Made Poisoned Creep Get Random Names
-Bug Fix - Sheriff Correctly Removed From Librarian Pull and Re Added Soldier To This List
-Changed README layout
+Changes Involving Vertical Scroll Objects
 
 # To Do
 Make A Setting To Allow For Toggling Removing Guarenteed Roles

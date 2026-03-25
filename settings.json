@@ -1,12 +1,17 @@
 {
     "Early End" : {
-        "description": "Make Jester End The Game As Soon As Their Condition Is Fufilled",
+        "description": "Make Jester End The Game As Soon As Their Condition Is Fufilled.",
         "type": "checkbox",
         "value": 1
     },
     "Double Down": {
-        "description": "Allow Every Role To Pick The Same Target Twice",
+        "description": "Allow Every Role To Pick The Same Target Twice.",
         "type": "checkbox",
         "value": 0
+    },
+    "Guarenteed Roles": {
+        "description": "Have Specific Roles (Sheriff and Doctor) Always In The Game.",
+        "type": "checkbox",
+        "value": 1
     }
 }

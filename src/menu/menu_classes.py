@@ -23,7 +23,7 @@ class Vertical_Scroll_Frame(tk.Frame):
 
         self.canvas.create_window((0, 0), window = self, anchor = "n")
         self.initialise()
-
+        
     # -- Methods -- #
     @enforce_types
     def scroll_all(self, event) -> None:

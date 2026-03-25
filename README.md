@@ -2,19 +2,20 @@
 A Program to allocate roles in a game of mafia
 
 # Changes
-Artificially Reduced The Max Players To Number Of Compatible Roles - 2
-Made The New Selection Cyclic Rather Than Random On Press
+Made Executioner Not End Game Early For Balance Consideration
+Made Poisoned Creep Get Random Names
+Bug Fix - Sheriff Correctly Removed From Librarian Pull and Re Added Soldier To This List
+Changed README layout
 
 # To Do
-Make It Impossbie To Shuffle Out Guarenteed Roles
+Make A Setting To Allow For Toggling Removing Guarenteed Roles
 Add Drunk
-Shuffle Villagers In (For Repeated Roles) Or Create A Repeated Role?
-Chanceller (Hitler) - Evil Mayor (Could False Claim Mayor)?
-Possible Third Evil Player?
-Add More Roles?
-Add Joke Roles?
 
-Make Doccumentation With Carlos
+# -- Ideas -- #
+Shuffle Villagers In (For Repeated Roles) Or Create A Repeated Role?
+Possible Third Evil Player?
+Add More Roles? - To Make Bluffing More Interesting
+Add Joke Roles?
 
 # Using The Milly Stand Counter (For GM)
 Press the up arrow key or the up button to add 1 to the counter

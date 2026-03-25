@@ -1,6 +1,6 @@
 {
     "Early End" : {
-        "description": "Make Jester and Executioner End The Game As Soon As Their Condition Is Fufilled",
+        "description": "Make Jester End The Game As Soon As Their Condition Is Fufilled",
         "type": "checkbox",
         "value": 1
     },

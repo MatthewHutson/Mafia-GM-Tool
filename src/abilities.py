@@ -127,9 +127,6 @@ class execute(Ability):
     def ability(self, user: str, data: Game_Data) -> None:
         data.players[user].solo_win = data.players[data.players[user].targets[0]].was_voted_out
 
-        if data.settings["Early End"] == 1 and data.players[user].solo_win:
-            data.playing = False
-
         if not (data.players[data.players[user].targets[0]].currently_alive or data.players[data.players[user].targets[0]].was_voted_out):
             data.players[user].solo_win = data.players[user].currently_alive
 
@@ -186,13 +183,13 @@ class telepathy(Ability):
             user_role.information.append(f"{target} is linked to another player!")
 
         if user_role.name == "Psychic":
-            mafia_roles: list[Role] = [role for role in data.evil_aligned.values() if not role.name == "Psychic"]
+            mafia_roles: list[Role] = [role for role in data.evil_aligned.values() if role.name != "Psychic"]
 
-            for roles in mafia_roles:
-                role.information.append(f"{target} is {role.name}, which is {data.get_card_by_role(role)}!")
+            for evil_role in mafia_roles:
+                evil_role.information.append(f"{target} is {role.name}, which is {data.get_card_by_role(role)}!")
 
                 if is_lover:
-                    role.information.append(f"{target} is linked to another player!")
+                    evil_role.information.append(f"{target} is linked to another player!")
 
 class stalk(Ability):
     @enforce_types
@@ -208,7 +205,12 @@ class stalk(Ability):
         if not data.players[user].poisoned:
             visitors = data.players[target].visited_by
         else:
-            visitors = []
+            random_num: int = randint(len(data.players))
+            selected_players = set([]) 
+
+            for i in range(random_num): selected_players.add(choice(list[data.players.keys()]))
+
+            visitors = list(selected_players)
 
         target_str: str = f"{target} was visited by "
         count: int = 0
@@ -294,6 +296,7 @@ class ambush(Ability):
     def ability(self, user: str, data: Game_Data) -> None:
         target = data.players[user].targets[0]
         visitors = deepcopy(data.players[target].visited_by)
+        new_target: str = "nobody"
 
         try:
             visitors.remove(user)
@@ -417,7 +420,7 @@ class index(Ability):
     @enforce_types
     def __init__(self) -> None:
         super().__init__(targets = 0, p = 5, ability_type = ["passive"], priority = 11)
-        self.seen_roles: set[str] = set(["Soldier", "Doctor", "Mafia", "Sherrif"])
+        self.seen_roles: set[str] = set(["Doctor", "Mafia", "Sheriff"])
 
     # -- Ability -- #
     @enforce_types

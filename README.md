@@ -14,7 +14,7 @@ Possible Third Evil Player?
 Add More Roles? - To Make Bluffing More Interesting
 Add Joke Roles?
 
-# Using The Milly Stand Counter (For GM)
+# Using The Mimi Stand Counter (For GM)
 Press the up arrow key or the up button to add 1 to the counter
 Press the down arrow key or the down button to remove 1 to the counter
 The Stand Counter Button Will Show The Current Count

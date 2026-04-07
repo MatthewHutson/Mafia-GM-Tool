@@ -26,9 +26,15 @@ class Ability():
     def ability(self, user: str, data: object) -> None:
         ...
 
+    def on_poison(self, user: str, data: object) -> None:
+        ...
+
     @enforce_types
     def __call__(self, user: str, data: object) -> None:
-        self.ability(user, data)
+        if data.players[user].poisoned:
+            self.on_poison(user, data)
+        else:
+            self.ability(user, data)
 
     @enforce_types
     def __eq__(self, ability2: Union[object, type]) -> bool:

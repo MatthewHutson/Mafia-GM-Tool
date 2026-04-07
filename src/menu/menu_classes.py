@@ -356,12 +356,17 @@ class Player_Role_Frame(Player_Frame):
             self.role_fg = "#ffffff"
 
         # -- Linked Icons -- #
-        self.linked_bg = "#ddb3dd"
-        self.linked_fg = "#000000"
-
         if self.role.linked:
             self.linked_bg = "#f94af9"
             self.linked_fg = "#ffffff"
+        else:
+            self.linked_bg = "#a0ddbe"
+            self.linked_fg = "#000000"
+
+        if self.role.drunk:
+            self.drunk_bg = "#e69138"
+        else:
+            self.drunk_bg = "#DBC1FC"
 
         # -- Solo Win Icons -- #
         if self.role.solo_win:
@@ -371,6 +376,7 @@ class Player_Role_Frame(Player_Frame):
 
         # -- Extra Icons -- #
         self.linked_icon = tk.Button(self.frame, text = "", bg = self.linked_bg, activebackground = self.linked_bg, fg = self.linked_fg, activeforeground = self.linked_fg, width = 2, height = 2)
+        self.drunk_icon = tk.Button(self.frame, text = "", bg = self.drunk_bg, activebackground = self.drunk_bg, fg = "#000000", activeforeground = "#000000", width = 2, height = 2)
         self.solo_win_icon = tk.Button(self.frame, text = "", bg = self.solo_win_bg, activebackground = self.solo_win_bg, fg = "#000000", activeforeground = "#000000", width = 2, height = 2)
         self.select_icon = tk.Button(self.frame, text = "Select", bg = "#5D9FF0", activebackground = "#4980C4", fg = "#FFFFFF", activeforeground = "#FFFFFF", width = 6, height = 4, command = self.select)
 
@@ -404,6 +410,7 @@ class Player_Role_Frame(Player_Frame):
         self.role_icon.pack(side = tk.RIGHT, padx = 2, expand = False)
         self.select_icon.pack(side = tk.RIGHT, padx = 2, expand = False)
         self.linked_icon.pack(side = tk.RIGHT, padx = 2, pady = 4, expand = False)
+        self.drunk_icon.pack(side = tk.RIGHT, padx = 2, pady = 4, expand = False)
         self.solo_win_icon.pack(side = tk.RIGHT, padx = 2, pady = 4, expand = False)
         super().pack()
 
@@ -412,6 +419,7 @@ class Player_Role_Frame(Player_Frame):
         self.current_role_icon.pack_forget()
         self.select_icon.pack_forget()
         self.linked_icon.pack_forget()
+        self.drunk_icon.pack_forget()
         self.solo_win_icon.pack_forget()
 
     @enforce_types

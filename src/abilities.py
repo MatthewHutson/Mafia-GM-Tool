@@ -18,7 +18,11 @@ class none(Ability):
         pass
 
     @enforce_types
-    def on_poison(self, user: str, data: Game_Data) -> None:
+    def if_poisoned(self, user: str, data: Game_Data) -> None:
+        pass
+
+    @enforce_types
+    def if_drunk(self, user: str, data: Game_Data) -> None:
         pass
 
 class vote(Ability):
@@ -32,26 +36,44 @@ class vote(Ability):
         pass
 
     @enforce_types
-    def on_poison(self, user: str, data: Game_Data) -> None:
+    def if_poisoned(self, user: str, data: Game_Data) -> None:
+        pass
+
+    @enforce_types
+    def if_drunk(self, user: str, data: Game_Data) -> None:
         pass
 
 class reveal(Ability):
     @enforce_types
     def __init__(self) -> None:
         super().__init__(targets = 1, p = 5, ability_type = ["repeat"], priority = 9, can_pick_same_target = True)
+
+    # -- Methods -- #
+    @enforce_types
+    def information(self, data: Game_Data, user: str, result: bool) -> None:
+        if result: data.players[user].information.append(f"Your target is GOOD!")
+        else: data.players[user].information.append(f"Your target is EVIL!")
     
     # -- Ability -- #
     @enforce_types
     def ability(self, user: str, data: Game_Data) -> None:
         target: str = data.players[user].targets[0]
-        alignment: bool = data.players[user].poisoned ^ data.players[target].alignment
+        alignment: bool = data.players[target].alignment
 
-        if alignment: data.players[user].information.append(f"Their target is GOOD!")
-        else: data.players[user].information.append(f"Their target is EVIL!")
+        self.information(data, user, alignment)
 
     @enforce_types
-    def on_poison(self, user: str, data: Game_Data) -> None:
-        self.ability(user, data)
+    def if_poisoned(self, user: str, data: Game_Data) -> None:
+        target: str = data.players[user].targets[0]
+        alignment: bool = not data.players[target].alignment
+
+        self.information(data, user, alignment)
+
+    @enforce_types
+    def if_drunk(self, user: str, data: Game_Data) -> None:
+        alignment: bool = choice([True, True, False])
+
+        self.information(data, user, alignment)
 
 class endure(Ability):
     @enforce_types
@@ -64,7 +86,11 @@ class endure(Ability):
         data.players[user].protected = True
 
     @enforce_types
-    def on_poison(self, user: str, data: Game_Data) -> None:
+    def if_poisoned(self, user: str, data: Game_Data) -> None:
+        pass
+
+    @enforce_types
+    def if_drunk(self, user: str, data: Game_Data) -> None:
         pass
 
 class protect(Ability):
@@ -86,7 +112,11 @@ class protect(Ability):
         if self.check_for_mayor_case(target, data): 
             data.players[target].protected = True
 
-    def on_poison(self, user: str, data: Game_Data) -> None:
+    def if_poisoned(self, user: str, data: Game_Data) -> None:
+        pass
+
+    @enforce_types
+    def if_drunk(self, user: str, data: Game_Data) -> None:
         pass
 
 class link(Ability):
@@ -110,8 +140,12 @@ class link(Ability):
         data.players[link_2].linked_to = link_1
 
     @enforce_types
-    def on_poison(self, user: str, data: Game_Data) -> None:
+    def if_poisoned(self, user: str, data: Game_Data) -> None:
         self.ability(user, data)
+
+    @enforce_types
+    def if_drunk(self, user: str, data: Game_Data) -> None:
+        pass
 
 class jester(Ability):
     @enforce_types
@@ -127,8 +161,12 @@ class jester(Ability):
             data.playing = False
 
     @enforce_types
-    def on_poison(self, user: str, data: Game_Data) -> None:
+    def if_poisoned(self, user: str, data: Game_Data) -> None:
         self.ability(user, data)
+
+    @enforce_types
+    def if_drunk(self, user: str, data: Game_Data) -> None:
+        data.players[user].solo_win = data.players[user].currently_alive
 
 class stop_vote(Ability):
     @enforce_types
@@ -144,8 +182,18 @@ class stop_vote(Ability):
             data.players[user].solo_win = data.players[user].currently_alive
 
     @enforce_types
-    def on_poison(self, user: str, data: Game_Data) -> None:
+    def if_poisoned(self, user: str, data: Game_Data) -> None:
         self.ability(user, data)
+
+    @enforce_types
+    def if_drunk(self, user: str, data: Game_Data) -> None:
+        data.players[user].solo_win = data.players[data.players[user].targets[0]].was_voted_out
+
+        if not (data.players[data.players[user].targets[0]].currently_alive or data.players[data.players[user].targets[0]].was_voted_out):
+            data.players[user].solo_win = data.players[user].was_voted_out
+
+            if data.settings["Early End"] == 1 and data.players[user].solo_win:
+                data.playing = False
 
 class execute(Ability):
     @enforce_types
@@ -161,8 +209,18 @@ class execute(Ability):
             data.players[user].solo_win = data.players[user].currently_alive
 
     @enforce_types
-    def on_poison(self, user: str, data: Game_Data) -> None:
+    def if_poisoned(self, user: str, data: Game_Data) -> None:
         self.ability(user, data)
+
+    @enforce_types
+    def if_drunk(self, user: str, data: Game_Data) -> None:
+        data.players[user].solo_win = not data.players[data.players[user].targets[0]].was_voted_out
+
+        if not (data.players[data.players[user].targets[0]].currently_alive or data.players[data.players[user].targets[0]].was_voted_out):
+            data.players[user].solo_win = data.players[user].was_voted_out
+
+            if data.settings["Early End"] == 1 and data.players[user].solo_win:
+                data.playing = False
 
 class poison(Ability):
     @enforce_types
@@ -181,7 +239,11 @@ class poison(Ability):
             data.players[targets_target].poisoned = False
 
     @enforce_types
-    def on_poison(self, user: str, data: Game_Data) -> None:
+    def if_poisoned(self, user: str, data: Game_Data) -> None:
+        pass
+
+    @enforce_types
+    def if_drunk(self, user: str, data: Game_Data) -> None:
         pass
 
 class kill(Ability):
@@ -196,7 +258,11 @@ class kill(Ability):
         data.players[target].die(data.players)
 
     @enforce_types
-    def on_poison(self, user: str, data: Game_Data) -> None:
+    def if_poisoned(self, user: str, data: Game_Data) -> None:
+        pass
+
+    @enforce_types
+    def if_drunk(self, user: str, data: Game_Data) -> None:
         pass
 
 class telepathy(Ability):
@@ -232,14 +298,23 @@ class telepathy(Ability):
         self.show_info(data, user_role, target, role, is_lover)
 
     @enforce_types
-    def on_poison(self, user: str, data: Game_Data) -> None:
+    def if_poisoned(self, user: str, data: Game_Data) -> None:
         target: str = data.players[user].targets[0]
         user_role = data.players[user]
 
-        role: Role = choice(data.roles)
-        is_lover: bool = True
+        if user_role.name == "Psychic":
+            roles = [role for role in data.roles.values() if role.alignment]
+        else:
+            roles = list(data.roles.values())
+
+        role: Role = choice(roles)
+        is_lover: bool = False
 
         self.show_info(data, user_role, target, role, is_lover)
+
+    @enforce_types
+    def if_drunk(self, user: str, data: Game_Data) -> None:
+        pass
 
 class stalk(Ability):
     @enforce_types
@@ -282,40 +357,27 @@ class stalk(Ability):
         self.information(data, user, target, visitors)
 
     @enforce_types
-    def on_poison(self, user: str, data: Game_Data) -> None:
+    def if_poisoned(self, user: str, data: Game_Data, can_include_self: bool = True) -> None:
         target: str = data.players[user].targets[0]
 
-        random_num: int = randint(len(data.players))
+        random_num: int = randint(0, len(data.players))
         selected_players = set([]) 
 
-        for i in range(random_num): selected_players.add(choice(list[data.players.keys()]))
+        for i in range(random_num): selected_players.add(choice(list(data.players.keys())))
+
+        if not can_include_self:
+            try:
+                selected_players.remove(user)
+            except:
+                pass
 
         visitors = list(selected_players)
 
         self.information(data, user, target, visitors)
 
-class vengance(Ability):
     @enforce_types
-    def __init__(self) -> None:
-        super().__init__(targets = 0, p = 5, ability_type = ["on_death"], can_pick_same_target = True)
-    
-    # -- Ability -- #
-    @enforce_types
-    def ability(self, user: str, data: Game_Data) -> None:
-        if not data.players[user].was_voted_out:
-            data.players[user].ability.targets = 1
-            selection_menu(data, data.menu_entries, user)
-
-            target = data.players[user].targets[0]
-            role = data.players[target]
-            role.protected = False
-            role.die(data.players)
-
-        data.players[user].ability.targets = 0
-
-    @enforce_types
-    def on_poison(self, user: str, data: Game_Data) -> None:
-        self.ability(user, data)
+    def if_drunk(self, user: str, data: Game_Data) -> None:
+        self.if_poisoned(user, data, False)
 
 class resurrect(Ability):
     @enforce_types
@@ -324,7 +386,7 @@ class resurrect(Ability):
     
     # -- Ability -- #
     @enforce_types
-    def ability(self, user: str, data: Game_Data, evil: bool = True) -> None:
+    def ability(self, user: str, data: Game_Data, evil: bool = False) -> None:
         user_role: Role = data.players[user]
         evil = evil or user_role.alignment
 
@@ -351,13 +413,52 @@ class resurrect(Ability):
            user_role.used_ability = False
 
     @enforce_types
-    def on_poison(self, user: str, data: Game_Data) -> None:
-        self.ability(user, data, False)
+    def if_poisoned(self, user: str, data: Game_Data) -> None:
+        self.ability(user, data, True)
+
+    @enforce_types
+    def if_drunk(self, user: str, data: Game_Data) -> None:
+        pass
+
+class vengance(Ability):
+    @enforce_types
+    def __init__(self) -> None:
+        super().__init__(targets = 1, p = 5, ability_type = ["on_death"], can_pick_same_target = True)
+    
+    # -- Ability -- #
+    @enforce_types
+    def ability(self, user: str, data: Game_Data) -> None:
+        if not data.players[user].was_voted_out:
+            target = data.players[user].targets[0]
+            role = data.players[target]
+            role.protected = False
+            role.die(data.players)
+
+
+    @enforce_types
+    def if_poisoned(self, user: str, data: Game_Data) -> None:
+        self.ability(user, data)
+
+    @enforce_types
+    def if_drunk(self, user: str, data: Game_Data) -> None:
+        pass
+
+        # if not data.players[user].was_voted_out:
+        #     primary_ability: Ability = data.players[user].ability
+
+        #     data.players[user].ability = resurrect()
+        #     data.players[user].drunk = False
+
+        #     selection_menu(data, data.menu_entries, user)
+        #     data.players[user].ability(user, data)
+
+        #     data.players[user].drunk = True
+        #     data.players[user].ability = primary_ability
 
 class ambush(Ability):
     @enforce_types
     def __init__(self) -> None:
-        super().__init__(targets = 1, p = 5, ability_type = ["repeat"], priority = 4, can_pick_same_target = True)
+        super().__init__(targets = 1, p = 5, ability_type = ["repeat", "on_demand"], priority = 4, can_pick_same_target = True)
         
     # -- Ability -- #
     @enforce_types
@@ -385,8 +486,12 @@ class ambush(Ability):
             data.players[player].information.append(f"{user} attempted to ambush {new_target}!")
 
     @enforce_types
-    def on_poison(self, user: str, data: Game_Data) -> None:
+    def if_poisoned(self, user: str, data: Game_Data) -> None:
         self.ability(user, data, False)
+
+    @enforce_types
+    def if_drunk(self, user: str, data: Game_Data) -> None:
+        pass
 
 class mayor(Ability):
     @enforce_types
@@ -405,8 +510,12 @@ class mayor(Ability):
             data.players[user].solo_win = len(data.players) == data.players[user].alternative_end_count
             
     @enforce_types
-    def on_poison(self, user: str, data: Game_Data) -> None:
+    def if_poisoned(self, user: str, data: Game_Data) -> None:
         self.ability(user, data)
+
+    @enforce_types
+    def if_drunk(self, user: str, data: Game_Data) -> None:
+        pass
 
 class gamble(Ability):
     @enforce_types
@@ -443,7 +552,11 @@ class gamble(Ability):
                 role.secondary_ability(user, data)
 
     @enforce_types
-    def on_poison(self, user: str, data: Game_Data) -> None:
+    def if_poisoned(self, user: str, data: Game_Data) -> None:
+        self.ability(user, data)
+
+    @enforce_types
+    def if_drunk(self, user: str, data: Game_Data) -> None:
         self.ability(user, data)
 
 class instant_death(Ability):
@@ -457,7 +570,11 @@ class instant_death(Ability):
         data.players[user].die(data.players)
 
     @enforce_types
-    def on_poison(self, user: str, data: Game_Data) -> None:
+    def if_poisoned(self, user: str, data: Game_Data) -> None:
+        pass
+
+    @enforce_types
+    def if_drunk(self, user: str, data: Game_Data) -> None:
         pass
 
 class magnet(Ability):
@@ -496,7 +613,7 @@ class magnet(Ability):
         self.magnetise(data, user, role, targets)
 
     @enforce_types
-    def on_poison(self, user: str, data: Game_Data) -> None:
+    def if_poisoned(self, user: str, data: Game_Data) -> None:
         role: Role = data.players[user]
         targets = []
 
@@ -507,6 +624,9 @@ class magnet(Ability):
 
         self.magnetise(data, user, role, targets)
 
+    @enforce_types
+    def if_drunk(self, user: str, data: Game_Data) -> None:
+        pass
 
 class index(Ability):
     @enforce_types
@@ -538,13 +658,23 @@ class index(Ability):
         self.information(data, user_role, selected_set)
 
     @enforce_types
-    def on_poison(self, user: str, data: Game_Data) -> None:
+    def if_poisoned(self, user: str, data: Game_Data) -> None:
         all_roles: set[str] = set(data.roles.keys())
         normal_roles: set[str] = set([role.name for role in data.players.values()])
 
         user_role: Role = data.players[user]
         self.seen_roles.add(user_role.name)
         selected_set: set[str] = all_roles - normal_roles - self.seen_roles
+
+        self.information(data, user_role, selected_set)
+
+    @enforce_types
+    def if_drunk(self, user: str, data: Game_Data) -> None:
+        all_roles: set[str] = set(data.roles.keys())
+
+        user_role: Role = data.players[user]
+        self.seen_roles.add(user_role.name)
+        selected_set: set[str] = all_roles - self.seen_roles
 
         self.information(data, user_role, selected_set)
     

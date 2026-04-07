@@ -111,7 +111,7 @@ def game(data: Game_Data, entries: Menu_Entry) -> None:
             pack_alive_and_dead(data, data.vote_role, 0)
             use_death_abilities(data)
             life_death_sort(data)
-            remove_round_data(data)
+            remove_round_data(data, True)
 
             check_for_victory(data)
 

@@ -1,7 +1,7 @@
 # -- Imports -- #
 from dataclasses import dataclass
 from utils import *
-from random import shuffle
+from random import shuffle, choice
 from copy import deepcopy
 import numpy as np
 
@@ -26,15 +26,21 @@ class Ability():
     def ability(self, user: str, data: object) -> None:
         ...
 
-    def on_poison(self, user: str, data: object) -> None:
+    def if_poisoned(self, user: str, data: object) -> None:
+        ...
+
+    def if_drunk(self, user: str, data: object) -> None:
         ...
 
     @enforce_types
     def __call__(self, user: str, data: object) -> None:
-        if data.players[user].poisoned:
-            self.on_poison(user, data)
-        else:
-            self.ability(user, data)
+        match data.players[user].ability_conditions:
+            case [True, False]:
+                self.if_poisoned(user, data)
+            case [False, True]:
+                self.if_drunk(user, data)
+            case _:
+                self.ability(user, data)
 
     @enforce_types
     def __eq__(self, ability2: Union[object, type]) -> bool:
@@ -60,6 +66,7 @@ class Role:
     currently_alive: bool = True
     protected: bool = False
     poisoned: bool = False
+    drunk: bool = False
     linked: bool = False
     linker: str = None
     linked_to: str = None
@@ -141,6 +148,11 @@ class Role:
     @enforce_types
     def targets(self, value: list[str]) -> None:
         self.current_targets = value
+
+    @property
+    @enforce_types
+    def ability_conditions(self) -> list[bool]:
+        return [self.poisoned, self.drunk]
 
     # -- Methods -- #
     @enforce_types
@@ -273,7 +285,6 @@ class Menu_Entry:
 
         return new_roles
 
-
     # -- Methods -- #
     @enforce_types
     def assign_roles(self) -> Players:
@@ -346,6 +357,16 @@ class Game_Data():
         # -- Secondary Ability Handling -- #
         for role in self.players.values():
             role.secondary_ability = deepcopy(self.abilities["none"])
+
+        # -- Drunk Consideration --#
+        self.set_drunk()
+
+    @enforce_types
+    def set_drunk(self) -> None:
+        if self.settings["Drunk"] == 1:
+            valid_players = list(self.good_aligned.keys())
+            player = choice(valid_players)
+            self.players[player].drunk = True
 
     @enforce_types
     def get_role_by_ability(self, ability: Ability) -> Union[Role, None]:

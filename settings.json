@@ -13,5 +13,10 @@
         "description": "Have Specific Roles (Sheriff and Doctor) Always In The Game.",
         "type": "checkbox",
         "value": 1
+    },
+    "Drunk": {
+        "description": "On Good or Neutral Role Becomes Drunk At The Start Of The Game, Their Role Will Not Function Properly Unless They Are Poisoned",
+        "type": "checkbox",
+        "value": 0
     }
 }

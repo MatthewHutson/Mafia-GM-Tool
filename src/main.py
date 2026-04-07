@@ -139,4 +139,4 @@ if __name__ == "__main__":
             playing = messagebox.askyesno("Game Over", "Do you want to play another round?")
         except Exception as e:
             playing = False
-            #raise e
+            raise e

@@ -2,17 +2,14 @@
 A Program to allocate roles in a game of mafia
 
 # -- Changes -- #
-Added Chancellor - Literally An Evil Mayor
-Made The Drunk Setting Random
-Made Secondary Ability Win Conditions Be Considered (Useful For Chancellor)
-Fixed Scroll Frames Not Actually Scrolling
-Fixed Necromancer Bug - "Good Creates Evil and Evil Creates Good [Unless Poisoned]"
+Removed an Test print case in the base Ability class
+Removed The Test Raise exception in main
+Made Changes To Magenet - Not Poisoned Magnet Can Select Who Their First Target Is "Magnetised" To
 
 # -- To Do -- #
 Check For Bugs With Drunk and New Code
 
 Ponder the idea of psychic getting told all in game roles (regardless of poison)
-Ponder the idea of magnet getting to pick the destination target when not poisoned
 Ponder the Idea of drunk Cupid Linking Themselves To A Random Player (Maybe One Of Their Targets?)
 
 Make A Setting To Allow For Toggling Removing Guarenteed Roles

@@ -567,7 +567,7 @@ class instant_death(Ability):
 class magnet(Ability):
     @enforce_types
     def __init__(self) -> None:
-        super().__init__(targets = 1, p = 5, ability_type = ["repeat"], priority = 1)
+        super().__init__(targets = 2, p = 5, ability_type = ["repeat"], priority = 1)
         
     # -- Extra Methods -- #
     @enforce_types
@@ -577,15 +577,15 @@ class magnet(Ability):
             role.poisoned = True
 
     @enforce_types
-    def magnetise(self, data: Game_Data, user: str, role: Role, targets: list[str]) -> None:
+    def magnetise(self, data: Game_Data, second_target: str, role: Role, targets: list[str]) -> None:
         for target in targets:
             target_role = data.players[target]
 
             if target_role.ability.target_living:
                 if role.ability.targets == 1:
-                    target_role.targets = [user]
+                    target_role.targets = [second_target]
                 elif role.ability.targets == 2:
-                    target_role.targets = [user, target]
+                    target_role.targets = [second_target, target]
 
     # -- Ability -- #
     @enforce_types
@@ -597,7 +597,7 @@ class magnet(Ability):
         target: Role = data.players[targets[0]]
         self.poison_consideration(role, target)
                         
-        self.magnetise(data, user, role, targets)
+        self.magnetise(data, role.targets[1], role, targets)
 
     @enforce_types
     def if_poisoned(self, user: str, data: Game_Data) -> None:

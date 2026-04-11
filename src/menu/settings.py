@@ -13,9 +13,10 @@ class Setting:
         # -- Internal Data -- #
         self.name: str = name
         self.data: dict = data
+        self.master: Vertical_Scroll_Frame = master
 
         # -- Tkinter Objects -- #
-        self.frame = tk.Frame(master.canvas)
+        self.frame = tk.Frame(master)
         self.nameplate = tk.Label(self.frame, text = self.name, bg = bg2)
         self.description_button = tk.Button(self.frame, text = "Info", command = self.description_popup, bg = "#5D9FF0", activebackground = "#4980C4", fg = "#FFFFFF", activeforeground= "#FFFFFF")
         self.gen_choice_widget()
@@ -53,10 +54,10 @@ class Setting:
 
     @enforce_types
     def pack(self) -> None:
-        self.frame.pack(side = tk.TOP, padx = 2, pady = 2, anchor = "ne", ipady = 8, fill = "x")
         self.nameplate.pack(side = tk.LEFT, padx = 2, fill = "both", expand = True)
         self.choice_widget.pack(side = tk.RIGHT, padx = 2, fill = "y", ipadx = 4)
         self.description_button.pack(side = tk.RIGHT, padx = 2, fill = "y", ipadx = 12)
+        self.master.add(self.frame, 8)
 
     @enforce_types
     def close(self) -> None:
@@ -76,6 +77,10 @@ def load_settings() -> dict:
     except:
         data: dict = {}
 
+    for setting_data in data.values():
+        if setting_data["type"] == "checkbox" and setting_data["value"] == "random":
+            setting_data["value"] = choice([0, 1])
+
     return data  
 
 @enforce_types
@@ -92,7 +97,7 @@ def remove_instances() -> None:
 
 @enforce_types
 def display_settings(root: tk.Tk, bg: str, font: tuple[str, int], entries: Menu_Entry) -> None:
-    # -- Initialisation - #
+    # -- Initialisation -- #
     global instances, frames
     settings: dict = entries.settings
     root = tk.Toplevel()

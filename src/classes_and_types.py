@@ -34,6 +34,8 @@ class Ability():
 
     @enforce_types
     def __call__(self, user: str, data: object) -> None:
+        if any(data.players[user].ability_conditions):
+            print(user + ":", data.players[user].ability_conditions)
         match data.players[user].ability_conditions:
             case [True, False]:
                 self.if_poisoned(user, data)

@@ -105,6 +105,8 @@ def main() -> None:
     for name, role in game_data.players.items():
         if "game_end" in role.ability_type:
             role.ability(name, game_data)
+        if "game_end" in role.secondary_ability.ability_type:
+            role.secondary_ability(name, game_data) 
 
     winners = []
 

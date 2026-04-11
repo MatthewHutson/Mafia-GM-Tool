@@ -388,7 +388,7 @@ class resurrect(Ability):
     @enforce_types
     def ability(self, user: str, data: Game_Data, evil: bool = False) -> None:
         user_role: Role = data.players[user]
-        evil = evil or user_role.alignment
+        evil = evil or not user_role.alignment
 
         if user_role.ability == self: # -- Gambler Check -- #
             ability_cancel = user_role.ability_cancel
@@ -434,26 +434,13 @@ class vengance(Ability):
             role.protected = False
             role.die(data.players)
 
-
     @enforce_types
     def if_poisoned(self, user: str, data: Game_Data) -> None:
-        self.ability(user, data)
+        pass
 
     @enforce_types
     def if_drunk(self, user: str, data: Game_Data) -> None:
         pass
-
-        # if not data.players[user].was_voted_out:
-        #     primary_ability: Ability = data.players[user].ability
-
-        #     data.players[user].ability = resurrect()
-        #     data.players[user].drunk = False
-
-        #     selection_menu(data, data.menu_entries, user)
-        #     data.players[user].ability(user, data)
-
-        #     data.players[user].drunk = True
-        #     data.players[user].ability = primary_ability
 
 class ambush(Ability):
     @enforce_types
@@ -504,7 +491,7 @@ class mayor(Ability):
         if data.playing:
             if not data.players[user].solo_win:
                 sleep(0.5)
-                if messagebox.askyesno("Mayor", "Has The Mayor Revealed Themselves?"):
+                if messagebox.askyesno("Mayor", f"Has {user} claimed mayor?"):
                     data.players[user].solo_win = True
         else:
             data.players[user].solo_win = len(data.players) == data.players[user].alternative_end_count

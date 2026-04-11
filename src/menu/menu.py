@@ -238,12 +238,12 @@ def pack_alive_and_dead(data: Game_Data, active_role: Role, number_of_targets: i
         dead_frames.remove(frame)
         frame.delete()
 
-    for name, Role in data.alive_players.items():
-        player_frame = Player_Role_Frame(name, data, alive_canvas, main_font, selected_players, active_role, number_of_targets)
+    for name in data.alive_players.keys():
+        player_frame = Player_Role_Frame(name, data, alive_canvas, main_font, selected_players, active_role, number_of_targets, pack_alive_and_dead)
         alive_frames.append(player_frame)
 
-    for name, Role in data.dead_players.items():
-        player_frame = Player_Role_Frame(name, data, dead_canvas, main_font, selected_players, active_role, number_of_targets)
+    for name in data.dead_players.keys():
+        player_frame = Player_Role_Frame(name, data, dead_canvas, main_font, selected_players, active_role, number_of_targets, pack_alive_and_dead)
         dead_frames.append(player_frame)
 
 @enforce_types
@@ -383,6 +383,8 @@ def setup_menu(entries: Menu_Entry, default_names: list[str]) -> None:
 @enforce_types
 def init_game_menu(entries: Menu_Entry, data: Game_Data) -> None:
     global alive_margin, alive_canvas, dead_margin, dead_canvas
+    player_margin_size: int = 160
+
     tk.Label(root, text = "Game Menu", font = ("Airial", 16), bg = bg_2).pack(side = tk.TOP, fill = "x", pady = 4)
     
     alive_margin = tk.Frame(root, bg = bg_2)
@@ -397,8 +399,8 @@ def init_game_menu(entries: Menu_Entry, data: Game_Data) -> None:
     alive_canvas.pack(side = tk.TOP, padx = 4, pady = 4, fill = "both")
     dead_canvas.pack(side = tk.TOP, padx = 4, pady = 4, fill = "both")
 
-    alive_margin.pack(side = tk.LEFT, padx = 4, pady = 4, fill = "y", ipadx = 128)
-    dead_margin.pack(side = tk.RIGHT, padx = 4, pady = 4, fill = "y", ipadx = 128)
+    alive_margin.pack(side = tk.LEFT, padx = 4, pady = 4, fill = "y", ipadx = player_margin_size)
+    dead_margin.pack(side = tk.RIGHT, padx = 4, pady = 4, fill = "y", ipadx = player_margin_size)
 
     pack_alive_and_dead(data, data.vote_role, 0) # -- Prevents Popup before the first night -- #
     card_index(root, bg_2, main_font, entries, data) # -- Gives Role Card Before Popups Appear -- #

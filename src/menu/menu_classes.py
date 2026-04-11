@@ -14,6 +14,7 @@ class Vertical_Scroll_Frame(tk.Frame):
         self.scroll_bar = tk.Scrollbar(master, orient = tk.VERTICAL)
         self.canvas = tk.Canvas(master, yscrollcommand = self.scroll_bar.set, bg = bg)
         self.scroll_bar.configure(command = self.canvas.yview)
+        self.root = master
 
         self.scroll_bar.pack(side = tk.RIGHT, fill = "y", ipadx = 4, expand = False)
         self.canvas.pack(side = tk.LEFT, fill = tk.BOTH, expand = True)
@@ -21,8 +22,12 @@ class Vertical_Scroll_Frame(tk.Frame):
         super().__init__(self.canvas)
         self.bg = bg
 
-        self.canvas.create_window((0, 0), window = self, anchor = "n")
+        self.canvas.create_window((0, 0), window = self, anchor = tk.NW)
         self.initialise()
+
+        master.update()
+        self.canvas_size: int = self.canvas.winfo_width()
+        self.items: int = 0
         
     # -- Methods -- #
     @enforce_types
@@ -37,6 +42,22 @@ class Vertical_Scroll_Frame(tk.Frame):
     def initialise(self) -> None:
         self.canvas.bind("<Configure>", self.scroll_all)
         self.canvas.master.bind("<MouseWheel>", self.scroll_event)
+
+    @enforce_types
+    def add(self, frame: tk.Widget, height: int = 0) -> None:
+        frame.pack(side = tk.TOP, fill = "x", pady = 2, ipady = height, expand = True)
+        frame.update()
+        true_height: int = frame.winfo_height()
+        frame.pack_forget()
+        frame.configure(width = self.canvas_size, height = true_height)
+        frame.pack(side = tk.TOP, pady = 2)
+        frame.pack_propagate(False)
+
+        self.root.update()
+        root_width = self.root.winfo_width()
+        root_height = self.root.winfo_height()
+
+        self.root.geometry(f"{root_width}x{root_height+1}")
 
 class Role_Icon:
     # -- Constructors -- #
@@ -334,15 +355,17 @@ class Player_Select_Frame(Player_Frame):
 class Player_Role_Frame(Player_Frame):
     # -- Constructor -- #
     @enforce_types
-    def __init__(self, name: str, data: Game_Data, main_frame: Union[tk.Frame, Vertical_Scroll_Frame], main_font: tuple[str, int], selected_players: list[str], selected_role: Role, number_of_targets: int) -> None:
+    def __init__(self, name: str, data: Game_Data, main_frame: Union[tk.Frame, Vertical_Scroll_Frame], main_font: tuple[str, int], selected_players: list[str], selected_role: Role, number_of_targets: int, pack_alive_and_dead: Any) -> None:
         super().__init__(name, main_frame, main_font)
         self.data = data
         self.alignment = self.role.true_alignment
         self.selected_players = selected_players
         self.number_of_targets = number_of_targets
+        self.selected_role = selected_role
         self.selected_role_name = selected_role.name
         self.selected = False
         self.current_role_icon = None
+        self.pack_alive_and_dead: Callable = pack_alive_and_dead
 
         # -- Role Colours -- #
         self.role_fg = "#000000"
@@ -398,6 +421,15 @@ class Player_Role_Frame(Player_Frame):
     @property
     def role(self) -> Role:
         return self.data.players[self.name]
+    
+    @property
+    def kill_icon(self) -> tk.Button:
+        if self.role.currently_alive:
+            self._kill_icon = tk.Button(self.frame, text = "Kill", bg = "#F05D5D", activebackground = "#C44949", fg = "#FFFFFF", activeforeground = "#FFFFFF", width = 6, height = 4, command = self.kill)
+        else:
+            self._kill_icon = tk.Button(self.frame, text = "Revive", bg = "#474747", activebackground = "#2B2B2B", fg = "#FFFFFF", activeforeground = "#FFFFFF", width = 6, height = 4, command = self.revive)
+
+        return self._kill_icon
 
     # -- Methods -- #
     @enforce_types
@@ -409,6 +441,7 @@ class Player_Role_Frame(Player_Frame):
     def pack(self) -> None:
         self.role_icon.pack(side = tk.RIGHT, padx = 2, expand = False)
         self.select_icon.pack(side = tk.RIGHT, padx = 2, expand = False)
+        self.kill_icon.pack(side = tk.RIGHT, padx = 2, expand = False)
         self.linked_icon.pack(side = tk.RIGHT, padx = 2, pady = 4, expand = False)
         self.drunk_icon.pack(side = tk.RIGHT, padx = 2, pady = 4, expand = False)
         self.solo_win_icon.pack(side = tk.RIGHT, padx = 2, pady = 4, expand = False)
@@ -418,6 +451,9 @@ class Player_Role_Frame(Player_Frame):
     def forget(self) -> None:
         self.current_role_icon.pack_forget()
         self.select_icon.pack_forget()
+        try: self._kill_icon.pack_forget()
+        except: pass
+
         self.linked_icon.pack_forget()
         self.drunk_icon.pack_forget()
         self.solo_win_icon.pack_forget()
@@ -438,6 +474,37 @@ class Player_Role_Frame(Player_Frame):
         self.forget()
         self.select_icon = tk.Button(self.frame, text = "Select", bg = self.selected_bg, activebackground = "#4980C4", fg = "#FFFFFF", activeforeground = "#FFFFFF", width = 6, height = 4, command = self.select)
         self.pack()
+
+    @enforce_types
+    def kill(self) -> None: 
+        if not messagebox.askyesno("Game Intervention", f"Are you sure you mean to dev kill {self.name}? (NO TO KILL)"):
+            self.role.currently_alive = False
+
+            del self.data.alive_players[self.name]
+            self.data.dead_players[self.name] = self.role
+
+            if self.role.alignment:
+                del self.data.good_aligned[self.name]
+            else:
+                del self.data.evil_aligned[self.name]
+
+
+            self.pack_alive_and_dead(self.data, self.selected_role, self.number_of_targets)
+
+    @enforce_types
+    def revive(self) -> None:
+        if not messagebox.askyesno("Game Intervention", f"Are you sure you mean to dev ressurect {self.name}? (NO TO RESSURECT)"):
+            self.role.currently_alive = True
+
+            del self.data.dead_players[self.name]
+            self.data.alive_players[self.name] = self.role
+
+            if self.role.alignment:
+                self.data.good_aligned[self.name] = self.role
+            else:
+                self.data.evil_aligned[self.name] = self.role
+
+            self.pack_alive_and_dead(self.data, self.selected_role, self.number_of_targets)
 
 # -- Protocols -- #
 class Has_Widget_Children(Protocol):

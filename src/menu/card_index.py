@@ -40,6 +40,7 @@ def card_index(root: tk.Tk, bg: str, font: tuple[str, int], entries: Menu_Entry,
     frames: list[tk.Frame] = []
     roles: list[Role_Icon] = []
     card_labels: list[tk.Label] = []
+    i = 0
 
     for role_name, card in card_data.items():
         if data != None:
@@ -50,7 +51,7 @@ def card_index(root: tk.Tk, bg: str, font: tuple[str, int], entries: Menu_Entry,
             except KeyError:
                 continue
 
-        frame = tk.Frame(main_frame.canvas)
+        frame = tk.Frame(main_frame)
         role_icon = Role_Icon([role_name], font, entries, (10, 2), (2, 2), none)
         card_label = tk.Label(frame, text = card, bg = bg)
 
@@ -60,7 +61,7 @@ def card_index(root: tk.Tk, bg: str, font: tuple[str, int], entries: Menu_Entry,
 
         role_icon.pack(frame, frames)
         card_label.pack(side = tk.RIGHT, padx = 2, pady = 2, anchor = "e", fill = "both", expand = True)
-        frame.pack(side = tk.TOP, pady = 2, anchor = "n", fill = "x", expand = True)
+        main_frame.add(frame)
 
 def destroy_card_index() -> None:
     global instances

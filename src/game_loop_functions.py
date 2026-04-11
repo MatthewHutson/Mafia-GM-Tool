@@ -63,7 +63,7 @@ def life_death_sort(data: Game_Data) -> None:
 @enforce_types
 def remove_round_data(data: Game_Data, used_Death_ability: bool = False) -> None:
     for role in data.players.values():
-        if not "singular" in role.ability_type and (used_Death_ability and ("on_death" in role.ability_type or "on_vote" in role.ability_type)): 
+        if (not "singular" in role.ability_type) and (used_Death_ability or not ("on_death" in role.ability_type or "on_vote" in role.ability_type)): 
             targets = role.targets
             for i in range(len(targets)):
                 targets.pop(0)

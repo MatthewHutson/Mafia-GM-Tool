@@ -2,9 +2,9 @@
 A Program to allocate roles in a game of mafia
 
 # -- Changes -- #
-Removed an Test print case in the base Ability class
-Removed The Test Raise exception in main
-Made Changes To Magenet - Not Poisoned Magnet Can Select Who Their First Target Is "Magnetised" To
+Made Statuses Be Hels In A New Class - Status_Manager
+This Makes It Easier To Distinguish Statuses From Other Kinds Of Role Attributes
+Fixed The Vertical Scroll Frames To Work In Main Game Screen
 
 # -- To Do -- #
 Check For Bugs With Drunk and New Code

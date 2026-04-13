@@ -40,6 +40,13 @@ def is_instance(value: Any, hint: type | TypeAlias) -> bool:
     else: 
         return type(value) is TypeAlias
     
+def ignored_exceptions(hint: type | TypeAlias) -> bool:
+    for subclass in Protocol.__subclasses__():
+        if hint == subclass or hint == Any:
+            return True
+    
+    return False
+    
 def any_instance(value: Any, hint: type | TypeAlias) -> bool:
     result: bool = False
     hints = get_union(hint)
@@ -48,7 +55,7 @@ def any_instance(value: Any, hint: type | TypeAlias) -> bool:
         if is_instance(value, int) and (hint == float) and (not result): 
             value = float(value) # -- Removes Half-Correct floats as int -- #
 
-        result = result or is_instance(value, hint)
+        result = result or is_instance(value, hint) or ignored_exceptions(hint)
 
     return result
 
@@ -65,11 +72,7 @@ def enforce_types(func: Callable) -> Callable:
                 value = args[i + args_offset] if kwargs.get(key) is None else kwargs.get(key)  # -- Checks Args then Kwargs For Entered Data Type -- #
 
                 # -- Protocols Are Meant To Take Many Forms -- #
-                for subclass in Protocol.__subclasses__():
-                    if hint == subclass or hint == Any:
-                        break
-                else:
-                    assert any_instance(value, hint), f"Argument {key} for {func.__name__} must be of type {hint} but value = {value} of type {type(value)} provided"
+                assert any_instance(value, hint), f"Argument {key} for {func.__name__} must be of type {hint} but value = {value} of type {type(value)} provided"
 
             except IndexError: pass  # -- Ignores The No Given Hint Case -- #
         

@@ -154,7 +154,9 @@ def add_player(players: list[Player_Select_Frame], roles: list[list[Role]], entr
         if len(players) < max_players:
             add_role_tile(len(players), roles, entries)
             
-        player_frame = Player_Select_Frame(name, player_tab, main_font, players, role_row_frames)
+        player_frame = Player_Select_Frame(name, player_canvas, main_font, players, role_row_frames)
+        player_canvas.update()
+        player_canvas.scroll_all()
         players.append(player_frame)
 
         role_boundary_reset(roles)
@@ -246,6 +248,11 @@ def pack_alive_and_dead(data: Game_Data, active_role: Role, number_of_targets: i
         player_frame = Player_Role_Frame(name, data, dead_canvas, main_font, selected_players, active_role, number_of_targets, pack_alive_and_dead)
         dead_frames.append(player_frame)
 
+    alive_canvas.update()
+    dead_canvas.update()
+    alive_canvas.scroll_all()
+    dead_canvas.scroll_all()
+
 @enforce_types
 def life_or_death_selection(data: Game_Data, ability: Ability, role: Role) -> bool:
     correct: bool = True
@@ -313,7 +320,7 @@ def terminate() -> None:
 @enforce_types
 def setup_menu(entries: Menu_Entry, default_names: list[str]) -> None:
     # -- Globals Handling -- #
-    global global_entries
+    global global_entries, player_canvas
     global_entries = entries
 
     # -- File Handling -- #
@@ -376,7 +383,10 @@ def setup_menu(entries: Menu_Entry, default_names: list[str]) -> None:
 
     # -- Player Display Tab -- #
     tk.Label(player_tab, text = "Players", font = main_font).pack(side = tk.TOP, padx = 4, pady = 4,  fill = "x")
-    player_tab.pack(side = tk.TOP, anchor = "w", padx = 4, pady = 4, ipadx = 128, ipady = 256)
+    player_tab.pack(side = tk.TOP, anchor = "w", padx = 4, pady = 4, ipadx = 128, ipady = 256, expand = False)
+    player_tab.update()
+    player_tab.pack_propagate(False)
+    player_canvas = Vertical_Scroll_Frame(master = player_tab, bg = bg_2)
     root.mainloop()
 
 # -- Main Game Menu -- #
@@ -393,14 +403,19 @@ def init_game_menu(entries: Menu_Entry, data: Game_Data) -> None:
     tk.Label(alive_margin, text = "Alive Players").pack(side = tk.TOP, padx = 4, pady = 4, fill = "x", ipady = 4)
     tk.Label(dead_margin, text = "Dead Players").pack(side = tk.TOP, padx = 4, pady = 4, fill = "x", ipady = 4)
     
-    alive_canvas = Vertical_Scroll_Frame(master = alive_margin, bg  = bg_2)
-    dead_canvas = Vertical_Scroll_Frame(master = dead_margin, bg = bg_2)
-
-    alive_canvas.pack(side = tk.TOP, padx = 4, pady = 4, fill = "both")
-    dead_canvas.pack(side = tk.TOP, padx = 4, pady = 4, fill = "both")
+    alive_canvas = Vertical_Scroll_Frame(master = alive_margin, bg  = bg_2, pack = False)
+    dead_canvas = Vertical_Scroll_Frame(master = dead_margin, bg = bg_2, pack = False)
 
     alive_margin.pack(side = tk.LEFT, padx = 4, pady = 4, fill = "y", ipadx = player_margin_size)
     dead_margin.pack(side = tk.RIGHT, padx = 4, pady = 4, fill = "y", ipadx = player_margin_size)
+
+    alive_margin.update()
+    dead_margin.update()
+    alive_margin.pack_propagate(False)
+    dead_margin.pack_propagate(False)
+
+    alive_canvas.pack(side = tk.TOP, padx = 4, pady = 4, fill = "both", expand = True)
+    dead_canvas.pack(side = tk.TOP, padx = 4, pady = 4, fill = "both", expand = True)
 
     pack_alive_and_dead(data, data.vote_role, 0) # -- Prevents Popup before the first night -- #
     card_index(root, bg_2, main_font, entries, data) # -- Gives Role Card Before Popups Appear -- #

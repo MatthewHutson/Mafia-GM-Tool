@@ -34,13 +34,12 @@ def card_index(root: tk.Tk, bg: str, font: tuple[str, int], entries: Menu_Entry,
     destroy_card_index()
     instances.append(card_root)
 
-    main_frame = Vertical_Scroll_Frame(master = card_root)
+    main_frame = Vertical_Scroll_Frame(master = card_root, bg = bg)
 
     # -- Card Index-- #
     frames: list[tk.Frame] = []
     roles: list[Role_Icon] = []
     card_labels: list[tk.Label] = []
-    i = 0
 
     for role_name, card in card_data.items():
         if data != None:
@@ -62,6 +61,8 @@ def card_index(root: tk.Tk, bg: str, font: tuple[str, int], entries: Menu_Entry,
         role_icon.pack(frame, frames)
         card_label.pack(side = tk.RIGHT, padx = 2, pady = 2, anchor = "e", fill = "both", expand = True)
         main_frame.add(frame)
+
+    main_frame.scroll_all()
 
 def destroy_card_index() -> None:
     global instances

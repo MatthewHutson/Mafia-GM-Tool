@@ -110,7 +110,7 @@ def display_settings(root: tk.Tk, bg: str, font: tuple[str, int], entries: Menu_
     remove_instances()
     instances.append(root)
 
-    main_frame = Vertical_Scroll_Frame(master = root)
+    main_frame = Vertical_Scroll_Frame(master = root, bg = bg)
 
     # -- Card Index-- #
     for name, data in settings.items():
@@ -118,4 +118,7 @@ def display_settings(root: tk.Tk, bg: str, font: tuple[str, int], entries: Menu_
 
     for setting in frames:
         setting.pack()
+    
+    main_frame.update()
+    main_frame.scroll_all()
         

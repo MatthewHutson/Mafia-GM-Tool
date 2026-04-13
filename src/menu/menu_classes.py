@@ -1,4 +1,5 @@
 # -- Imports -- #
+from __future__ import annotations
 from utils import *
 from typing import Protocol
 from classes_and_types import *
@@ -10,28 +11,24 @@ from typing import Union
 # -- Classes -- #
 class Vertical_Scroll_Frame(tk.Frame):
     @enforce_types
-    def __init__(self, master: Union[tk.Tk, tk.Toplevel, tk.Frame], bg: str = "#ffffff") -> None:
+    def __init__(self, master: Union[tk.Tk, tk.Toplevel, tk.Frame], bg: str = "#ffffff", pack: bool = True) -> None:
         self.scroll_bar = tk.Scrollbar(master, orient = tk.VERTICAL)
         self.canvas = tk.Canvas(master, yscrollcommand = self.scroll_bar.set, bg = bg)
         self.scroll_bar.configure(command = self.canvas.yview)
         self.root = master
 
-        self.scroll_bar.pack(side = tk.RIGHT, fill = "y", ipadx = 4, expand = False)
-        self.canvas.pack(side = tk.LEFT, fill = tk.BOTH, expand = True)
-
         super().__init__(self.canvas)
         self.bg = bg
 
+        self.scroll_bar.pack(side = tk.RIGHT, fill = "y", ipadx = 4, expand = False)
+        if pack: self.pack(side = tk.LEFT, fill = tk.BOTH, expand = True)
+
         self.canvas.create_window((0, 0), window = self, anchor = tk.NW)
         self.initialise()
-
-        master.update()
-        self.canvas_size: int = self.canvas.winfo_width()
-        self.items: int = 0
         
     # -- Methods -- #
     @enforce_types
-    def scroll_all(self, event) -> None:
+    def scroll_all(self, event = None) -> None:
         self.canvas.config(scrollregion = self.canvas.bbox("all"))
 
     @enforce_types
@@ -44,20 +41,31 @@ class Vertical_Scroll_Frame(tk.Frame):
         self.canvas.master.bind("<MouseWheel>", self.scroll_event)
 
     @enforce_types
+    def bind_all_children(self, widget: tk.Widget, sequence: str, func: Any) -> None:
+        for child in widget.winfo_children():
+            self.bind_all_children(child, sequence, func)
+
+        widget.bind(sequence, func)
+
+    @enforce_types
     def add(self, frame: tk.Widget, height: int = 0) -> None:
         frame.pack(side = tk.TOP, fill = "x", pady = 2, ipady = height, expand = True)
         frame.update()
-        true_height: int = frame.winfo_height()
-        frame.pack_forget()
-        frame.configure(width = self.canvas_size, height = true_height)
-        frame.pack(side = tk.TOP, pady = 2)
-        frame.pack_propagate(False)
 
+    @enforce_types
+    def add_player_frame(self, frame: Player_Frame) -> None:
+        frame.pack()
+        self.bind_all_children(frame.frame, "<MouseWheel>", self.scroll_event)
+        frame.update()
+
+    @enforce_types
+    def pack(self, **kwargs) -> None:
+        self.canvas.pack(**kwargs)
         self.root.update()
-        root_width = self.root.winfo_width()
-        root_height = self.root.winfo_height()
+        self.scroll_all()
+        self.canvas_size: int = self.canvas.winfo_width()
 
-        self.root.geometry(f"{root_width}x{root_height+1}")
+        tk.Frame(self, width = self.canvas_size, height = 0).pack(side = tk.TOP)
 
 class Role_Icon:
     # -- Constructors -- #
@@ -320,6 +328,7 @@ class Player_Frame:
         self.name_label = tk.Label(self.frame, text = capitalise_words(user_input), font = main_font).pack(side = tk.LEFT, fill = "x", padx = 4)
         self.frame.pack_propagate(False)
         self.name: str = capitalise_words(user_input)
+        self.master = main_frame
 
     # -- Methods -- #
     @enforce_types
@@ -334,6 +343,31 @@ class Player_Frame:
     def pack(self) -> None:
         self.frame.pack(anchor = "n", side = tk.TOP, padx = 4, fill = "x", ipady = 16, pady = 2)
 
+    @enforce_types
+    def delete(self) -> None:
+        self.frame.pack_forget()
+        del self
+
+    @enforce_types
+    def forget(self) -> None:
+        self.frame.pack_forget()
+
+    @enforce_types
+    def configure(self, **kwargs) -> None:
+        self.frame.configure(**kwargs)
+
+    @enforce_types
+    def pack_propagate(self, value: bool = False) -> None:
+        self.frame.pack_propagate(value)
+
+    @enforce_types
+    def update(self) -> None:
+        self.frame.update()
+
+    @enforce_types
+    def winfo_height(self) -> int:
+        return self.frame.winfo_height()
+
 class Player_Select_Frame(Player_Frame):
     # -- Constructor -- #
     @enforce_types
@@ -341,8 +375,12 @@ class Player_Select_Frame(Player_Frame):
         super().__init__(user_input, main_frame, main_font)
         self.players = players
         self.icon_frame = icon_frame
-        self.delete_button = tk.Button(self.frame, text = "Remove", fg = "#ffffff", bg = "#ff0000", highlightbackground = "#cd0000", activebackground = "#aa0000", font = main_font, command = self.delete).pack(side = tk.RIGHT)
-        self.pack()
+        self.delete_button = tk.Button(self.frame, text = "Remove", fg = "#ffffff", bg = "#ff0000", highlightbackground = "#cd0000", activebackground = "#aa0000", font = main_font, command = self.delete).pack(side = tk.RIGHT, pady = 2)
+
+        if type(self.master) == Vertical_Scroll_Frame:
+            self.master.add_player_frame(self)
+        else:
+            self.pack()
 
     # -- Methods -- #
     @enforce_types
@@ -403,7 +441,11 @@ class Player_Role_Frame(Player_Frame):
         self.solo_win_icon = tk.Button(self.frame, text = "", bg = self.solo_win_bg, activebackground = self.solo_win_bg, fg = "#000000", activeforeground = "#000000", width = 2, height = 2)
         self.select_icon = tk.Button(self.frame, text = "Select", bg = "#5D9FF0", activebackground = "#4980C4", fg = "#FFFFFF", activeforeground = "#FFFFFF", width = 6, height = 4, command = self.select)
 
-        self.pack()
+
+        if type(self.master) == Vertical_Scroll_Frame:
+            self.master.add_player_frame(self)
+        else:
+            self.pack()
 
     # -- Propterties -- #
     @property
@@ -433,11 +475,6 @@ class Player_Role_Frame(Player_Frame):
 
     # -- Methods -- #
     @enforce_types
-    def delete(self) -> None:
-        self.frame.pack_forget()
-        del self
-
-    @enforce_types
     def pack(self) -> None:
         self.role_icon.pack(side = tk.RIGHT, padx = 2, expand = False)
         self.select_icon.pack(side = tk.RIGHT, padx = 2, expand = False)
@@ -457,6 +494,7 @@ class Player_Role_Frame(Player_Frame):
         self.linked_icon.pack_forget()
         self.drunk_icon.pack_forget()
         self.solo_win_icon.pack_forget()
+        super().forget()
 
     @enforce_types
     def select(self) -> None:

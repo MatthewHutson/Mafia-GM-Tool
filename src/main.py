@@ -1,4 +1,5 @@
 # -- Imports -- #
+from __future__ import annotations
 import json
 import os
 from utils import *
@@ -85,7 +86,7 @@ def main() -> None:
 
             del data["alignment"]
             
-            roles[data["name"]] = Role(**data, current_targets = [], information = [], visited_by = [])
+            roles[data["name"]] = Role.new(**data)
 
     with open("defaults.txt") as file:
         string_data: str = file.readline()
@@ -141,4 +142,4 @@ if __name__ == "__main__":
             playing = messagebox.askyesno("Game Over", "Do you want to play another round?")
         except Exception as e:
             playing = False
-            #raise e
+            raise e

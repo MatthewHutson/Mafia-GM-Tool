@@ -1,4 +1,5 @@
 # -- Imports -- #
+from __future__ import annotations
 from dataclasses import dataclass
 from utils import *
 from random import shuffle, choice
@@ -6,9 +7,42 @@ from copy import deepcopy
 import numpy as np
 
 # -- Ability Template Class -- #
+@dataclass
+class Status_Manager():
+    # -- Statuses-- #
+    drunk: bool = False
+    poisoned: bool = False
+    protected: bool = False
+    linked: bool = False
+    unemployed: bool = False # Only Used For Neutrals #
+
+    # -- Properties -- #
+    @property
+    @enforce_types
+    def status_dict(self) -> dict:
+        return {capitalise_words(name): value for name, value in self.__dict__.items()}
+    
+    # -- Methods -- #
+    @enforce_types
+    def ability_conditions(self) -> list[bool]:
+        return [self.poisoned, self.drunk]
+    
+    @enforce_types
+    def get_data(self, user: str) -> list[str]:
+        output: list[str] = []
+
+        for status, value in self.__dict__.items():
+            if value:
+                output.append(user, "is", status + ".")
+            else:
+                output.append(user, "is NOT", status + ".")
+
+        return output
+
 class Ability():
     @enforce_types
     def __init__(self, targets: int, p: Union[int, float], ability_type: list[str], target_living: bool = True, priority: int = 255, can_pick_same_target: bool = False) -> None:
+        # -- Attributes -- #
         self.targets: int = targets
         self.p: int | float = p
         self.ability_type: list[str] = ability_type
@@ -23,27 +57,24 @@ class Ability():
         return capitalise_words(type(self).__name__, "_")
 
     # -- Methods -- #
-    def ability(self, user: str, data: object) -> None:
+    def ability(self, user: str, data: Game_Data) -> None:
         ...
 
-    def if_poisoned(self, user: str, data: object) -> None:
+    def if_poisoned(self, user: str, data: Game_Data) -> None:
         ...
 
-    def if_drunk(self, user: str, data: object) -> None:
+    def if_drunk(self, user: str, data: Game_Data) -> None:
         ...
 
     @enforce_types
-    def __call__(self, user: str, data: object) -> None:
-        match data.players[user].ability_conditions:
-            case [True, False]:
-                self.if_poisoned(user, data)
-            case [False, True]:
-                self.if_drunk(user, data)
-            case _:
-                self.ability(user, data)
+    def __call__(self, user: str, data: Game_Data) -> None:
+        match data.players[user].statuses.ability_conditions():
+            case [True, False]: self.if_poisoned(user, data)
+            case [False, True]: self.if_drunk(user, data)
+            case _: self.ability(user, data)
 
     @enforce_types
-    def __eq__(self, ability2: Union[object, type]) -> bool:
+    def __eq__(self, ability2: Union[Ability, type]) -> bool:
         if type(ability2) == type:
             return type(self) == ability2
         else:
@@ -58,16 +89,14 @@ class Role:
     _alignment: bool # True Being Good, False Being Evil #
     mafia_alternative: bool # Switches to Mafia Abiltity When All Normal Mafia Dies #
     max_count: int
-    current_targets: list[object]
+    current_targets: list[str]
     information: list[str]
     visited_by: list[str]
+    statuses: Status_Manager
     secondary_ability: Ability = None
     new_mafia = False # For Mafia Alternative Handling
     currently_alive: bool = True
     protected: bool = False
-    poisoned: bool = False
-    drunk: bool = False
-    linked: bool = False
     linker: str = None
     linked_to: str = None
     selected_target = False
@@ -149,19 +178,14 @@ class Role:
     def targets(self, value: list[str]) -> None:
         self.current_targets = value
 
-    @property
-    @enforce_types
-    def ability_conditions(self) -> list[bool]:
-        return [self.poisoned, self.drunk]
-
     # -- Methods -- #
     @enforce_types
-    def die(self, players: dict[str, object], recurse: bool = True) -> bool:
+    def die(self, players: Players, recurse: bool = True) -> bool:
         if not self.protected: 
             self.currently_alive = False
             self.just_died = True
 
-            if self.linked and recurse and (not players[self.linker].poisoned): # Recursion Base Case and Cupid Poison Check #
+            if self.statuses.linked and recurse and (not players[self.linker].poisoned): # Recursion Base Case and Cupid Poison Check #
                 players[self.linked_to].protected = False
                 players[self.linked_to].die(players, recurse = False)
 
@@ -177,9 +201,31 @@ class Role:
     @enforce_types
     def __str__(self) -> str:
         return f"Role: {self.name}, Alignment: {self.named_alignment}, Primary Ability: {self.ability.__name__}, Secondary Ability: {self.secondary_ability.__name__}, Alive: {self.currently_alive}"
+    
+    @enforce_types
+    def __getattribute__(self, name: str) -> Any:
+        # -- Allows The Extention Of All Statuses Into Objects Dictionaries -- #
+        if name != "statuses" and name != "__dict__":
+            # -- Nesting To Avoid Recursion Errors -- #
+            if "statuses" in self.__dict__.keys():
+                if name in self.statuses.__dict__.keys():
+                    return self.statuses.__getattribute__(name)
+            
+        return super().__getattribute__(name)
+    
+    @enforce_types
+    def __setattr__(self, name: str, value: Any) -> None:
+        # -- Allows The Extention Of All Statuses Into Objects Dictionaries -- #
+        if name != "statuses" and name != "__dict__":
+            # -- Nesting To Avoid Recursion Errors -- #
+            if "statuses" in self.__dict__.keys():
+                if name in self.statuses.__dict__.keys():
+                     self.statuses.__setattr__(name, value)
+            
+        super().__setattr__(name, value)
 
     @enforce_types
-    def on_death_ability(self, data: object) -> None:
+    def on_death_ability(self, data: Game_Data) -> None:
         if "on_death" in self.ability_type and not "on_vote" in self.ability_type and self.just_died:
             user = list(data.players.keys())[list(data.players.values()).index(self)]
             self.ability(user, data)
@@ -191,10 +237,10 @@ class Role:
         self.just_died = False
 
     @enforce_types
-    def voted_out(self, players: dict[str, object], recurse: bool = True) -> None:
+    def voted_out(self, players: Players, recurse: bool = True) -> None:
         self.was_voted_out = True
         self.die(players, False)
-        if self.linked and recurse:
+        if self.statuses.linked and recurse:
             players[self.linked_to].voted_out(players, False)
     
     @enforce_types
@@ -204,6 +250,9 @@ class Role:
     @enforce_types
     def update_targets(self) -> None:
         self.previous_targets = deepcopy(self.targets)
+
+    def new(*args, **kwargs) -> Role:
+        return Role(*args, **kwargs, current_targets = [], information = [], visited_by = [], statuses = Status_Manager())
     
 # -- Type Definitions -- #
 class Players(dict[str, Role]):
@@ -226,7 +275,7 @@ class Players(dict[str, Role]):
         return True
     
     @enforce_types
-    def deepcopy(self) -> dict[str, Role]:
+    def deepcopy(self) -> Players:
         # -- To Avoid copy.deepcopy Issues -- #
         new_data: dict[str, Role] = {}
 
@@ -307,7 +356,7 @@ class Game_Data():
     roles: dict[str, Role]
     abilities: dict[str, Callable]
     ablity_distribution: dict[str, float]
-    card_dict: dict[str, object]
+    card_dict: dict[str, str]
     menu_entries: Menu_Entry
     settings: dict[str, Any] = None
     mafia_role: Role = None
@@ -352,13 +401,13 @@ class Game_Data():
         self.settings = {name: data["value"] for name, data in self.menu_entries.settings.items()}
 
         # -- Using A Role For Menu Purposes -- #
-        self.vote_role: Role = Role("Voting", self.abilities["vote"], True, False, 999, [], [], []) 
+        self.vote_role: Role = Role.new("Voting", self.abilities["vote"], True, False, 999)
         
         # -- Secondary Ability Handling -- #
         for role in self.players.values():
             role.secondary_ability = deepcopy(self.abilities["none"])
 
-        # -- Drunk Consideration --#
+        # -- statuses.drunk Consideration --#
         self.set_drunk()
 
     @enforce_types

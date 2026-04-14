@@ -9,10 +9,10 @@ import json
 class Setting:
     # -- Constructor -- #
     @enforce_types
-    def __init__(self, master: Vertical_Scroll_Frame, name: str, data: dict, bg2: str) -> None:
+    def __init__(self, master: Vertical_Scroll_Frame, name: str, settings: dict, bg2: str) -> None:
         # -- Internal Data -- #
+        self.settings = settings
         self.name: str = name
-        self.data: dict = data
         self.master: Vertical_Scroll_Frame = master
 
         # -- Tkinter Objects -- #
@@ -26,6 +26,11 @@ class Setting:
     @enforce_types
     def description(self) -> str:
         return self.data["description"]
+    
+    @property
+    @enforce_types
+    def data(self) -> dict[str, Any]:
+        return self.settings[self.name]
     
     @property
     @enforce_types
@@ -50,6 +55,7 @@ class Setting:
                 self.widget_value = tk.IntVar(value = self.data["value"])
                 self.choice_widget = tk.Checkbutton(self.frame, variable = self.widget_value)
             case _:
+                self.widget_value = "N/A"
                 self.choice_widget = tk.Label(self.frame, text = "N/A")
 
     @enforce_types
@@ -60,8 +66,12 @@ class Setting:
         self.master.add(self.frame, 8)
 
     @enforce_types
-    def close(self) -> None:
+    def update(self) -> None:
         self.data["value"] = self.widget_value.get()
+
+    @enforce_types
+    def close(self) -> None:
+        self.update()
         self.frame.pack_forget()
 
 # -- Global Vars -- #
@@ -96,6 +106,13 @@ def remove_instances() -> None:
         instance.destroy()
 
 @enforce_types
+def update_settings() -> None:
+    # -- Updates All Settings When Called By Menu -- #
+    global frames
+    for setting in frames:
+        setting.update()
+
+@enforce_types
 def display_settings(root: tk.Tk, bg: str, font: tuple[str, int], entries: Menu_Entry) -> None:
     # -- Initialisation -- #
     global instances, frames
@@ -113,8 +130,8 @@ def display_settings(root: tk.Tk, bg: str, font: tuple[str, int], entries: Menu_
     main_frame = Vertical_Scroll_Frame(master = root, bg = bg)
 
     # -- Card Index-- #
-    for name, data in settings.items():
-        frames.append(Setting(main_frame, name, data, bg))
+    for name in settings.keys():
+        frames.append(Setting(main_frame, name, settings, bg))
 
     for setting in frames:
         setting.pack()

@@ -43,12 +43,12 @@ def card_index(root: tk.Tk, bg: str, font: tuple[str, int], entries: Menu_Entry,
 
     for role_name, card in card_data.items():
         if data != None:
-            try:
-                assert entries.role_dict[role_name] in data.players.values()
-            except AssertionError:
-                continue
-            except KeyError:
-                continue
+            try: assert entries.role_dict[role_name] in data.players.values()
+            except AssertionError: continue
+            except KeyError: continue
+        elif role_name == "Testing":
+            continue
+
 
         frame = tk.Frame(main_frame)
         role_icon = Role_Icon([role_name], font, entries, (10, 2), (2, 2), none)
@@ -61,6 +61,7 @@ def card_index(root: tk.Tk, bg: str, font: tuple[str, int], entries: Menu_Entry,
         role_icon.pack(frame, frames)
         card_label.pack(side = tk.RIGHT, padx = 2, pady = 2, anchor = "e", fill = "both", expand = True)
         main_frame.add(frame)
+        main_frame.update()
 
     main_frame.scroll_all()
 

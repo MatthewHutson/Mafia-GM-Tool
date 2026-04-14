@@ -59,6 +59,12 @@ class Vertical_Scroll_Frame(tk.Frame):
         frame.update()
 
     @enforce_types
+    def add_setting(self, setting: tk.Frame) -> None:
+        setting.pack()
+        self.bind_all_children(setting.master, "<MouseWheel>", self.scroll_event)
+        setting.master.update()
+
+    @enforce_types
     def pack(self, **kwargs) -> None:
         self.canvas.pack(**kwargs)
         self.root.update()
@@ -113,7 +119,9 @@ class Role_Icon:
     
     @property
     def bg_colour(self) -> str:
-        if self.alignment == None:
+        if self.name == "Testing":
+            return  "#36eeee"
+        elif self.alignment == None:
             return  "#f5f5f5"
         elif self.alignment:
             return "#48f748"
@@ -122,6 +130,8 @@ class Role_Icon:
 
     @property
     def fg_colour(self) -> str:
+        if self.name == "Testing":
+            return  "#000000"
         if self.alignment == False:
             return "#ffffff"
         else:
@@ -150,7 +160,8 @@ class Role_Icon:
     @enforce_types
     def delete(self) -> None:
         self.forget()
-        self.entries.current_roles_lists.remove(self.roles)
+        try: self.entries.current_roles_lists.remove(self.roles)
+        except: pass
         del self
 
     @enforce_types
@@ -407,8 +418,11 @@ class Player_Role_Frame(Player_Frame):
 
         # -- Role Colours -- #
         self.role_fg = "#000000"
-        
-        if self.alignment == None:
+
+
+        if self.role.name == "Testing":
+            self.role_bg = "#36eeee"
+        elif self.alignment == None:
             self.role_bg = "#f5f5f5"
         elif self.alignment:
             self.role_bg = "#48f748"
@@ -509,9 +523,9 @@ class Player_Role_Frame(Player_Frame):
         elif len(self.selected_players) >= self.number_of_targets:
             messagebox.showwarning("Warning", f"{self.selected_role_name} can only select {self.number_of_targets} target{"s" if self.number_of_targets != 1 else ""}!")
         
-        self.forget()
-        self.select_icon = tk.Button(self.frame, text = "Select", bg = self.selected_bg, activebackground = "#4980C4", fg = "#FFFFFF", activeforeground = "#FFFFFF", width = 6, height = 4, command = self.select)
-        self.pack()
+        self.select_icon.configure(bg = self.selected_bg, activebackground = "#4980C4") 
+        self.select_icon.update()
+        self.select_icon.configure()
 
     @enforce_types
     def kill(self) -> None: 

@@ -2,11 +2,16 @@
 A Program to allocate roles in a game of mafia
 
 # -- Changes -- #
-Made Statuses Be Hels In A New Class - Status_Manager
-This Makes It Easier To Distinguish Statuses From Other Kinds Of Role Attributes
-Fixed The Vertical Scroll Frames To Work In Main Game Screen
+Bug Fix - Protection Was Considered Both A Status and Not A Status
+Bug Fix - Selection Fucked With Order
+Created Examiner Ability
+Added The Testing Role To Test Specific Features
+Removed testing prints
+kept e raised in main
 
 # -- To Do -- #
+I think examine crashes the game?
+FIX RANDOM KEY ERROR BUG (related to shuffle bug?)
 Check For Bugs With Drunk and New Code
 
 Ponder the idea of psychic getting told all in game roles (regardless of poison)

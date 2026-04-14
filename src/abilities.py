@@ -176,9 +176,11 @@ class stop_vote(Ability):
     # -- Ability -- #
     @enforce_types
     def ability(self, user: str, data: Game_Data) -> None:
+        data.players[user].unemployed = False
         data.players[user].solo_win = not data.players[data.players[user].targets[0]].was_voted_out
 
         if not (data.players[data.players[user].targets[0]].currently_alive or data.players[data.players[user].targets[0]].was_voted_out):
+            data.players[user].unemployed = True
             data.players[user].solo_win = data.players[user].currently_alive
 
     @enforce_types
@@ -187,9 +189,11 @@ class stop_vote(Ability):
 
     @enforce_types
     def if_drunk(self, user: str, data: Game_Data) -> None:
+        data.players[user].unemployed = False
         data.players[user].solo_win = data.players[data.players[user].targets[0]].was_voted_out
 
         if not (data.players[data.players[user].targets[0]].currently_alive or data.players[data.players[user].targets[0]].was_voted_out):
+            data.players[user].unemployed = True
             data.players[user].solo_win = data.players[user].was_voted_out
 
             if data.settings["Early End"] == 1 and data.players[user].solo_win:
@@ -203,9 +207,11 @@ class execute(Ability):
     # -- Ability -- #
     @enforce_types
     def ability(self, user: str, data: Game_Data) -> None:
+        data.players[user].unemployed = False
         data.players[user].solo_win = data.players[data.players[user].targets[0]].was_voted_out
 
         if not (data.players[data.players[user].targets[0]].currently_alive or data.players[data.players[user].targets[0]].was_voted_out):
+            data.players[user].unemployed = True
             data.players[user].solo_win = data.players[user].currently_alive
 
     @enforce_types
@@ -214,9 +220,11 @@ class execute(Ability):
 
     @enforce_types
     def if_drunk(self, user: str, data: Game_Data) -> None:
+        data.players[user].unemployed = False
         data.players[user].solo_win = not data.players[data.players[user].targets[0]].was_voted_out
 
         if not (data.players[data.players[user].targets[0]].currently_alive or data.players[data.players[user].targets[0]].was_voted_out):
+            data.players[user].unemployed = True
             data.players[user].solo_win = data.players[user].was_voted_out
 
             if data.settings["Early End"] == 1 and data.players[user].solo_win:
@@ -665,3 +673,28 @@ class index(Ability):
 
         self.information(data, user_role, selected_set)
     
+class examine(Ability):
+    @enforce_types
+    def __init__(self) -> None:
+        super().__init__(targets = 1, p = 5, ability_type = ["repeat"], priority = 11, can_pick_same_target = True)
+
+    # -- Ability -- #
+    @enforce_types
+    def ability(self, user: str, data: Game_Data) -> None:
+        target: str = data.players[user].targets[0]
+        role: Role = data.players[target]
+
+        for item in role.statuses.get_data():
+            role.information.append(item)
+
+    @enforce_types
+    def if_poisoned(self, user: str, data: Game_Data) -> None:
+        target: str = data.players[user].targets[0]
+        role: Role = data.players[target]
+
+        for item in role.statuses.bullshit_data():
+            role.information.append(item)
+
+    @enforce_types
+    def if_drunk(self, user: str, data: Game_Data) -> None:
+        self.if_poisoned(user, data)

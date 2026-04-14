@@ -12,7 +12,6 @@ class Status_Manager():
     # -- Statuses-- #
     drunk: bool = False
     poisoned: bool = False
-    protected: bool = False
     linked: bool = False
     unemployed: bool = False # Only Used For Neutrals #
 
@@ -36,6 +35,15 @@ class Status_Manager():
                 output.append(user, "is", status + ".")
             else:
                 output.append(user, "is NOT", status + ".")
+
+        return output
+
+    @enforce_types
+    def bullshit_data(self, user: str) -> list[str]:
+        output: list[str] = []
+        for status in self.__dict__.items():
+            extra: str = choice([" NOT", " NOT", " NOT", ""])
+            output.append(user, f"is{extra}", status + ".")
 
         return output
 
@@ -200,7 +208,10 @@ class Role:
 
     @enforce_types
     def __str__(self) -> str:
-        return f"Role: {self.name}, Alignment: {self.named_alignment}, Primary Ability: {self.ability.__name__}, Secondary Ability: {self.secondary_ability.__name__}, Alive: {self.currently_alive}"
+        if self.secondary_ability is None:
+            return f"Role: {self.name}, Alignment: {self.named_alignment}, Primary Ability: {self.ability.__name__}, Secondary Ability: None, Alive: {self.currently_alive}"
+        else:
+            return f"Role: {self.name}, Alignment: {self.named_alignment}, Primary Ability: {self.ability.__name__}, Secondary Ability: {self.secondary_ability.__name__}, Alive: {self.currently_alive}"
     
     @enforce_types
     def __getattribute__(self, name: str) -> Any:

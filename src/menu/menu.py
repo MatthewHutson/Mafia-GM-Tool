@@ -3,7 +3,7 @@ from utils import *
 from menu.menu_classes import *
 from menu.mimi_stand_counter import counter_init
 from menu.card_index import card_index, destroy_card_index
-from menu.settings import display_settings, remove_instances
+from menu.settings import display_settings, remove_instances, update_settings
 from menu.timer import create_timer, delete_timer
 from tkinter import messagebox
 from copy import deepcopy
@@ -102,9 +102,14 @@ def get_roles(player_count: int) -> list[list[Role]]:
     for max in other_role_boundaries:
         if max <= player_count:
             remaining_roles = other_role_dict[max]
+
+    update_settings()
         
     shuffle(remaining_roles)
     i = 0
+
+    if global_entries.settings["Testing Role"]["value"] == 1:
+        remaining_roles.insert(0, ["Testing"])
 
     if player_count >= len(role_list):
         while (role_count <= player_count) and i < len(remaining_roles):
@@ -359,8 +364,8 @@ def setup_menu(entries: Menu_Entry, default_names: list[str]) -> None:
     counter_init(root, settings_frame, (8, 3), (4, 0), tk.LEFT)
 
     # -- Settings Button -- #
-    random_button = tk.Button(settings_frame, text = "Settings", command = lambda: display_settings(root, bg_2, main_font, entries), bg = "#CACACA", activebackground = "#AFAFAF", fg = "#000000", activeforeground = "#000000")
-    random_button.pack(side = tk.RIGHT, ipady = 3, ipadx = 8, padx = 4)
+    settings_button = tk.Button(settings_frame, text = "Settings", command = lambda: display_settings(root, bg_2, main_font, entries), bg = "#CACACA", activebackground = "#AFAFAF", fg = "#000000", activeforeground = "#000000")
+    settings_button.pack(side = tk.RIGHT, ipady = 3, ipadx = 8, padx = 4)
 
     # -- Randomise Button -- #
     random_button = tk.Button(settings_frame, text = "Randomise", command = role_boundary_reset_for_icons, bg = "#48f748", activebackground = "#55E036", fg = "#000000", activeforeground = "#000000")

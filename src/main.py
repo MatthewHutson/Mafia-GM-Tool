@@ -90,6 +90,10 @@ def main() -> None:
 
     with open("defaults.txt") as file:
         string_data: str = file.readline()
+
+        if string_data[-1:] == "\n":
+            string_data = string_data[:-1]
+
         name_data: list[str] = string_data.split(", ")
 
     entries = Menu_Entry([], list(roles.values()), deepcopy(list(roles.keys())), [], [], load_settings())
@@ -142,4 +146,4 @@ if __name__ == "__main__":
             playing = messagebox.askyesno("Game Over", "Do you want to play another round?")
         except Exception as e:
             playing = False
-            raise e
+            #raise e

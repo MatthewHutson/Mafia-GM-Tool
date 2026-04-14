@@ -2,16 +2,13 @@
 A Program to allocate roles in a game of mafia
 
 # -- Changes -- #
-Bug Fix - Protection Was Considered Both A Status and Not A Status
-Bug Fix - Selection Fucked With Order
-Created Examiner Ability
-Added The Testing Role To Test Specific Features
-Removed testing prints
-kept e raised in main
+Fixed Examiner
+Fixed SHuffle Bug
+Made Nap Time No Logner Stops Scrollbar Working
+Made 12 Players Introduce A 3rd Evil Player
+unraised e raised in main
 
 # -- To Do -- #
-I think examine crashes the game?
-FIX RANDOM KEY ERROR BUG (related to shuffle bug?)
 Check For Bugs With Drunk and New Code
 
 Ponder the idea of psychic getting told all in game roles (regardless of poison)

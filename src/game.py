@@ -4,6 +4,7 @@ import os
 from utils import *
 from tkinter import messagebox
 from time import sleep
+import threading
 from classes_and_types import *
 from menu.menu import *
 from menu.card_index import card_init
@@ -62,7 +63,7 @@ def selection_coindition(data: Game_Data, role: Role, name: str, is_primary_abil
 @enforce_types
 def nap_time(data: Game_Data) -> None:
     # -- A Menu To Inform Evil Players Of Their Allies And Bluffs -- #
-    all_roles: set[str] = set(data.roles.keys()) - set(["Villager"])
+    all_roles: set[str] = set(data.roles.keys()) - set(["Villager", "Testing"])
     playing_roles: set[str] = set(role.name for role in data.players.values())
     evil_roles: set[str] = set(name for name, role in data.roles.items() if not role.alignment)
     bluff_roles: list[str] = list(all_roles - playing_roles - evil_roles)
@@ -71,9 +72,15 @@ def nap_time(data: Game_Data) -> None:
     evil_cards: list[str] = [data.get_card_by_role(role) for role in list(data.evil_aligned.values()) if role.name != "Mafia"]
     bluff_cards: list[str] = [data.get_card_by_role(data.roles[role]) for role in bluff_roles]
 
-    sleep(0.5)
+
     info: str = f"Wake up The Evil Team: {list(data.evil_aligned.keys())}. Show Them \n\n #1: Their Teammate(s): {evil_cards}. \n #2: Their Bluff Roles: {bluff_cards}. \n\nPress NO When Everyone Is Ready To Procede."
-    while messagebox.askyesno("Sleepy Time", info): sleep(0.5)
+    nap_time_info(info)
+
+@enforce_types
+def nap_time_info(info: str) -> None:
+    if messagebox.askyesno("Sleepy Time", info):
+        timer = threading.Timer(3.0, lambda: nap_time_info(info))
+        timer.start()
 
 @enforce_types
 def game(data: Game_Data, entries: Menu_Entry) -> None:

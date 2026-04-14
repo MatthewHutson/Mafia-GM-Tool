@@ -382,11 +382,12 @@ class Player_Frame:
 class Player_Select_Frame(Player_Frame):
     # -- Constructor -- #
     @enforce_types
-    def __init__(self, user_input: str, main_frame: tk.Frame, main_font: tuple[str, int], players: list[object], icon_frame: Role_Row) -> None:
+    def __init__(self, user_input: str, main_frame: tk.Frame, main_font: tuple[str, int], players: list[object], icon_frame: Role_Row, role_update: Any) -> None:
         super().__init__(user_input, main_frame, main_font)
         self.players = players
         self.icon_frame = icon_frame
         self.delete_button = tk.Button(self.frame, text = "Remove", fg = "#ffffff", bg = "#ff0000", highlightbackground = "#cd0000", activebackground = "#aa0000", font = main_font, command = self.delete).pack(side = tk.RIGHT, pady = 2)
+        self.role_update = role_update
 
         if type(self.master) == Vertical_Scroll_Frame:
             self.master.add_player_frame(self)
@@ -395,10 +396,11 @@ class Player_Select_Frame(Player_Frame):
 
     # -- Methods -- #
     @enforce_types
-    def delete(self) -> None:
+    def delete(self, update: bool = True) -> None:
         self.frame.pack_forget()
         self.players.remove(self)
         self.icon_frame.remove_end_item()
+        if update: self.role_update()
         del self
 
 class Player_Role_Frame(Player_Frame):

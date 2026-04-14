@@ -1,5 +1,5 @@
 {
-    "0": [
+    "1": [
         ["Mafia"]
     ],
 
@@ -9,6 +9,11 @@
     ],
     "8": [
         ["Mafia"],
+        ["Poisoner", "Psychic", "Magnet", "Ambusher", "Chancellor"]
+    ],
+    "12": [
+        ["Mafia"],
+        ["Poisoner", "Psychic", "Magnet", "Ambusher", "Chancellor"],
         ["Poisoner", "Psychic", "Magnet", "Ambusher", "Chancellor"]
     ]
 }

@@ -9,9 +9,9 @@ import numpy as np
 # -- Ability Template Class -- #
 @dataclass
 class Status_Manager():
-    # -- Statuses-- #
-    drunk: bool = False
+    # -- Statuses -- #
     poisoned: bool = False
+    drunk: bool = False
     linked: bool = False
     unemployed: bool = False # Only Used For Neutrals #
 
@@ -32,9 +32,9 @@ class Status_Manager():
 
         for status, value in self.__dict__.items():
             if value:
-                output.append(user, "is", status + ".")
+                output.append(f"{user} is {status}.")
             else:
-                output.append(user, "is NOT", status + ".")
+                output.append(f"{user} is NOT {status}.")
 
         return output
 
@@ -43,7 +43,7 @@ class Status_Manager():
         output: list[str] = []
         for status in self.__dict__.items():
             extra: str = choice([" NOT", " NOT", " NOT", ""])
-            output.append(user, f"is{extra}", status + ".")
+            output.append(f"{user} is{extra} {status}.")
 
         return output
 
@@ -82,9 +82,11 @@ class Ability():
             case _: self.ability(user, data)
 
     @enforce_types
-    def __eq__(self, ability2: Union[Ability, type]) -> bool:
+    def __eq__(self, ability2: Union[Ability, type, None]) -> bool:
         if type(ability2) == type:
             return type(self) == ability2
+        elif ability2 is None:
+            return str(self).lower() ==  "none" # -- Catches Null Value and None Ability -- #
         else:
             return type(ability2) == type(self)
 

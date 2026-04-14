@@ -74,25 +74,26 @@ def new_load_system() -> None:
     max_mafia: int = len(list(evil_role_dict.values())[-1])
     max_guarenteed_roles: int = len(guarenteed_roles)
     max_other_roles: int = len(list(other_role_dict.values())[-1])
-    max_players = max_mafia + max_guarenteed_roles + max_other_roles - 2
+    max_players = max_guarenteed_roles + max_other_roles
 
 @enforce_types
-def get_roles_by_players() -> list[list[Role]]:
-    return get_roles(len(players))
+def get_roles_by_players(offset: int = 1) -> list[list[Role]]:
+    return get_roles(len(players), offset)
 
 @enforce_types
-def get_roles(player_count: int) -> list[list[Role]]:
+def get_roles(player_count: int, offset: int = 1) -> list[list[Role]]:
     # -- Part Of Role Load System V3 -- #
-    roles: list[list[Role]] = []
+    roles: list[list[Role]] = deepcopy(list(evil_role_dict.values())[0])
+    player_count += offset
     
     for max, role_list in evil_role_dict.items():
-        if player_count >= max:
+        if player_count > max:
             roles = deepcopy(role_list)
 
     role_count: int = len(roles)
 
     for role_list in guarenteed_roles:
-        if role_count <= player_count:
+        if role_count < player_count:
             role_count += 1
             roles.append(role_list)
 
@@ -111,12 +112,13 @@ def get_roles(player_count: int) -> list[list[Role]]:
     if global_entries.settings["Testing Role"]["value"] == 1:
         remaining_roles.insert(0, ["Testing"])
 
-    if player_count >= len(role_list):
-        while (role_count <= player_count) and i < len(remaining_roles):
-            roles.append(remaining_roles[i])
+    player_count -= len(roles)
 
-            i += 1
-            role_count += 1
+    while (player_count > 0) and i < len(remaining_roles):
+        roles.append(remaining_roles[i])
+
+        i += 1
+        player_count -= 1
 
     shuffle(roles)
 
@@ -141,7 +143,7 @@ def role_boundary_reset(roles: list[list[Role]]) -> None:
 
 @enforce_types
 def role_boundary_reset_for_icons() -> None:
-    role_boundary_reset(get_roles_by_players())
+    role_boundary_reset(get_roles_by_players(0))
 
 @enforce_types
 def add_player(players: list[Player_Select_Frame], roles: list[list[Role]], entries: Menu_Entry, name: str) -> None:
@@ -151,7 +153,7 @@ def add_player(players: list[Player_Select_Frame], roles: list[list[Role]], entr
         
         name_entry.delete(0, tk.END)
 
-        if len(players) >= max_players: raise IndexError
+        if len(players) >= max_players: raise OverflowError
         
         for frame in players:
             if frame == capitalise_words(name): raise NameError
@@ -159,14 +161,14 @@ def add_player(players: list[Player_Select_Frame], roles: list[list[Role]], entr
         if len(players) < max_players:
             add_role_tile(len(players), roles, entries)
             
-        player_frame = Player_Select_Frame(name, player_canvas, main_font, players, role_row_frames)
+        player_frame = Player_Select_Frame(name, player_canvas, main_font, players, role_row_frames, role_boundary_reset_for_icons)
         player_canvas.update()
         player_canvas.scroll_all()
         players.append(player_frame)
 
         role_boundary_reset(roles)
 
-    except IndexError as e:
+    except OverflowError as e:
         messagebox.showwarning("Warning", "You Have Reached The Maximum Number of Players!")
     except NameError:
         messagebox.showwarning("Warning", "A Player With This Name Already Exists!")
@@ -175,7 +177,7 @@ def add_player(players: list[Player_Select_Frame], roles: list[list[Role]], entr
 
 @enforce_types
 def get_roles_by_defaults(default_names: list[str]) -> list[list[Role]]:
-    return get_roles(len(default_names))
+    return get_roles(len(default_names), 0)
 
 @enforce_types
 def add_defaults(players: list[tk.Label], entries: Menu_Entry, default_names: list[str]) -> None:
@@ -206,7 +208,7 @@ def clear() -> None:
     root.unbind("<Return>")
 
     for i in range(len(players)):
-        players[0].delete()
+        players[0].delete(False)
 
 @enforce_types
 def clear_widgets(root: Has_Widget_Children) -> None:

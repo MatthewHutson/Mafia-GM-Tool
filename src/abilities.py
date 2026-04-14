@@ -676,7 +676,7 @@ class index(Ability):
 class examine(Ability):
     @enforce_types
     def __init__(self) -> None:
-        super().__init__(targets = 1, p = 5, ability_type = ["repeat"], priority = 11, can_pick_same_target = True)
+        super().__init__(targets = 1, p = 0, ability_type = ["repeat"], priority = 11, can_pick_same_target = True)
 
     # -- Ability -- #
     @enforce_types
@@ -684,16 +684,16 @@ class examine(Ability):
         target: str = data.players[user].targets[0]
         role: Role = data.players[target]
 
-        for item in role.statuses.get_data():
-            role.information.append(item)
+        for item in role.statuses.get_data(target):
+            data.players[user].information.append(item)
 
     @enforce_types
     def if_poisoned(self, user: str, data: Game_Data) -> None:
         target: str = data.players[user].targets[0]
         role: Role = data.players[target]
 
-        for item in role.statuses.bullshit_data():
-            role.information.append(item)
+        for item in role.statuses.bullshit_data(target):
+            data.players[user].information.append(item)
 
     @enforce_types
     def if_drunk(self, user: str, data: Game_Data) -> None:

@@ -2,11 +2,9 @@
 A Program to allocate roles in a game of mafia
 
 # -- Changes -- #
-Fixed Examiner
-Fixed SHuffle Bug
-Made Nap Time No Logner Stops Scrollbar Working
-Made 12 Players Introduce A 3rd Evil Player
-unraised e raised in main
+Made Everything In Menu Be Tied To 3 Pre-defined colours (bg_1, bg_2 and text_colour)
+Made ScrollBar Be Capable Of Being Modified
+Tried To Make Dark Mode (Didn't End Up Looking Good)
 
 # -- To Do -- #
 Check For Bugs With Drunk and New Code

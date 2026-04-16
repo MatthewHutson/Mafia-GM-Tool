@@ -22,7 +22,7 @@ def card_init() -> dict[str, str]:
     return card_data  
 
 @enforce_types
-def card_index(root: tk.Tk, bg: str, font: tuple[str, int], entries: Menu_Entry, data: Game_Data = None) -> None:
+def card_index(root: tk.Tk, bg: str, font: tuple[str, int], fg: str, entries: Menu_Entry, data: Game_Data = None) -> None:
     # -- Initialisation - #
     global instances
     card_data: dict[str, str] = card_init()
@@ -50,9 +50,9 @@ def card_index(root: tk.Tk, bg: str, font: tuple[str, int], entries: Menu_Entry,
             continue
 
 
-        frame = tk.Frame(main_frame)
+        frame = tk.Frame(main_frame, bg = bg)
         role_icon = Role_Icon([role_name], font, entries, (10, 2), (2, 2), none)
-        card_label = tk.Label(frame, text = card, bg = bg)
+        card_label = tk.Label(frame, text = card, bg = bg, fg = fg)
 
         frames.append(frame)
         roles.append(role_icon)

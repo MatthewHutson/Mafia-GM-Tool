@@ -3,24 +3,49 @@ from __future__ import annotations
 from utils import *
 from typing import Protocol
 from classes_and_types import *
-from random import randint, shuffle
+from random import randint
 import tkinter as tk
+from tkinter import ttk
 from tkinter import messagebox
 from typing import Union
 
 # -- Classes -- #
 class Vertical_Scroll_Frame(tk.Frame):
     @enforce_types
-    def __init__(self, master: Union[tk.Tk, tk.Toplevel, tk.Frame], bg: str = "#ffffff", pack: bool = True) -> None:
-        self.scroll_bar = tk.Scrollbar(master, orient = tk.VERTICAL)
-        self.canvas = tk.Canvas(master, yscrollcommand = self.scroll_bar.set, bg = bg)
+    def __init__(self, master: Union[tk.Tk, tk.Toplevel, tk.Frame], bg: str = "#F0F0F0", bg_2: str = "#d3d3d3", pack: bool = True) -> None:
+        # -- Style Given Using Non_Default -- #
+        # self.scroll_colour: str = bg_2 #4F4F4F
+        # style = ttk.Style()
+        # style.theme_use('clam')
+        # style.configure(
+        #     "Custom.Vertical.TScrollbar",
+        #     gripcount = 0,
+        #     background = self.scroll_colour,   # Scrollbar slider color
+        #     darkcolor = bg,    # Darker edge
+        #     lightcolor = bg,   # Lighter edge
+        #     troughcolor = bg,  # Background trough
+        #     bordercolor = bg,
+        #     arrowcolor = bg,
+        #     activebackground = bg
+        # )
+        # style.map(
+        #     "Custom.Vertical.TScrollbar",
+        #     background=[("disabled", self.scroll_colour)],  # thumb when disabled
+        #     arrowcolor=[("disabled", bg)],  # arrows when disabled
+        #     troughcolor=[("disabled", bg)]  # trough when disabled
+        # )
+
+        # -- Style Given Using Non_Default -- #
+        self.scroll_bar = tk.Scrollbar(master, orient = tk.VERTICAL, takefocus = True) #style = "Custom.Vertical.TScrollbar" with ttk Scrollbar Instead
+        self.canvas = tk.Canvas(master, yscrollcommand = self.scroll_bar.set, bg = bg_2, highlightthickness = 0, borderwidth = 0)
         self.scroll_bar.configure(command = self.canvas.yview)
         self.root = master
-
-        super().__init__(self.canvas)
         self.bg = bg
 
+        super().__init__(self.canvas, bg = bg)
+
         self.scroll_bar.pack(side = tk.RIGHT, fill = "y", ipadx = 4, expand = False)
+        self.scroll_bar.update()
         if pack: self.pack(side = tk.LEFT, fill = tk.BOTH, expand = True)
 
         self.canvas.create_window((0, 0), window = self, anchor = tk.NW)
@@ -71,7 +96,7 @@ class Vertical_Scroll_Frame(tk.Frame):
         self.scroll_all()
         self.canvas_size: int = self.canvas.winfo_width()
 
-        tk.Frame(self, width = self.canvas_size, height = 0).pack(side = tk.TOP)
+        tk.Frame(self, width = self.canvas_size, height = 0, bg = self.bg).pack(side = tk.TOP)
 
 class Role_Icon:
     # -- Constructors -- #
@@ -227,11 +252,12 @@ class Role_Icon:
 class Role_Row:
     # -- Constructor -- #
     @enforce_types
-    def __init__(self, frame: tk.Frame) -> None:
+    def __init__(self, frame: tk.Frame, bg: str) -> None:
         self.frames: list[tk.Frame] = []
         self.icons: list[list[Role_Icon]] = []
         self.master_frame = frame
         self.max_row_length = 6
+        self.bg = bg
 
     # -- Property -- #
     @property
@@ -256,7 +282,7 @@ class Role_Row:
 
     @enforce_types
     def add_row(self) -> None:
-        self.frames.append(tk.Frame(self.master_frame, bg = "#d3d3d3"))
+        self.frames.append(tk.Frame(self.master_frame, bg = self.bg))
         self.icons.append([])
 
     @enforce_types
@@ -334,9 +360,9 @@ class Role_Row:
         
 class Player_Frame:
     # -- Constructor -- #
-    def __init__(self, user_input: str, main_frame: Union[tk.Frame, Vertical_Scroll_Frame], main_font: tuple[str, int]) -> None:
-        self.frame = tk.Frame(main_frame)
-        self.name_label = tk.Label(self.frame, text = capitalise_words(user_input), font = main_font).pack(side = tk.LEFT, fill = "x", padx = 4)
+    def __init__(self, user_input: str, main_frame: Union[tk.Frame, Vertical_Scroll_Frame], main_font: tuple[str, int], bg: str, fg: str) -> None:
+        self.frame = tk.Frame(main_frame, bg = bg)
+        self.name_label = tk.Label(self.frame, text = capitalise_words(user_input), font = main_font, bg = bg, fg = fg).pack(side = tk.LEFT, fill = "x", padx = 4)
         self.frame.pack_propagate(False)
         self.name: str = capitalise_words(user_input)
         self.master = main_frame
@@ -382,8 +408,8 @@ class Player_Frame:
 class Player_Select_Frame(Player_Frame):
     # -- Constructor -- #
     @enforce_types
-    def __init__(self, user_input: str, main_frame: tk.Frame, main_font: tuple[str, int], players: list[object], icon_frame: Role_Row, role_update: Any) -> None:
-        super().__init__(user_input, main_frame, main_font)
+    def __init__(self, user_input: str, main_frame: tk.Frame, main_font: tuple[str, int], players: list[object], icon_frame: Role_Row, role_update: Any, bg: str, fg: str) -> None:
+        super().__init__(user_input, main_frame, main_font, bg, fg)
         self.players = players
         self.icon_frame = icon_frame
         self.delete_button = tk.Button(self.frame, text = "Remove", fg = "#ffffff", bg = "#ff0000", highlightbackground = "#cd0000", activebackground = "#aa0000", font = main_font, command = self.delete).pack(side = tk.RIGHT, pady = 2)
@@ -406,8 +432,8 @@ class Player_Select_Frame(Player_Frame):
 class Player_Role_Frame(Player_Frame):
     # -- Constructor -- #
     @enforce_types
-    def __init__(self, name: str, data: Game_Data, main_frame: Union[tk.Frame, Vertical_Scroll_Frame], main_font: tuple[str, int], selected_players: list[str], selected_role: Role, number_of_targets: int, pack_alive_and_dead: Any) -> None:
-        super().__init__(name, main_frame, main_font)
+    def __init__(self, name: str, data: Game_Data, main_frame: Union[tk.Frame, Vertical_Scroll_Frame], main_font: tuple[str, int], selected_players: list[str], selected_role: Role, number_of_targets: int, pack_alive_and_dead: Any, bg: str, fg: str) -> None:
+        super().__init__(name, main_frame, main_font, bg, fg)
         self.data = data
         self.alignment = self.role.true_alignment
         self.selected_players = selected_players

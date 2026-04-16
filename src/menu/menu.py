@@ -18,7 +18,12 @@ root: tk.Tk = tk.Tk()
 MIN_PLAYERS: int = 4
 max_players: int = 4
 
+# -- Colour Schemes -- #
+bg_1: str  = "#F0F0F0"
 bg_2: str = "#d3d3d3"
+text_colour: str = "#000000"
+
+root.config(bg = bg_1)
 
 players: list[Player_Select_Frame] = []
 
@@ -28,16 +33,16 @@ other_role_dict: dict[int, list[list[Role]]] = {}
 guarenteed_roles: list[Role] = []
 
 # -- Tkitner Vars -- #
-player_margin = tk.Frame(root)
+player_margin = tk.Frame(root, bg = bg_1)
 player_tab = tk.Frame(player_margin, bg = bg_2)
 
-input_frame = tk.Frame(player_margin)
-name_entry: tk.Entry = tk.Entry(input_frame)
+input_frame = tk.Frame(player_margin, bg = bg_1)
+name_entry: tk.Entry = tk.Entry(input_frame, bg = bg_2, fg = text_colour)
 
-settings_frame = tk.Frame(root)
+settings_frame = tk.Frame(root, bg = bg_1)
 
 role_frame = tk.Frame(root, bg = bg_2)
-role_row_frames = Role_Row(role_frame)
+role_row_frames = Role_Row(role_frame, bg_2)
 
 main_font: tuple[str, int] = ("Airial", 10)
 
@@ -71,7 +76,6 @@ def new_load_system() -> None:
     global_entries.all_roles_lists = list(evil_role_dict.values())[-1] + guarenteed_roles + list(other_role_dict.values())[-1]
 
     # -- Managing Player Count -- #
-    max_mafia: int = len(list(evil_role_dict.values())[-1])
     max_guarenteed_roles: int = len(guarenteed_roles)
     max_other_roles: int = len(list(other_role_dict.values())[-1])
     max_players = max_guarenteed_roles + max_other_roles
@@ -161,7 +165,7 @@ def add_player(players: list[Player_Select_Frame], roles: list[list[Role]], entr
         if len(players) < max_players:
             add_role_tile(len(players), roles, entries)
             
-        player_frame = Player_Select_Frame(name, player_canvas, main_font, players, role_row_frames, role_boundary_reset_for_icons)
+        player_frame = Player_Select_Frame(name, player_canvas, main_font, players, role_row_frames, role_boundary_reset_for_icons, bg_2, text_colour)
         player_canvas.update()
         player_canvas.scroll_all()
         players.append(player_frame)
@@ -248,11 +252,11 @@ def pack_alive_and_dead(data: Game_Data, active_role: Role, number_of_targets: i
         frame.delete()
 
     for name in data.alive_players.keys():
-        player_frame = Player_Role_Frame(name, data, alive_canvas, main_font, selected_players, active_role, number_of_targets, pack_alive_and_dead)
+        player_frame = Player_Role_Frame(name, data, alive_canvas, main_font, selected_players, active_role, number_of_targets, pack_alive_and_dead, bg_2, text_colour)
         alive_frames.append(player_frame)
 
     for name in data.dead_players.keys():
-        player_frame = Player_Role_Frame(name, data, dead_canvas, main_font, selected_players, active_role, number_of_targets, pack_alive_and_dead)
+        player_frame = Player_Role_Frame(name, data, dead_canvas, main_font, selected_players, active_role, number_of_targets, pack_alive_and_dead, bg_2, text_colour)
         dead_frames.append(player_frame)
 
     alive_canvas.update()
@@ -345,10 +349,10 @@ def setup_menu(entries: Menu_Entry, default_names: list[str]) -> None:
     root.resizable(False, False)
     root.geometry("1216x512")
     root.title("Mafia Game")
-    tk.Label(root, text = "Player Selection", font = ("Airial", 16), bg = bg_2).pack(side = tk.TOP, fill = "x", pady = 4)
+    tk.Label(root, text = "Player Selection", font = ("Airial", 16), bg = bg_2, fg = text_colour).pack(side = tk.TOP, fill = "x", pady = 4)
 
     # -- Add Player Input -- #
-    tk.Label(input_frame, text = "Name:").pack(side = tk.LEFT, padx = 8, pady = 8)
+    tk.Label(input_frame, text = "Name:", bg = bg_1, fg = text_colour).pack(side = tk.LEFT, padx = 8, pady = 8)
     tk.Button(input_frame, text = "Defaults", command = lambda: add_defaults(players, entries, default_names), bg = "#5D9FF0", highlightbackground = "#4980C4", activebackground = "#4980C4", fg = "#ffffff", activeforeground = "#ffffff").pack(side = tk.RIGHT, padx = 8, pady = 8)
     tk.Button(input_frame, text = "Add", command = lambda: add_player_from_entry(players, get_roles_by_players(), entries, max_players), bg = "#00ff00", highlightbackground = "#00cd00", activebackground = "#00aa00").pack(side = tk.RIGHT, padx = 8, pady = 8)
     name_entry.pack(fill = "x", padx = 8, pady = 8, ipady = 12)
@@ -366,7 +370,7 @@ def setup_menu(entries: Menu_Entry, default_names: list[str]) -> None:
     counter_init(root, settings_frame, (8, 3), (4, 0), tk.LEFT)
 
     # -- Settings Button -- #
-    settings_button = tk.Button(settings_frame, text = "Settings", command = lambda: display_settings(root, bg_2, main_font, entries), bg = "#CACACA", activebackground = "#AFAFAF", fg = "#000000", activeforeground = "#000000")
+    settings_button = tk.Button(settings_frame, text = "Settings", command = lambda: display_settings(root, bg_1, bg_2, text_colour, entries), bg = "#CACACA", activebackground = "#AFAFAF", fg = "#000000", activeforeground = "#ffffff")
     settings_button.pack(side = tk.RIGHT, ipady = 3, ipadx = 8, padx = 4)
 
     # -- Randomise Button -- #
@@ -374,11 +378,11 @@ def setup_menu(entries: Menu_Entry, default_names: list[str]) -> None:
     random_button.pack(side = tk.RIGHT, ipady = 3, ipadx = 8, padx = 4)
 
     # -- Card Index -- #
-    index_access_button = tk.Button(settings_frame, text = "Card Index", command = lambda: card_index(root, bg_2, main_font, entries), bg = "#C65DF0", activebackground = "#C049C4", fg = "#ffffff", activeforeground = "#ffffff")
+    index_access_button = tk.Button(settings_frame, text = "Card Index", command = lambda: card_index(root, bg_2, main_font, text_colour, entries), bg = "#C65DF0", activebackground = "#C049C4", fg = "#ffffff", activeforeground = "#ffffff")
     index_access_button.pack(side = tk.RIGHT, ipadx = 8, ipady = 3, padx = 4)
 
     # -- Role Selection -- #
-    tk.Label(role_frame, text = "Roles", font = main_font).pack(side = tk.TOP, padx = 4, pady = 4, fill = "x")
+    tk.Label(role_frame, text = "Roles", font = main_font, bg = bg_1, fg = text_colour).pack(side = tk.TOP, padx = 4, pady = 4, fill = "x")
 
     # -- Main Partitions -- #
     player_margin.pack(side = tk.LEFT, anchor = "nw")
@@ -389,11 +393,11 @@ def setup_menu(entries: Menu_Entry, default_names: list[str]) -> None:
     role_frame.pack_propagate(False)
 
     # -- Player Display Tab -- #
-    tk.Label(player_tab, text = "Players", font = main_font).pack(side = tk.TOP, padx = 4, pady = 4,  fill = "x")
+    tk.Label(player_tab, text = "Players", font = main_font, bg = bg_1, fg = text_colour).pack(side = tk.TOP, padx = 4, pady = 4,  fill = "x")
     player_tab.pack(side = tk.TOP, anchor = "w", padx = 4, pady = 4, ipadx = 128, ipady = 256, expand = False)
     player_tab.update()
     player_tab.pack_propagate(False)
-    player_canvas = Vertical_Scroll_Frame(master = player_tab, bg = bg_2)
+    player_canvas = Vertical_Scroll_Frame(master = player_tab, bg = bg_1, bg_2 = bg_2)
     root.mainloop()
 
 # -- Main Game Menu -- #
@@ -402,16 +406,16 @@ def init_game_menu(entries: Menu_Entry, data: Game_Data) -> None:
     global alive_margin, alive_canvas, dead_margin, dead_canvas
     player_margin_size: int = 160
 
-    tk.Label(root, text = "Game Menu", font = ("Airial", 16), bg = bg_2).pack(side = tk.TOP, fill = "x", pady = 4)
+    tk.Label(root, text = "Game Menu", font = ("Airial", 16), bg = bg_2, fg = text_colour).pack(side = tk.TOP, fill = "x", pady = 4)
     
     alive_margin = tk.Frame(root, bg = bg_2)
     dead_margin = tk.Frame(root, bg = bg_2)
 
-    tk.Label(alive_margin, text = "Alive Players").pack(side = tk.TOP, padx = 4, pady = 4, fill = "x", ipady = 4)
-    tk.Label(dead_margin, text = "Dead Players").pack(side = tk.TOP, padx = 4, pady = 4, fill = "x", ipady = 4)
+    tk.Label(alive_margin, text = "Alive Players", bg = bg_1, fg = text_colour).pack(side = tk.TOP, padx = 4, pady = 4, fill = "x", ipady = 4)
+    tk.Label(dead_margin, text = "Dead Players", bg = bg_1, fg = text_colour).pack(side = tk.TOP, padx = 4, pady = 4, fill = "x", ipady = 4)
     
-    alive_canvas = Vertical_Scroll_Frame(master = alive_margin, bg  = bg_2, pack = False)
-    dead_canvas = Vertical_Scroll_Frame(master = dead_margin, bg = bg_2, pack = False)
+    alive_canvas = Vertical_Scroll_Frame(master = alive_margin, bg  = bg_1, bg_2 = bg_2, pack = False)
+    dead_canvas = Vertical_Scroll_Frame(master = dead_margin, bg = bg_1, bg_2 = bg_2, pack = False)
 
     alive_margin.pack(side = tk.LEFT, padx = 4, pady = 4, fill = "y", ipadx = player_margin_size)
     dead_margin.pack(side = tk.RIGHT, padx = 4, pady = 4, fill = "y", ipadx = player_margin_size)
@@ -425,7 +429,7 @@ def init_game_menu(entries: Menu_Entry, data: Game_Data) -> None:
     dead_canvas.pack(side = tk.TOP, padx = 4, pady = 4, fill = "both", expand = True)
 
     pack_alive_and_dead(data, data.vote_role, 0) # -- Prevents Popup before the first night -- #
-    card_index(root, bg_2, main_font, entries, data) # -- Gives Role Card Before Popups Appear -- #
+    card_index(root, bg_2, main_font, text_colour, entries, data) # -- Gives Role Card Before Popups Appear -- #
 
 @enforce_types
 def selection_menu(data: Game_Data, entries: Menu_Entry, user: str, target: str = "", is_primary_ability: bool = True, can_recurse: bool = True) -> None:
@@ -467,7 +471,7 @@ def selection_menu(data: Game_Data, entries: Menu_Entry, user: str, target: str 
         else:
             text = f"{user} is using the power of {role.name} ({role.ability.__name__}). Select {ability.targets} target{"s" if ability.targets > 1 else ""}"
 
-    action_label = tk.Label(action_frame, font = main_font, text = text)
+    action_label = tk.Label(action_frame, font = main_font, text = text, bg = bg_1, fg = text_colour)
     confirm_frame = tk.Frame(action_frame, bg = bg_2)
     info_frame = tk.Frame(action_frame, bg = bg_2)
     vote_frame = tk.Frame(action_frame, bg = bg_2)
@@ -478,7 +482,7 @@ def selection_menu(data: Game_Data, entries: Menu_Entry, user: str, target: str 
     tk.Button(confirm_frame, text = "End Game", command = lambda: menu_quit(data), bg = "#E03636", activebackground = "#8B2B2B", fg = "#ffffff", activeforeground = "#ffffff").pack(side = tk.RIGHT, ipadx = 16, ipady = 8, pady = 4, padx = 4)
 
     # -- Card Index -- #
-    index_access_button = tk.Button(info_frame, text = "Card Index", command = lambda: card_index(root, bg_2, main_font, entries, data), bg = "#C65DF0", activebackground = "#C049C4", fg = "#ffffff", activeforeground = "#ffffff", width = 18)
+    index_access_button = tk.Button(info_frame, text = "Card Index", command = lambda: card_index(root, bg_2, main_font, text_colour, entries, data), bg = "#C65DF0", activebackground = "#C049C4", fg = "#ffffff", activeforeground = "#ffffff", width = 18)
     index_access_button.pack(side = tk.LEFT, ipady = 8, padx = 4)
 
     # -- Mimi Stand Counter -- #
@@ -493,7 +497,7 @@ def selection_menu(data: Game_Data, entries: Menu_Entry, user: str, target: str 
 
     # -- Vote Skip Button -- #
     if user == "none":
-        tk.Button(vote_frame, text = "Skip Vote", command = skip, bg = "#64F05D", activebackground = "#64C449", fg = "#000000", activeforeground = "#000000").pack(side = tk.LEFT, ipadx = 24, ipady = 8, padx = 4, pady = 2, anchor = "sw")
+        tk.Button(vote_frame, text = "Skip Vote", command = skip, bg = "#64F05D", activebackground = "#64C449", fg = text_colour, activeforeground = text_colour).pack(side = tk.LEFT, ipadx = 24, ipady = 8, padx = 4, pady = 2, anchor = "sw")
 
     # -- Timer Button -- #
     create_timer(vote_frame, 300, main_font, (12, 2), (4, 2), tk.RIGHT)

@@ -2,9 +2,10 @@
 A Program to allocate roles in a game of mafia
 
 # -- Changes -- #
-Made Everything In Menu Be Tied To 3 Pre-defined colours (bg_1, bg_2 and text_colour)
-Made ScrollBar Be Capable Of Being Modified
-Tried To Make Dark Mode (Didn't End Up Looking Good)
+Made Instant Death A Toggleable Setting - Can Remove It From Gambler Pool
+Made Instant Death Now Has a 2.5% Chance and None Has 22.5% Chance Initially
+Added MessageBox Icons
+Used Messagebox Defaults To Make Program More Sensible
 
 # -- To Do -- #
 Check For Bugs With Drunk and New Code

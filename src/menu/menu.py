@@ -173,9 +173,9 @@ def add_player(players: list[Player_Select_Frame], roles: list[list[Role]], entr
         role_boundary_reset(roles)
 
     except OverflowError as e:
-        messagebox.showwarning("Warning", "You Have Reached The Maximum Number of Players!")
+        messagebox.showwarning("Warning", "You Have Reached The Maximum Number of Players!", icon = "warning")
     except NameError:
-        messagebox.showwarning("Warning", "A Player With This Name Already Exists!")
+        messagebox.showwarning("Warning", "A Player With This Name Already Exists!", icon = "warning")
     except ValueError:
         pass
 
@@ -221,7 +221,7 @@ def clear_widgets(root: Has_Widget_Children) -> None:
             widget.pack_forget()
             clear_widgets(widget)
     except Exception as e: 
-        messagebox.showerror("Error", f"An error occurred while clearing the menu: \n\n{e}")
+        messagebox.showerror("Error", f"An error occurred while clearing the menu: \n\n{e}", icon = "error")
 
 @enforce_types
 def get_data(root: tk.Tk, entries: Menu_Entry) -> None:
@@ -233,9 +233,9 @@ def get_data(root: tk.Tk, entries: Menu_Entry) -> None:
 @enforce_types
 def start_confirm(entries: Menu_Entry) -> None:
     if len(players) < 4:
-        messagebox.showerror("Error", "You Need at Least 4 Players to Start!")
+        messagebox.showerror("Error", "You Need at Least 4 Players to Start!", icon = "error")
     else:
-        if messagebox.askyesno("Confirm Choice", "Do you wish to start the game?"):
+        if messagebox.askyesno("Confirm Choice", "Do you wish to start the game?", icon = "question"):
             remove_instances()
             get_data(root, entries)
 
@@ -278,7 +278,7 @@ def no_double_down(data: Game_Data, role: Role, ability: Ability) -> bool:
     if isinstance(role.previous_targets, list) and data.settings["Double Down"] == 0:
         for target in selected_players:
             if target in role.previous_targets and not ability.can_pick_same_target:
-                messagebox.showwarning("Warning", f"You Cannot Pick The Same Target Twice!")
+                messagebox.showwarning("Warning", f"You Cannot Pick The Same Target Twice!", icon = "warning")
                 return False
     
     return True
@@ -296,20 +296,20 @@ def confirm_selection(data: Game_Data, role: Role, is_primary_ability: bool) -> 
     can_pick_that_target: bool = no_double_down(data, role, ability)
 
     if len(selected_players) == ability.targets and correct_lives and can_pick_that_target:
-        if messagebox.askyesno("Confirm Selection", f"Are you sure you want to select {selected_players}?"):
+        if messagebox.askyesno("Confirm Selection", f"Are you sure you want to select {selected_players}?", icon = "question"):
             root.quit()
     elif can_pick_that_target:
         if role.name != "Voting":
             if ability.target_living:
-                messagebox.showwarning("Warning", f"You must select {ability.targets} alive {plural_targets}!")
+                messagebox.showwarning("Warning", f"You must select {ability.targets} alive {plural_targets}!", icon = "warning")
             else:
-                messagebox.showwarning("Warning", f"You must select {ability.targets} dead {plural_targets}!")
+                messagebox.showwarning("Warning", f"You must select {ability.targets} dead {plural_targets}!", icon = "warning")
         else:
-            messagebox.showwarning("Warning", "You can only vote 1 alive player out!")
+            messagebox.showwarning("Warning", "You can only vote 1 alive player out!", icon = "warning")
 
 @enforce_types
 def menu_quit(data: Game_Data) -> None:
-    if messagebox.askyesno("Confirm Selection", "Are you sure you want to end the game?"):
+    if messagebox.askyesno("Confirm Selection", "Are you sure you want to end the game?", icon = "question"):
         data.playing = False
         root.quit()
         clear()
@@ -318,13 +318,13 @@ def menu_quit(data: Game_Data) -> None:
 @enforce_types
 def skip() -> None:
     global selected_players
-    if messagebox.askyesno("Confirm Selection", "Are you sure you want to skip the vote?"):
+    if messagebox.askyesno("Confirm Selection", "Are you sure you want to skip the vote?", icon = "question"):
         selected_players = []
         root.quit()
 
 @enforce_types
 def terminate() -> None:
-    if messagebox.askyesno("Confirm Selection", "Are you sure you want to quit?"):
+    if messagebox.askyesno("Confirm Selection", "Are you sure you want to quit?", icon = "question"):
         sys.exit()
 
 # -- Setup Menu -- #
@@ -544,8 +544,8 @@ def information(data: Game_Data, tell_nothing: bool = True) -> None:
             count += 1
         
         if info != "\n":
-            messagebox.showinfo("Info", f"{player} is told: {info}")
+            messagebox.showinfo("Info", f"{player} is told: {info}", icon = "info")
         elif tell_nothing:
-            messagebox.showinfo("Info", f"{player} is told nothing!")
+            messagebox.showinfo("Info", f"{player} is told nothing!", icon = "info")
 
         role.information = []

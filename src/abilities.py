@@ -10,7 +10,7 @@ from re import fullmatch
 class none(Ability):
     @enforce_types
     def __init__(self) -> None:
-        super().__init__(targets = 0, p = 20, ability_type = ["passive"])
+        super().__init__(targets = 0, p = 22.5, ability_type = ["passive"])
     
     # -- Ability -- #
     @enforce_types
@@ -499,7 +499,7 @@ class mayor(Ability):
         if data.playing:
             if not data.players[user].solo_win:
                 sleep(0.5)
-                if messagebox.askyesno("Mayor", f"Has {user} claimed mayor?"):
+                if messagebox.askyesno("Mayor", f"Has {user} claimed mayor?", icon = "question"):
                     data.players[user].solo_win = True
         else:
             data.players[user].solo_win = len(data.players) == data.players[user].alternative_end_count
@@ -516,20 +516,22 @@ class gamble(Ability):
     @enforce_types
     def __init__(self) -> None:
         super().__init__(targets = 0, p = 0, ability_type = ["alternate", "secondary_ability", "passive"], priority = 8)
-        self.used_abilities: list[Role] = []
+        self.used_abilities: set[str] = set([])
         
     # -- Ability -- #
     @enforce_types
     def ability(self, user: str, data: Game_Data) -> None:
+        if data.settings["Instant Death"] == 0:
+            self.used_abilities.add("instant_death")
+
         role: Role = data.players[user]
+        
         if role.ability_cancel:
             role.secondary_ability(user, data)
 
-            if role.secondary_ability != none or role.secondary_ability:
-                self.used_abilities.append(role.secondary_ability)
-
         else:
-            role.secondary_ability = data.random_ability(self.used_abilities)
+            role_data: list[str, Ability] = data.random_ability(self.used_abilities)
+            role.secondary_ability = role_data[1]
             role.secondary_ability.used_ability = False
             self.used_ability = False
 
@@ -546,6 +548,10 @@ class gamble(Ability):
             if "instant" in role.secondary_ability.ability_type:
                 role.secondary_ability(user, data)
 
+            # -- Removed The Ability From Being Drawn Again -- #
+            if not (role.secondary_ability == none or role.secondary_ability is None):
+                self.used_abilities.add(role_data[0])
+
     @enforce_types
     def if_poisoned(self, user: str, data: Game_Data) -> None:
         self.ability(user, data)
@@ -557,7 +563,7 @@ class gamble(Ability):
 class instant_death(Ability):
     @enforce_types
     def __init__(self) -> None:
-        super().__init__(targets = 1, p = 5, ability_type = ["late"])
+        super().__init__(targets = 1, p = 2.5, ability_type = ["late"])
         
     # -- Ability -- #
     @enforce_types

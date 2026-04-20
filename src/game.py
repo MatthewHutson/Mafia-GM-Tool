@@ -16,7 +16,7 @@ import abilities as a
 def on_demand(data: Game_Data, role: Role, ability: Ability, is_primary_ability: bool, name: str) -> None:
     if "on_demand" in ability.ability_type and (not ("singular" in ability.ability_type and (role.selected_target))):
         sleep(0.5)
-        use_ability = messagebox.askyesno("Ability", f"Does {name}, the {role.name} want to use their ability ({ability.__name__})?")
+        use_ability = messagebox.askyesno("Ability", f"Does {name}, the {role.name} want to use their ability ({ability.__name__})?", default = "no", icon = "question")
         
         if is_primary_ability:
             role.ability_cancel = not use_ability
@@ -29,7 +29,7 @@ def on_demand(data: Game_Data, role: Role, ability: Ability, is_primary_ability:
 def alternate(data: Game_Data, role: Role, ability: Ability, name: str) -> None:
     if "alternate" in ability.ability_type and (not ("singular" in ability.ability_type and (role.selected_target))):
         sleep(0.5)
-        use_ability = messagebox.askyesno("Ability", f"Does {name}, the {role.name} want to usre their primary ability ({ability.__name__}) instead of their secondary ability ({role.secondary_ability.__name__})?")
+        use_ability = messagebox.askyesno("Ability", f"Does {name}, the {role.name} want to usre their primary ability ({ability.__name__}) instead of their secondary ability ({role.secondary_ability.__name__})?", icon = "question")
         role.ability_cancel = not use_ability
         role.secondary_ability_cancel = use_ability
         role.made_choice = True
@@ -73,12 +73,12 @@ def nap_time(data: Game_Data) -> None:
     bluff_cards: list[str] = [data.get_card_by_role(data.roles[role]) for role in bluff_roles]
 
 
-    info: str = f"Wake up The Evil Team: {list(data.evil_aligned.keys())}. Show Them \n\n #1: Their Teammate(s): {evil_cards}. \n #2: Their Bluff Roles: {bluff_cards}. \n\nPress NO When Everyone Is Ready To Procede."
+    info: str = f"Wake up The Evil Team: {list(data.evil_aligned.keys())}. Show Them \n\n #1: Their Teammate(s): {evil_cards}. \n #2: Their Bluff Roles: {bluff_cards}. \n\nIs Everyone Ready To Procede?"
     nap_time_info(info)
 
 @enforce_types
 def nap_time_info(info: str) -> None:
-    if messagebox.askyesno("Sleepy Time", info):
+    if not messagebox.askyesno("Sleepy Time", info, default = "no", icon = "info"):
         timer = threading.Timer(3.0, lambda: nap_time_info(info))
         timer.start()
 
@@ -104,7 +104,7 @@ def game(data: Game_Data, entries: Menu_Entry) -> None:
 
             if data.playing and not (can_pick_primary_target or can_pick_secondary_target) and not role.made_choice:
                 sleep(0.5)
-                messagebox.showinfo("Wake Up", f"Wake Up {name} to use no ability.")
+                messagebox.showinfo("Wake Up", f"Wake Up {name} to use no ability.", icon = "info")
 
         if data.playing:
             use_abilities(data)

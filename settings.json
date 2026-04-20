@@ -23,5 +23,10 @@
         "description": "Shuffle The Testing Role Into The Game.",
         "type": "checkbox",
         "value": 0
+    },
+    "Instant Death": {
+        "description": "The Gambler Has A Chance of Rolling Instant Death. If They Are Not Protected, Poisoned or Drunk On The Turn They Roll This, They Die.",
+        "type": "checkbox",
+        "value": 1
     }
 }

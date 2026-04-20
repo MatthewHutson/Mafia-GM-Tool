@@ -86,7 +86,7 @@ class Ability():
         if type(ability2) == type:
             return type(self) == ability2
         elif ability2 is None:
-            return str(self).lower() ==  "none" # -- Catches Null Value and None Ability -- #
+            return str(self).lower() == "none" # -- Catches Null Value and None Ability -- #
         else:
             return type(ability2) == type(self)
 
@@ -442,9 +442,9 @@ class Game_Data():
         return self.card_dict[role.name]
     
     @enforce_types
-    def random_ability(self, used_abilities: list[Role] = []) -> Ability:
+    def random_ability(self, used_abilities: set[str] = set([])) -> list[str, Ability]:
         temp_dist: dict = {ability: probability for ability, probability in self.ablity_distribution.items() if not ability in used_abilities}
         total = sum(temp_dist.values())
         temp_dist = {key: value / total for key, value in temp_dist.items()}
-        sample: list[str] = np.random.choice(np.array(list(temp_dist.keys())), size = 1, p = np.array(list(temp_dist.values())))
-        return self.abilities[sample[0]]
+        sample: list[np.str_] = np.random.choice(np.array(list(temp_dist.keys())), size = 1, p = np.array(list(temp_dist.values())))
+        return [str(sample[0]), self.abilities[sample[0]]]

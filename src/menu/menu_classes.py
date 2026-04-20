@@ -549,7 +549,7 @@ class Player_Role_Frame(Player_Frame):
             self.selected = not self.selected
 
         elif len(self.selected_players) >= self.number_of_targets:
-            messagebox.showwarning("Warning", f"{self.selected_role_name} can only select {self.number_of_targets} target{"s" if self.number_of_targets != 1 else ""}!")
+            messagebox.showwarning("Warning", f"{self.selected_role_name} can only select {self.number_of_targets} target{"s" if self.number_of_targets != 1 else ""}!", icon = "warning")
         
         self.select_icon.configure(bg = self.selected_bg, activebackground = "#4980C4") 
         self.select_icon.update()
@@ -557,7 +557,7 @@ class Player_Role_Frame(Player_Frame):
 
     @enforce_types
     def kill(self) -> None: 
-        if not messagebox.askyesno("Game Intervention", f"Are you sure you mean to dev kill {self.name}? (NO TO KILL)"):
+        if messagebox.askyesno("Game Intervention", f"Are you sure you mean to dev kill {self.name}?", default = "no", icon = "question"):
             self.role.currently_alive = False
 
             del self.data.alive_players[self.name]
@@ -573,7 +573,7 @@ class Player_Role_Frame(Player_Frame):
 
     @enforce_types
     def revive(self) -> None:
-        if not messagebox.askyesno("Game Intervention", f"Are you sure you mean to dev ressurect {self.name}? (NO TO RESSURECT)"):
+        if messagebox.askyesno("Game Intervention", f"Are you sure you mean to dev ressurect {self.name}?", default = "no", icon = "question"):
             self.role.currently_alive = True
 
             del self.data.dead_players[self.name]

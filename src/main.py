@@ -18,7 +18,7 @@ import abilities as a
 def on_demand(data: Game_Data, role: Role, ability: Ability, is_primary_ability: bool, name: str) -> None:
     if "on_demand" in ability.ability_type and (not ("singular" in ability.ability_type and (role.selected_target))):
         sleep(0.5)
-        use_ability = messagebox.askyesno("Ability", f"Does {name}, the {role.name} want to use their ability ({ability.__name__})?")
+        use_ability = messagebox.askyesno("Ability", f"Does {name}, the {role.name} want to use their ability ({ability.__name__})?", icon = "question")
         
         if is_primary_ability:
             role.ability_cancel = not use_ability
@@ -31,7 +31,7 @@ def on_demand(data: Game_Data, role: Role, ability: Ability, is_primary_ability:
 def alternate(data: Game_Data, role: Role, ability: Ability, name: str) -> None:
     if "alternate" in ability.ability_type and (not ("singular" in ability.ability_type and (role.selected_target))):
         sleep(0.5)
-        use_ability = messagebox.askyesno("Ability", f"Does {name}, the {role.name} want to usre their primary ability ({ability.__name__}) instead of their secondary ability ({role.secondary_ability.__name__})?")
+        use_ability = messagebox.askyesno("Ability", f"Does {name}, the {role.name} want to usre their primary ability ({ability.__name__}) instead of their secondary ability ({role.secondary_ability.__name__})?", icon = "question")
         role.ability_cancel = not use_ability
         role.secondary_ability_cancel = use_ability
         role.made_choice = True
@@ -143,7 +143,7 @@ if __name__ == "__main__":
     while playing == True:
         try:
             main()
-            playing = messagebox.askyesno("Game Over", "Do you want to play another round?")
+            playing = messagebox.askyesno("Game Over", "Do you want to play another round?", icon = "question")
         except Exception as e:
             playing = False
             #raise e

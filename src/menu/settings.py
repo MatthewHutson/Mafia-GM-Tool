@@ -47,7 +47,7 @@ class Setting:
     # -- Methods -- #
     @enforce_types
     def description_popup(self) -> None:
-        messagebox.showinfo("Description", self.description)
+        messagebox.showinfo("Description", self.description, icon = "info")
 
     @enforce_types
     def gen_choice_widget(self) -> None:

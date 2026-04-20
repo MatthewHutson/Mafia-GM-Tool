@@ -97,7 +97,7 @@ def show_victory(victory_data: list[str]) -> None:
     else:
         victory_str += "None"
 
-    messagebox.showinfo("Game Over", victory_str)
+    messagebox.showinfo("Game Over", victory_str, icon = "info")
 
 @enforce_types
 def check_for_victory(data: Game_Data) -> None:
@@ -127,14 +127,14 @@ def revert_to_mafia(data: Game_Data) -> None:
         next_evil_player = data.next_evil_player
         if next_evil_player != None:
             ability_swap(data, next_evil_player)
-
+    
     elif mafia_count > 1:
         for name, role in data.evil_aligned.items():
-            if role.ability == data.mafia_role.ability:
+            print(role.name)
+            if role.ability == data.mafia_role.ability and role.name != "Mafia":
                 ability_swap(data, name)
 
         data.evil_count = 0
-        revert_to_mafia(data)
 
 @enforce_types
 def role_switch(data: Game_Data, player: str, new_role: Role) -> None:
@@ -154,6 +154,7 @@ def ability_swap(data: Game_Data, player: str) -> None:
     players = data.players
     role = players[player]
     role.ability, role.secondary_ability = role.secondary_ability, role.ability
+    role.information.append(f"Your ability is now {data.get_role_by_ability(role.ability).name} ({role.ability.__name__})")
     
 @enforce_types
 def use_vote_abiltities(data: Game_Data) -> None:

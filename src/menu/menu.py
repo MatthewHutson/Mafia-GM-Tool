@@ -8,6 +8,7 @@ from menu.timer import create_timer, delete_timer
 from tkinter import messagebox
 from copy import deepcopy
 from random import shuffle
+from pathlib import Path
 import tkinter as tk
 import sys
 import json
@@ -52,6 +53,7 @@ global_entries: Menu_Entry = None
 alive_frames = []
 dead_frames = []
 selected_players = []
+load_from_backup: bool = False
 
 @enforce_types
 def new_load_system() -> None:
@@ -327,12 +329,25 @@ def terminate() -> None:
     if messagebox.askyesno("Confirm Selection", "Are you sure you want to quit?", icon = "question"):
         sys.exit()
 
+@enforce_types
+def load_backup() -> None:
+    global load_from_backup
+    if Path("backup.csv").is_file():
+        if messagebox.askyesno("Load Backup", "Do You Want To Load The Previous Backup And Thus Continue From That State?", icon = "question", default = "no"):
+            load_from_backup = True
+            remove_instances()
+            clear()
+            root.quit()
+    else:
+        messagebox.showerror("Error", "No Backup Exists!", icon = "error")
+
 # -- Setup Menu -- #
 @enforce_types
-def setup_menu(entries: Menu_Entry, default_names: list[str]) -> None:
+def setup_menu(entries: Menu_Entry, default_names: list[str]) -> bool:
     # -- Globals Handling -- #
-    global global_entries, player_canvas
+    global global_entries, player_canvas, load_from_backup
     global_entries = entries
+    load_from_backup = False
 
     # -- File Handling -- #
     new_load_system()
@@ -362,8 +377,10 @@ def setup_menu(entries: Menu_Entry, default_names: list[str]) -> None:
 
     # -- Menu Progression Buttons -- #
     start = tk.Button(settings_frame, text = "Start", command = lambda: start_confirm(entries), bg = "#5D9FF0", activebackground = "#4980C4", fg = "#ffffff", activeforeground = "#ffffff")
+    restore_backup = tk.Button(settings_frame, text = "Load Backup", command = load_backup, bg = "#A25DF0", activebackground = "#8249C4", fg = "#ffffff", activeforeground = "#ffffff")
     exit = tk.Button(settings_frame, text = "Quit", command = terminate, bg = "#E03636", activebackground = "#8B2B2B", fg = "#ffffff", activeforeground = "#ffffff")
     start.pack(side = tk.RIGHT, ipady = 3, ipadx = 16, padx = 4)
+    restore_backup.pack(side = tk.RIGHT, ipady = 3, ipadx = 16, padx = 4)
     exit.pack(side = tk.RIGHT, ipady = 3, ipadx = 16, padx = 4)
 
     # -- Mimi Stand Counter -- #
@@ -399,6 +416,8 @@ def setup_menu(entries: Menu_Entry, default_names: list[str]) -> None:
     player_tab.pack_propagate(False)
     player_canvas = Vertical_Scroll_Frame(master = player_tab, bg = bg_1, bg_2 = bg_2)
     root.mainloop()
+
+    return not load_from_backup
 
 # -- Main Game Menu -- #
 @enforce_types

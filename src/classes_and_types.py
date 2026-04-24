@@ -5,6 +5,7 @@ from utils import *
 from random import shuffle, choice
 from copy import deepcopy
 import numpy as np
+import csv
 
 # -- Ability Template Class -- #
 @dataclass
@@ -171,12 +172,16 @@ class Role:
     @property
     @enforce_types
     def used_secondary_ability(self) -> bool:
-        return self.secondary_ability.used_ability
+        if self.secondary_ability is not None:
+            return self.secondary_ability.used_ability
+        else:
+            return False
     
     @used_secondary_ability.setter
     @enforce_types
-    def used_ability(self, value: bool) -> None:
-        self.secondary_ability.used_ability = value
+    def used_secondary_ability(self, value: bool) -> None:
+        if self.secondary_ability is not None:
+            self.secondary_ability.used_ability = value
 
     @property
     @enforce_types
@@ -400,16 +405,17 @@ class Game_Data():
         return Players(dict(sorted(self.players.items(), key = lambda item: item[1].priority)))
 
     # -- Methods -- #
-    def init(self) -> None:
+    @enforce_types
+    def init(self, alter_drunk: bool = True) -> None:
         # -- Player Info -- #
         self.mafia_role = deepcopy(self.roles["Mafia"]) 
         self.none_role = deepcopy(self.roles["Villager"])
 
-        self.good_aligned = Players({name: role for name, role in self.players.items() if role.alignment})
-        self.evil_aligned = Players({name: role for name, role in self.players.items() if not role.alignment})
+        self.good_aligned = Players({name: role for name, role in self.players.items() if role.alignment and role.currently_alive})
+        self.evil_aligned = Players({name: role for name, role in self.players.items() if not role.alignment and role.currently_alive})
 
-        self.alive_players = self.players.deepcopy()
-        self.dead_players = Players({})
+        self.alive_players = Players({name: role for name, role in self.players.items() if role.currently_alive})
+        self.dead_players = Players({name: role for name, role in self.players.items() if not role.currently_alive})
 
         self.settings = {name: data["value"] for name, data in self.menu_entries.settings.items()}
 
@@ -420,8 +426,9 @@ class Game_Data():
         for role in self.players.values():
             role.secondary_ability = deepcopy(self.abilities["none"])
 
-        # -- statuses.drunk Consideration --#
-        self.set_drunk()
+        # -- statuses.drunk Consideration -- #
+        if alter_drunk:
+            self.set_drunk()
 
     @enforce_types
     def set_drunk(self) -> None:
@@ -448,3 +455,85 @@ class Game_Data():
         temp_dist = {key: value / total for key, value in temp_dist.items()}
         sample: list[np.str_] = np.random.choice(np.array(list(temp_dist.keys())), size = 1, p = np.array(list(temp_dist.values())))
         return [str(sample[0]), self.abilities[sample[0]]]
+    
+    @enforce_types
+    def backup_to_csv(self) -> None:
+        # -- Saves Game State To The Backup csv When Crash Occurs -- #
+        file_name: str = "backup.csv"
+        data: list[list[str]] = [["Name", "Role", "Alignment", "Has Selected Target", "Used Primary", "Used Secondary", "Alive", "Solo Win", "Drunk", "Lover", "Targets"]]
+        data: list[list[str]] = data + [[name, role.name, role._alignment, role.selected_target, role.ability.used_ability, role.secondary_ability.used_ability, role.currently_alive, role.solo_win, role.statuses.drunk, role.statuses.linked, str(role.targets)] for name, role in self.players.items()]
+
+        with open(file_name, "w") as file:
+            writer = csv.writer(file, delimiter = ",", lineterminator = "\n")
+            writer.writerows(data)
+
+    @enforce_types
+    def load_from_backup(self) -> None:
+        # -- Loads Game State To The Backup csv From The State When Crash Occurs -- #
+        file_name: str = "backup.csv"
+        data: list[list[str]] = []
+        lovers: list[str] = []
+        final_data: dict[str, Role] = {}
+
+        with open(file_name, "r") as file:
+            reader = csv.reader(file, delimiter = ",")
+            is_data: bool = False
+            data: list[list[str]] = []
+
+            for row in reader:
+                if is_data: data.append(row)
+                else: is_data = True
+
+        for row in data:
+            # -- Data Management -- #
+            if row[2] == "":
+                row[2] = None
+            else:
+                row[2] = eval(row[2])
+
+            row[3] = eval(row[3])
+            row[4] = eval(row[4])
+            row[5] = eval(row[5])
+            row[6] = eval(row[6])
+            row[7] = eval(row[7])
+            row[8] = eval(row[8])
+            row[9] = eval(row[9])
+
+            if len(row[-1]) > 2:
+                row[-1] = row[-1][1:-1].split(", ")
+
+                for item in row[-1]:
+                    item = item[1: -1]
+            else:
+                row[-1] = []
+
+            # -- Loading Data -- #
+            role: Role = self.roles[row[1]]
+            role._alignment = row[2]
+            role.selected_target = row[3]
+            role.used_ability = row[4]
+            role.used_secondary_ability = row[5]
+            role.currently_alive = row[6]
+            role.solo_win = row[7]
+            role.statuses.drunk = row[8]
+            role.statuses.linked = row[9]
+            role.targets = row[-1]
+
+            if row[6]: lovers.append(row[0])
+            final_data[row[0]] = role
+
+        if len(lovers) == 2:
+            cupid: str = None
+            for name, role in final_data:
+                if role.name == "Cupid":
+                    cupid = name
+                    break
+
+
+            final_data[lovers[0]].linked_to = lovers[1]
+            final_data[lovers[1]].linked_to = lovers[0]
+            final_data[lovers[0]].linker = cupid
+            final_data[lovers[1]].linker = cupid
+
+        self.players = Players(final_data)
+        self.init(alter_drunk = False)

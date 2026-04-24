@@ -2,13 +2,13 @@
 A Program to allocate roles in a game of mafia
 
 # -- Changes -- #
-Made Instant Death A Toggleable Setting - Can Remove It From Gambler Pool
-Made Instant Death Now Has a 2.5% Chance and None Has 22.5% Chance Initially
-Added MessageBox Icons
-Used Messagebox Defaults To Make Program More Sensible
+Made Backup System - If The Game Crashes, I Can Reload From a Previous State
 
 # -- To Do -- #
 Check For Bugs With Drunk and New Code
+Fix backed Up Abilities Keeping Extra Data
+Find More Backup related bugs
+Made The Defaults File Local Rather Than On The Global Repository
 
 Ponder the idea of psychic getting told all in game roles (regardless of poison)
 Ponder the Idea of drunk Cupid Linking Themselves To A Random Player (Maybe One Of Their Targets?)

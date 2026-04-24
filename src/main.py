@@ -99,43 +99,53 @@ def main() -> None:
     entries = Menu_Entry([], list(roles.values()), deepcopy(list(roles.keys())), [], [], load_settings())
 
     # -- Menu -- #
-    setup_menu(entries, name_data)
+    normal_load = setup_menu(entries, name_data)
+    print(normal_load)
 
     # -- Player Organisation -- #
     game_data = Game_Data(Players(entries.assign_roles()), roles, role_functions, ability_distribution, card_init(), entries)
-    game_data.init()
 
-    game(game_data, entries)
+    if normal_load:
+        game_data.init()
+    else:
+        game_data.load_from_backup()
 
-    for name, role in game_data.players.items():
-        if "game_end" in role.ability_type:
-            role.ability(name, game_data)
-        if "game_end" in role.secondary_ability.ability_type:
-            role.secondary_ability(name, game_data) 
+    try:
+        game(game_data, entries)
 
-    winners = []
+        for name, role in game_data.players.items():
+            if "game_end" in role.ability_type:
+                role.ability(name, game_data)
+            if "game_end" in role.secondary_ability.ability_type:
+                role.secondary_ability(name, game_data) 
 
-    for name, role in game_data.players.items():
-        if role.solo_win:
-            if not role.team_win_condition:
-                if role.channeled_role == None:
-                    winners.append(f"\n{name} as the {role.name}")
-                else:
-                    winners.append(f"\n{name} as the {role.name} chanelling the {role.channeled_role}")
-            else:
-                # -- For Mayor -- #
-                if role.currently_alive:
-                    if role.alignment:
-                        game_data.good_win = True
-                        game_data.evil_win = False
+        winners = []
+
+        for name, role in game_data.players.items():
+            if role.solo_win:
+                if not role.team_win_condition:
+                    if role.channeled_role == None:
+                        winners.append(f"\n{name} as the {role.name}")
                     else:
-                        game_data.good_win = False
-                        game_data.evil_win = True
+                        winners.append(f"\n{name} as the {role.name} chanelling the {role.channeled_role}")
+                else:
+                    # -- For Mayor -- #
+                    if role.currently_alive:
+                        if role.alignment:
+                            game_data.good_win = True
+                            game_data.evil_win = False
+                        else:
+                            game_data.good_win = False
+                            game_data.evil_win = True
 
-    if game_data.good_win: winners.append("\nThe Good Team!")
-    if game_data.evil_win: winners.append("\nThe Evil Team!")
+        if game_data.good_win: winners.append("\nThe Good Team!")
+        if game_data.evil_win: winners.append("\nThe Evil Team!")
 
-    show_victory(winners)
+        show_victory(winners)
+
+    except Exception as e:
+        game_data.backup_to_csv()
+        raise e
     
 # -- On Run -- #
 if __name__ == "__main__":

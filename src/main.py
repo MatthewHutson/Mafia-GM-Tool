@@ -11,6 +11,7 @@ from menu.card_index import card_init
 from menu.settings import load_settings
 from game_loop_functions import *
 from game import game
+from pathlib import Path
 import abilities as a
 
 # -- Functions -- #
@@ -88,7 +89,11 @@ def main() -> None:
             
             roles[data["name"]] = Role.new(**data)
 
-    with open("defaults.txt") as file:
+    if not Path("defaults.txt").is_file():
+        with open("defaults.txt", "w") as file:
+            pass
+   
+    with open("defaults.txt", "r") as file:
         string_data: str = file.readline()
 
         if string_data[-1:] == "\n":
@@ -134,7 +139,7 @@ def main() -> None:
                         if role.alignment:
                             game_data.good_win = True
                             game_data.evil_win = False
-                        else:
+                        elif not game_data.good_win:
                             game_data.good_win = False
                             game_data.evil_win = True
 

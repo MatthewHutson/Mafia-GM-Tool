@@ -2,7 +2,9 @@
 A Program to allocate roles in a game of mafia
 
 # -- Changes -- #
-Made Backup System - If The Game Crashes, I Can Reload From a Previous State
+Bug Fix - No Defaults File Doesn't Crash The Program
+Bug Fix - "Opps Forgot To Make The Mayor Take Priority Over Chancellor"
+Drunk Mayor Ends At 2 (Sobers Up). Still Cannot Claim Though Lol
 
 # -- To Do -- #
 Check For Bugs With Drunk and New Code
@@ -10,6 +12,7 @@ Fix backed Up Abilities Keeping Extra Data
 Find More Backup related bugs
 Made The Defaults File Local Rather Than On The Global Repository
 
+Ponder Drunk Creep Causing Recursive Effect
 Ponder the idea of psychic getting told all in game roles (regardless of poison)
 Ponder the Idea of drunk Cupid Linking Themselves To A Random Player (Maybe One Of Their Targets?)
 

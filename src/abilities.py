@@ -510,7 +510,11 @@ class mayor(Ability):
 
     @enforce_types
     def if_drunk(self, user: str, data: Game_Data) -> None:
-        pass
+        if data.playing:
+            messagebox.showinfo("Info", f"The May Is Drunk Silly, So Nothing Should Happen", icon = "info")
+            data.players[user].alternative_end_count = 2
+        else:
+            data.players[user].solo_win = len(data.players) == data.players[user].alternative_end_count
 
 class gamble(Ability):
     @enforce_types

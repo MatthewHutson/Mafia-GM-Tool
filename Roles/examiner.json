@@ -1,0 +1,7 @@
+{
+    "name": "Examiner",
+    "ability": "examine",
+    "alignment": true,
+    "mafia_alternative": false,
+    "max_count": 1
+}

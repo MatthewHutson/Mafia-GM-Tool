@@ -6,7 +6,8 @@
         ["Necromancer"],
         ["Gambler"],
         ["Soldier"], 
-        ["Bomber"]
+        ["Bomber"],
+        ["Examiner"]
     ],
     "7": [
         ["Lawyer"],
@@ -19,6 +20,7 @@
         ["Bomber"],
         ["Jester"],
         ["Soldier"], 
-        ["Librarian"]
+        ["Librarian"],
+        ["Examiner"]
     ]
 }

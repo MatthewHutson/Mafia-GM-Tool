@@ -122,7 +122,7 @@ class protect(Ability):
 class link(Ability):
     @enforce_types
     def __init__(self) -> None:
-        super().__init__(targets = 2, p = 0, ability_type = ["singular"], priority = 4)
+        super().__init__(targets = 2, p = 0, ability_type = ["singular", "on_demand"], priority = 4)
         
     # -- Ability -- #
     @enforce_types
@@ -166,7 +166,8 @@ class jester(Ability):
 
     @enforce_types
     def if_drunk(self, user: str, data: Game_Data) -> None:
-        data.players[user].solo_win = data.players[user].currently_alive
+        pass
+        # data.players[user].solo_win = data.players[user].currently_alive
 
 class stop_vote(Ability):
     @enforce_types
@@ -189,15 +190,16 @@ class stop_vote(Ability):
 
     @enforce_types
     def if_drunk(self, user: str, data: Game_Data) -> None:
-        data.players[user].unemployed = False
-        data.players[user].solo_win = data.players[data.players[user].targets[0]].was_voted_out
+        pass
+        # data.players[user].unemployed = False
+        # data.players[user].solo_win = data.players[data.players[user].targets[0]].was_voted_out
 
-        if not (data.players[data.players[user].targets[0]].currently_alive or data.players[data.players[user].targets[0]].was_voted_out):
-            data.players[user].unemployed = True
-            data.players[user].solo_win = data.players[user].was_voted_out
+        # if not (data.players[data.players[user].targets[0]].currently_alive or data.players[data.players[user].targets[0]].was_voted_out):
+        #     data.players[user].unemployed = True
+        #     data.players[user].solo_win = data.players[user].was_voted_out
 
-            if data.settings["Early End"] == 1 and data.players[user].solo_win:
-                data.playing = False
+        #     if data.settings["Early End"] == 1 and data.players[user].solo_win:
+        #         data.playing = False
 
 class execute(Ability):
     @enforce_types
@@ -220,15 +222,16 @@ class execute(Ability):
 
     @enforce_types
     def if_drunk(self, user: str, data: Game_Data) -> None:
-        data.players[user].unemployed = False
-        data.players[user].solo_win = not data.players[data.players[user].targets[0]].was_voted_out
+        pass
+        # data.players[user].unemployed = False
+        # data.players[user].solo_win = not data.players[data.players[user].targets[0]].was_voted_out
 
-        if not (data.players[data.players[user].targets[0]].currently_alive or data.players[data.players[user].targets[0]].was_voted_out):
-            data.players[user].unemployed = True
-            data.players[user].solo_win = data.players[user].was_voted_out
+        # if not (data.players[data.players[user].targets[0]].currently_alive or data.players[data.players[user].targets[0]].was_voted_out):
+        #     data.players[user].unemployed = True
+        #     data.players[user].solo_win = data.players[user].was_voted_out
 
-            if data.settings["Early End"] == 1 and data.players[user].solo_win:
-                data.playing = False
+        #     if data.settings["Early End"] == 1 and data.players[user].solo_win:
+        #         data.playing = False
 
 class poison(Ability):
     @enforce_types
@@ -357,10 +360,19 @@ class stalk(Ability):
         
     # -- Ability -- #
     @enforce_types
-    def ability(self, user: str, data: Game_Data) -> None:
-        target: str = data.players[user].targets[0]
+    def ability(self, user: str, data: Game_Data, altered_target: str = None) -> None:
+        visitors: list[str] = None
+        
+        if altered_target == None:
+            target: str = data.players[user].targets[0]
+        else:
+            try:
+                target: str = data.players[data.players[user].targets[0]].targets[0]
+            except:
+                visitors = []
 
-        visitors = data.players[target].visited_by
+        if visitors is None:
+            visitors = data.players[target].visited_by
 
         self.information(data, user, target, visitors)
 
@@ -385,7 +397,8 @@ class stalk(Ability):
 
     @enforce_types
     def if_drunk(self, user: str, data: Game_Data) -> None:
-        self.if_poisoned(user, data, False)
+        target: str = data.players[user].targets[0]
+        self.ability(user, data, target)
 
 class resurrect(Ability):
     @enforce_types
@@ -702,9 +715,13 @@ class examine(Ability):
         target: str = data.players[user].targets[0]
         role: Role = data.players[target]
 
-        for item in role.statuses.bullshit_data(target):
-            data.players[user].information.append(item)
+        for item in role.statuses.get_data(target):
+            data.players[user].information.append(not item)
 
     @enforce_types
     def if_drunk(self, user: str, data: Game_Data) -> None:
-        self.if_poisoned(user, data)
+        target: str = data.players[user].targets[0]
+        role: Role = data.players[target]
+
+        for item in role.statuses.bullshit_data(target):
+            data.players[user].information.append(item)

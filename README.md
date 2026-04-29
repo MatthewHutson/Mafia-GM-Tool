@@ -2,17 +2,20 @@
 A Program to allocate roles in a game of mafia
 
 # -- Changes -- #
-Bug Fix - No Defaults File Doesn't Crash The Program
-Bug Fix - "Opps Forgot To Make The Mayor Take Priority Over Chancellor"
-Drunk Mayor Ends At 2 (Sobers Up). Still Cannot Claim Though Lol
+Added Examiner
+Make Poisones Examiner Be Inverse (Drunk Is Still Bulshit)
+Made Drunk Neutrals Do Nothing (Can Be Set Back)
+Drunk Creep Now Causes Recursive Effect
+Cupid Can Decide To Delay Link
 
 # -- To Do -- #
+Doccument Drunk & examiner & cupid changes
 Check For Bugs With Drunk and New Code
 Fix backed Up Abilities Keeping Extra Data
 Find More Backup related bugs
 Made The Defaults File Local Rather Than On The Global Repository
 
-Ponder Drunk Creep Causing Recursive Effect
+Ponder The Idea That Lovers Are Informed Upon Link
 Ponder the idea of psychic getting told all in game roles (regardless of poison)
 Ponder the Idea of drunk Cupid Linking Themselves To A Random Player (Maybe One Of Their Targets?)
 

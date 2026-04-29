@@ -15,6 +15,9 @@ Fix backed Up Abilities Keeping Extra Data
 Find More Backup related bugs
 Made The Defaults File Local Rather Than On The Global Repository
 
+Ponder The Idea Of Gambler Starting With Good Role
+Ponder The Idea Of Last Evil Standing Gets To Alternate Abilities (Likely Too Hard To Program)
+Ponder Lawyer Getting Client's Role
 Ponder The Idea That Lovers Are Informed Upon Link
 Ponder the idea of psychic getting told all in game roles (regardless of poison)
 Ponder the Idea of drunk Cupid Linking Themselves To A Random Player (Maybe One Of Their Targets?)

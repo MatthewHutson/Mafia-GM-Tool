@@ -78,7 +78,7 @@ class reveal(Ability):
 class endure(Ability):
     @enforce_types
     def __init__(self) -> None:
-        super().__init__(targets = 0, p = 5, ability_type = ["passive"], priority = 2)
+        super().__init__(targets = 0, p = 7.5, ability_type = ["passive"], priority = 2)
     
     # -- Ability -- #
     @enforce_types
@@ -123,13 +123,10 @@ class link(Ability):
     @enforce_types
     def __init__(self) -> None:
         super().__init__(targets = 2, p = 0, ability_type = ["singular", "on_demand"], priority = 4)
-        
-    # -- Ability -- #
+
+    # -- Extra Methods -- #
     @enforce_types
-    def ability(self, user: str, data: Game_Data) -> None:
-        link_1: str = data.players[user].targets[0]
-        link_2: str = data.players[user].targets[1]
-        
+    def link(self, data: Game_Data, user: str, link_1: str, link_2: str) -> None:
         data.players[link_1].linked = True
         data.players[link_2].linked = True
 
@@ -138,6 +135,13 @@ class link(Ability):
 
         data.players[link_1].linked_to = link_2
         data.players[link_2].linked_to = link_1
+        
+    # -- Ability -- #
+    @enforce_types
+    def ability(self, user: str, data: Game_Data) -> None:
+        link_1: str = data.players[user].targets[0]
+        link_2: str = data.players[user].targets[1]
+        self.link(data, user, link_1, link_2)
 
     @enforce_types
     def if_poisoned(self, user: str, data: Game_Data) -> None:
@@ -145,7 +149,8 @@ class link(Ability):
 
     @enforce_types
     def if_drunk(self, user: str, data: Game_Data) -> None:
-        pass
+        link_1: str = choice([name for name, role in data.players.items() if role.name != "Cupid"])
+        self.link(data, user, user, link_1)
 
 class jester(Ability):
     @enforce_types
@@ -236,7 +241,7 @@ class execute(Ability):
 class poison(Ability):
     @enforce_types
     def __init__(self) -> None:
-        super().__init__(targets = 1, p = 5, ability_type = ["repeat"], priority = 0)
+        super().__init__(targets = 1, p = 2.5, ability_type = ["repeat"], priority = 0)
     
     # -- Ability -- #
     @enforce_types
@@ -260,7 +265,7 @@ class poison(Ability):
 class kill(Ability):
     @enforce_types
     def __init__(self) -> None:
-        super().__init__(targets = 1, p = 5, ability_type = ["repeat"], priority = 5, can_pick_same_target = True)
+        super().__init__(targets = 1, p = 2.5, ability_type = ["repeat"], priority = 5, can_pick_same_target = True)
         
     # -- Ability -- #
     @enforce_types
@@ -268,9 +273,13 @@ class kill(Ability):
         target: str = data.players[user].targets[0]
         data.players[target].die(data.players)
 
+        if data.players[user].secondary_ability == mayor:
+            data.players[user].secondary_ability(user, data)
+
     @enforce_types
     def if_poisoned(self, user: str, data: Game_Data) -> None:
-        pass
+        if data.players[user].secondary_ability == mayor:
+            data.players[user].secondary_ability(user, data)
 
     @enforce_types
     def if_drunk(self, user: str, data: Game_Data) -> None:
@@ -279,23 +288,20 @@ class kill(Ability):
 class telepathy(Ability):
     @enforce_types
     def __init__(self) -> None:
-        super().__init__(targets = 1, p = 5, ability_type = ["repeat"], priority = 4, can_pick_same_target = True)
+        super().__init__(targets = 1, p = 2.5, ability_type = ["repeat"], priority = 4, can_pick_same_target = True)
+        self.examine: Ability = examine()
 
     # -- Methods -- #
-    def show_info(self, data: Game_Data, user_role: Role, target: str, role: Role, is_lover: bool) -> None:
+    def show_info(self, user: str, data: Game_Data, user_role: Role, target: str, role: Role, is_lover: bool) -> None:
         user_role.information.append(f"{target} is {role.name}, which is {data.get_card_by_role(role)}!")
-
-        if is_lover:
-            user_role.information.append(f"{target} is linked to another player!")
+        self.examine(user, data)
 
         if user_role.name == "Psychic":
-            mafia_roles: list[Role] = [role for role in data.evil_aligned.values() if role.name != "Psychic"]
+            mafia_roles: dict[str, Role] = {name: role for name, role in data.evil_aligned.items() if role.name != "Psychic"}
 
-            for evil_role in mafia_roles:
+            for name, evil_role in mafia_roles.items():
                 evil_role.information.append(f"{target} is {role.name}, which is {data.get_card_by_role(role)}!")
-
-                if is_lover:
-                    evil_role.information.append(f"{target} is linked to another player!")
+                self.examine(name, data)
     
     # -- Ability -- #
     @enforce_types
@@ -444,7 +450,7 @@ class resurrect(Ability):
 class vengance(Ability):
     @enforce_types
     def __init__(self) -> None:
-        super().__init__(targets = 1, p = 5, ability_type = ["on_death"], can_pick_same_target = True)
+        super().__init__(targets = 1, p = 7.5, ability_type = ["on_death"], can_pick_same_target = True)
     
     # -- Ability -- #
     @enforce_types
@@ -466,7 +472,7 @@ class vengance(Ability):
 class ambush(Ability):
     @enforce_types
     def __init__(self) -> None:
-        super().__init__(targets = 1, p = 5, ability_type = ["repeat", "on_demand"], priority = 4, can_pick_same_target = True)
+        super().__init__(targets = 1, p = 2.5, ability_type = ["repeat", "on_demand"], priority = 4, can_pick_same_target = True)
         
     # -- Ability -- #
     @enforce_types
@@ -532,42 +538,47 @@ class mayor(Ability):
 class gamble(Ability):
     @enforce_types
     def __init__(self) -> None:
-        super().__init__(targets = 0, p = 0, ability_type = ["alternate", "secondary_ability", "passive"], priority = 8)
+        super().__init__(targets = 0, p = 0, ability_type = ["alternate", "secondary_ability", "passive", "game_start"], priority = 8)
         self.used_abilities: set[str] = set([])
+        self.non_starting_abilities: set[str] = set([])
         
     # -- Ability -- #
     @enforce_types
-    def ability(self, user: str, data: Game_Data) -> None:
-        if data.settings["Instant Death"] == 0:
-            self.used_abilities.add("instant_death")
+    def ability(self, user: str, data: Game_Data, early_start: bool = False) -> None:
+        if early_start:
+            self.non_starting_abilities: set[Role] = set([name for name in data.roles.keys()]) - set([name for name, role in data.roles.items() if role.true_alignment == True])
+            data.players[user].secondary_ability = data.random_ability(self.non_starting_abilities)
 
-        role: Role = data.players[user]
-        
-        if role.ability_cancel:
-            role.secondary_ability(user, data)
-
+            if data.settings["Instant Death"] == 0:
+                self.used_abilities.add("instant_death")
         else:
-            role_data: list[str, Ability] = data.random_ability(self.used_abilities)
-            role.secondary_ability = role_data[1]
-            role.secondary_ability.used_ability = False
-            self.used_ability = False
-
-            if role.secondary_ability == instant_death:
-                role.information.append(f"They rolled {role.secondary_ability.__name__}!")
-            else:
-                new_role: Role = data.get_role_by_ability(role.secondary_ability)
-                new_card: str = data.get_card_by_role(new_role)
-
-                role.information.append(f"They rolled {new_role.name}, which has the card {new_card}!")
-
-            role.ability.priority = role.secondary_ability.priority + 0.5
-
-            if "instant" in role.secondary_ability.ability_type:
+            role: Role = data.players[user]
+            
+            if role.ability_cancel:
                 role.secondary_ability(user, data)
 
-            # -- Removed The Ability From Being Drawn Again -- #
-            if not (role.secondary_ability == none or role.secondary_ability is None):
-                self.used_abilities.add(role_data[0])
+            else:
+                role_data: list[str, Ability] = data.random_ability(self.used_abilities)
+                role.secondary_ability = role_data[1]
+                role.secondary_ability.used_ability = False
+                self.used_ability = False
+
+                if role.secondary_ability == instant_death:
+                    role.information.append(f"They rolled {role.secondary_ability.__name__}!")
+                else:
+                    new_role: Role = data.get_role_by_ability(role.secondary_ability)
+                    new_card: str = data.get_card_by_role(new_role)
+
+                    role.information.append(f"They rolled {new_role.name}, which has the card {new_card}!")
+
+                role.ability.priority = role.secondary_ability.priority + 0.5
+
+                if "instant" in role.secondary_ability.ability_type:
+                    role.secondary_ability(user, data)
+
+                # -- Removed The Ability From Being Drawn Again -- #
+                if not (role.secondary_ability == none or role.secondary_ability is None):
+                    self.used_abilities.add(role_data[0])
 
     @enforce_types
     def if_poisoned(self, user: str, data: Game_Data) -> None:
@@ -598,7 +609,7 @@ class instant_death(Ability):
 class magnet(Ability):
     @enforce_types
     def __init__(self) -> None:
-        super().__init__(targets = 2, p = 5, ability_type = ["repeat"], priority = 1)
+        super().__init__(targets = 2, p = 2.5, ability_type = ["repeat"], priority = 1)
         
     # -- Extra Methods -- #
     @enforce_types
@@ -652,10 +663,16 @@ class index(Ability):
         super().__init__(targets = 0, p = 5, ability_type = ["passive"], priority = 11)
         self.seen_roles: set[str] = set(["Doctor", "Mafia", "Sheriff"])
 
+    # -- Properties -- #
+    @property
+    @enforce_types
+    def count(self) -> int:
+        return len(self.seen_roles)
+
     # -- Methods -- #
     @enforce_types
     def information(self, data: Game_Data, user_role: Role, selected_set: set[str]) -> None:
-        if len(selected_set) > 0:
+        if len(selected_set) > 0 and self.count < len(data.players):
             selected_role: str = choice(list(selected_set))
 
             self.seen_roles.add(selected_role)
@@ -699,7 +716,7 @@ class index(Ability):
 class examine(Ability):
     @enforce_types
     def __init__(self) -> None:
-        super().__init__(targets = 1, p = 0, ability_type = ["repeat"], priority = 11, can_pick_same_target = True)
+        super().__init__(targets = 1, p = 7.5, ability_type = ["repeat"], priority = 11, can_pick_same_target = True)
 
     # -- Ability -- #
     @enforce_types

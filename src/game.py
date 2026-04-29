@@ -83,8 +83,23 @@ def nap_time_info(info: str) -> None:
         timer.start()
 
 @enforce_types
+def start_abilities(data: Game_Data):
+    for user, role in data.players.items():
+        if "game_start" in role.ability.ability_type:
+            try:
+                role.ability(user, data, early_start = True)
+            except:
+                role.ability(user, data)
+        if "game_start" in role.secondary_ability.ability_type:
+            try:
+                role.secondary_ability(user, data, early_start = True)
+            except:
+                role.secondary_ability(user, data)
+
+@enforce_types
 def game(data: Game_Data, entries: Menu_Entry) -> None:
     # -- Game Setup -- #
+    start_abilities(data)
     init_game_menu(entries, data)
     nap_time(data)
 

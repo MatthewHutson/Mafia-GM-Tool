@@ -105,7 +105,6 @@ def main() -> None:
 
     # -- Menu -- #
     normal_load = setup_menu(entries, name_data)
-    print(normal_load)
 
     # -- Player Organisation -- #
     game_data = Game_Data(Players(entries.assign_roles()), roles, role_functions, ability_distribution, card_init(), entries)

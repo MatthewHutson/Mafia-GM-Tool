@@ -2,11 +2,9 @@
 A Program to allocate roles in a game of mafia
 
 # -- Changes -- #
-Made System To See Primary And Secondary Ability Of Current Player As GM And Get The Respective Cards
+Bug Fix - Gambler Could Still Start With Any Ability Rather Than Just Good Ones
 
 # -- To Do -- #
-Bug Fix - Gambler Can Still Start With Any Ability Rather Than Just Good Ones
-
 Check For Bugs With Drunk and New Code
 Fix backed Up Abilities Keeping Extra Data
 Find More Backup related bugs

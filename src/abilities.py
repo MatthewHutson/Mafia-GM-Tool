@@ -546,9 +546,8 @@ class gamble(Ability):
     @enforce_types
     def ability(self, user: str, data: Game_Data, early_start: bool = False) -> None:
         if early_start:
-            self.non_starting_abilities: set[str] = set([role.ability.true_name for role in data.roles.values()]) - set([role.ability.true_name for role in data.roles.values() if role.true_alignment == True])
-            self.non_starting_abilities.add("none")
-
+            self.non_starting_abilities: set[str] = {role.ability.true_name for role in data.roles.values()} - {role.ability.true_name for role in data.roles.values() if role.true_alignment == True}
+            self.non_starting_abilities = self.non_starting_abilities.union({"none", "vote", "instant_death"})
             role_data: list[str, Ability] = data.random_ability(self.non_starting_abilities)
             
             self.used_abilities.add(role_data[0])

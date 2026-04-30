@@ -87,14 +87,15 @@ def start_abilities(data: Game_Data) -> None:
     for user, role in data.players.items():
         if "game_start" in role.ability.ability_type:
             try:
-                role.ability(user, data, early_start = True)
+                role.ability.ability(user, data, early_start = True)
             except:
-                role.ability(user, data)
+                role.ability.ability(user, data)
+
         if "game_start" in role.secondary_ability.ability_type:
             try:
-                role.secondary_ability(user, data, early_start = True)
+                role.secondary_ability.ability(user, data, early_start = True)
             except:
-                role.secondary_ability(user, data)
+                role.secondary_ability.ability(user, data)
 
 @enforce_types
 def game(data: Game_Data, entries: Menu_Entry) -> None:

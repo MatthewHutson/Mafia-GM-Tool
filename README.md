@@ -2,15 +2,11 @@
 A Program to allocate roles in a game of mafia
 
 # -- Changes -- #
-Documented Drunk Changes
-Made Psychic Get All Statuses
-Made Chancellor Officially Stack With Mafia Promotion
-Made Librarian Stop Drawing Roles Once They Have As Many Roles As Players
-Cupid Can Delay Their Activation
-Altered Gambler Probabilities - Made Evil Roles Rarer and "Weaker" Good Roles More Likely
-Gambler Starts With A Random Good Role
+Made System To See Primary And Secondary Ability Of Current Player As GM And Get The Respective Cards
 
 # -- To Do -- #
+Bug Fix - Gambler Can Still Start With Any Ability Rather Than Just Good Ones
+
 Check For Bugs With Drunk and New Code
 Fix backed Up Abilities Keeping Extra Data
 Find More Backup related bugs

@@ -64,6 +64,11 @@ class Ability():
     @enforce_types
     def __name__(self) -> str:
         return capitalise_words(type(self).__name__, "_")
+    
+    @property
+    @enforce_types
+    def true_name(self) -> str:
+        return type(self).__name__
 
     # -- Methods -- #
     def ability(self, user: str, data: Game_Data) -> None:
@@ -528,7 +533,6 @@ class Game_Data():
                 if role.name == "Cupid":
                     cupid = name
                     break
-
 
             final_data[lovers[0]].linked_to = lovers[1]
             final_data[lovers[1]].linked_to = lovers[0]

@@ -101,9 +101,10 @@ class Vertical_Scroll_Frame(tk.Frame):
 class Role_Icon:
     # -- Constructors -- #
     @enforce_types
-    def __init__(self, roles: list[str], main_font: tuple[str, int], entries: Menu_Entry, size: tuple[int] = (16, 4), padding: tuple[int] = (2, 0), command: Any = None) -> None:
+    def __init__(self, roles: list[str], main_font: tuple[str, int], entries: Menu_Entry, size: tuple[int] = (16, 4), padding: tuple[int] = (2, 0), command: Any = None, data: Game_Data = None) -> None:
         self.font = main_font
         self.entries = entries
+        self.data = data
         self.size = size
         self.padding = padding
         self.label = None
@@ -117,7 +118,8 @@ class Role_Icon:
 
     @enforce_types
     def re_init(self, roles: list[list[str]]) -> None:
-        self.roles = [self.entries.role_dict[role] for role in roles]
+        if self.data is None: self.roles = [self.entries.role_dict[role] for role in roles]
+        else: self.roles = [self.data.roles[role] for role in roles]
         self.role_names = roles
         self.index = len(self.roles) - 1
 
@@ -172,7 +174,7 @@ class Role_Icon:
         return self.name
         
     @enforce_types
-    def pack(self, frame: tk.Frame = None, frames: list[object] = None) -> None:
+    def pack(self, frame: tk.Frame = None, frames: list[object] = None, side = tk.LEFT) -> None:
         if self.frame == None:
             self.frame = frame
         
@@ -180,7 +182,7 @@ class Role_Icon:
             self.frames = frames
         
         self.label = tk.Button(self.frame, text = self.name, font = self.font, bg = self.bg_colour, highlightbackground = self.bg_colour, activebackground = self.bg_colour, fg = self.fg_colour, activeforeground = self.fg_colour, width = self.size[0], height = self.size[1], command = self.command)
-        self.label.pack(padx = self.padding[0], pady = self.padding[1], side = tk.LEFT, expand = False)
+        self.label.pack(padx = self.padding[0], pady = self.padding[1], side = side, expand = False)
 
     @enforce_types
     def delete(self) -> None:

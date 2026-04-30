@@ -55,6 +55,8 @@ dead_frames = []
 selected_players = []
 load_from_backup: bool = False
 
+def none(): pass
+
 @enforce_types
 def new_load_system() -> None:
     # -- Load System Version 3 -- #
@@ -451,7 +453,7 @@ def init_game_menu(entries: Menu_Entry, data: Game_Data) -> None:
     card_index(root, bg_2, main_font, text_colour, entries, data) # -- Gives Role Card Before Popups Appear -- #
 
 @enforce_types
-def selection_menu(data: Game_Data, entries: Menu_Entry, user: str, target: str = "", is_primary_ability: bool = True, can_recurse: bool = True) -> None:
+def selection_menu_create(data: Game_Data, entries: Menu_Entry, user: str, target: str = "", is_primary_ability: bool = True, functional: bool = True) -> Any:
     # -- Setup -- #
     global selected_players
     selected_players = []
@@ -478,26 +480,26 @@ def selection_menu(data: Game_Data, entries: Menu_Entry, user: str, target: str 
         confirm_selection(data, role, is_primary_ability)
 
     # -- Subroutine Main -- #
-    pack_alive_and_dead(data, role, ability.targets)
+    if functional: pack_alive_and_dead(data, role, ability.targets)
     action_frame = tk.Frame(root, bg = bg_2)
-
 
     if user == "none":
         text = "Voting Menu"
     else:
         if target == "":
-            text =  f"{user} is the {role.name} using {ability.__name__}. Select {ability.targets} target{"s" if ability.targets > 1 else ""}"
+            text =  f"{user} is the {role.name} using {ability.__name__}. Select {ability.targets} target{"s" if ability.targets != 1 else ""}"
         else:
-            text = f"{user} is using the power of {role.name} ({role.ability.__name__}). Select {ability.targets} target{"s" if ability.targets > 1 else ""}"
+            text = f"{user} is using the power of {role.name} ({role.ability.__name__}). Select {ability.targets} target{"s" if ability.targets != 1 else ""}"
 
     action_label = tk.Label(action_frame, font = main_font, text = text, bg = bg_1, fg = text_colour)
     confirm_frame = tk.Frame(action_frame, bg = bg_2)
     info_frame = tk.Frame(action_frame, bg = bg_2)
     vote_frame = tk.Frame(action_frame, bg = bg_2)
+    ability_frame = tk.Frame(action_frame, bg = bg_2)
 
     action_label.pack(side = tk.TOP, fill = "x", padx = 4, pady = 4, ipady = 4)
 
-    tk.Button(confirm_frame, text = "Confirm Choices", command = lambda: confirm_selection(data, role, is_primary_ability), bg = "#5D9FF0", activebackground = "#4980C4", fg = "#ffffff", activeforeground = "#ffffff").pack(side = tk.LEFT, ipadx = 16, ipady = 8, padx = 4)
+    if functional: tk.Button(confirm_frame, text = "Confirm Choices", command = lambda: confirm_selection(data, role, is_primary_ability), bg = "#5D9FF0", activebackground = "#4980C4", fg = "#ffffff", activeforeground = "#ffffff").pack(side = tk.LEFT, ipadx = 16, ipady = 8, padx = 4)
     tk.Button(confirm_frame, text = "End Game", command = lambda: menu_quit(data), bg = "#E03636", activebackground = "#8B2B2B", fg = "#ffffff", activeforeground = "#ffffff").pack(side = tk.RIGHT, ipadx = 16, ipady = 8, pady = 4, padx = 4)
 
     # -- Card Index -- #
@@ -513,6 +515,36 @@ def selection_menu(data: Game_Data, entries: Menu_Entry, user: str, target: str 
     confirm_frame.pack(side = tk.BOTTOM, fill = "x", ipady = 1)
     vote_frame.pack(side = tk.TOP, fill = "x", ipady = 1)
     action_frame.pack(side = tk.TOP, fill = "both", padx = 4, pady = 4, expand = True)
+    ability_frame.pack(side = tk.LEFT, fill = "x", padx = 32, ipady = 96, expand = True)
+
+    # -- Ability Frames -- #
+    if user != "none":
+        primary_frame = tk.Frame(ability_frame, bg = bg_1, relief = "raised", borderwidth = 4)
+        secondary_frame = tk.Frame(ability_frame, bg = bg_1, relief = "raised", borderwidth = 4)
+
+        primary_frame.pack(side = tk.LEFT, ipadx = 64, fill = "y")
+        secondary_frame.pack(side = tk.RIGHT, ipadx = 64, fill = "y")
+
+        primary_frame.pack_propagate(False)
+        secondary_frame.pack_propagate(False)
+
+        primary_name = tk.Label(primary_frame, text = f"Primary Ability:\n{ability.__name__} ({ability.targets})", bg = bg_2)
+        primary_name.pack(side = tk.TOP, fill = "x", padx = 2, pady = 2, ipady = 10, expand = False)
+        primary_name.update()
+        size: tuple = (primary_name.winfo_width(), 3)
+
+        Role_Icon([data.get_role_by_ability(ability).name], main_font, entries, size, command = none, data = data).pack(primary_frame, side = tk.TOP)
+        tk.Label(primary_frame, text = f"Card:\n{data.get_card_by_role(data.get_role_by_ability(ability))}", bg = bg_2).pack(side = tk.BOTTOM, fill = "both", padx = 2, pady = 2, expand = True, anchor = "w")
+
+        if role.secondary_ability is not None:
+            if role.secondary_ability.__name__.lower() != "none":
+                tk.Label(secondary_frame, text = f"Secondary Ability:\n{role.secondary_ability.__name__} ({role.secondary_ability.targets})", bg = bg_2).pack(side = tk.TOP, fill = "x", padx = 2, pady = 2, ipady = 10, expand = False, anchor = "w")
+                Role_Icon([data.get_role_by_ability(role.secondary_ability).name], main_font, entries, size, command = none, data = data).pack(secondary_frame, side = tk.TOP)
+                tk.Label(secondary_frame, text = f"Card:\n{data.get_card_by_role(data.get_role_by_ability(role.secondary_ability))}", bg = bg_2).pack(side = tk.BOTTOM, fill = "both", padx = 2, pady = 2, expand = True, anchor = "w")
+            else:
+                tk.Label(secondary_frame, text = f"Secondary Ability:\nNone (0)", bg = bg_2).pack(side = tk.TOP, fill = "both", padx = 2, pady = 2, ipady = 10, expand = False, anchor = "w")
+        else:
+            tk.Label(secondary_frame, text = f"Secondary Ability:\nNone (0)", bg = bg_2).pack(side = tk.TOP, fill = "both", padx = 2, pady = 2, ipady = 10, expand = False, anchor = "w")
 
     # -- Vote Skip Button -- #
     if user == "none":
@@ -521,8 +553,10 @@ def selection_menu(data: Game_Data, entries: Menu_Entry, user: str, target: str 
     # -- Timer Button -- #
     create_timer(vote_frame, 300, main_font, (12, 2), (4, 2), tk.RIGHT)
 
-    root.mainloop()
+    return action_frame, action_label, ability
 
+@enforce_types
+def selection_menu_destroy(data: Game_Data, entries: Menu_Entry, user: str, action_frame: tk.Frame, action_label: tk.Label, ability: Ability, is_primary_ability: bool = True, can_recurse: bool = True, functional: bool = True) -> None:
     try: role = data.players[user] # -- To Consider recurse_targets -- #
     except: pass
 
@@ -530,18 +564,26 @@ def selection_menu(data: Game_Data, entries: Menu_Entry, user: str, target: str 
         action_frame.pack_forget()
         action_label.pack_forget()
 
-    role.selected_target = True
-    role.targets = role.targets + deepcopy(selected_players)
+    if functional:
+        role.selected_target = True
+        role.targets = role.targets + deepcopy(selected_players)
 
-    for player in selected_players:
-        data.players[player].visited_by.append(user)
-        shuffle(data.players[player].visited_by)
+        for player in selected_players:
+            data.players[player].visited_by.append(user)
+            shuffle(data.players[player].visited_by)
 
-    if "recurse_targets" in ability.ability_type and can_recurse and data.playing:
-        for i in range(len(selected_players)):
-            player = selected_players[i]
-            if data.players[player].ability.targets > 0 and not data.players[user].recursion_fuck_up:
-                selection_menu(data, entries, user, player, is_primary_ability, False)
+        if "recurse_targets" in ability.ability_type and can_recurse and data.playing:
+            for i in range(len(selected_players)):
+                player = selected_players[i]
+                if data.players[player].ability.targets > 0 and not data.players[user].recursion_fuck_up:
+                    selection_menu(data, entries, user, player, is_primary_ability, False)
+
+@enforce_types
+def selection_menu(data: Game_Data, entries: Menu_Entry, user: str, target: str = "", is_primary_ability: bool = True, can_recurse: bool = True) -> None:
+    global selected_players
+    action_frame, action_label, ability = selection_menu_create(data, entries, user, target, is_primary_ability)
+    root.mainloop()
+    selection_menu_destroy(data, entries, user, action_frame, action_label, ability, is_primary_ability, can_recurse)
 
 @enforce_types
 def voting_menu(data: Game_Data, entries: Menu_Entry) -> str:

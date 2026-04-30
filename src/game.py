@@ -83,7 +83,7 @@ def nap_time_info(info: str) -> None:
         timer.start()
 
 @enforce_types
-def start_abilities(data: Game_Data):
+def start_abilities(data: Game_Data) -> None:
     for user, role in data.players.items():
         if "game_start" in role.ability.ability_type:
             try:
@@ -107,8 +107,15 @@ def game(data: Game_Data, entries: Menu_Entry) -> None:
     while data.playing:
         # -- Game Loop -- #
         for name, role in data.alive_players.items():
+            if data.playing:
+                action_frame, action_label, ability = selection_menu_create(data, entries, name, functional = False)
+
             role.made_choice = False
             can_pick_primary_target: bool = selection_coindition(data, role, name, True)
+
+            if data.playing:
+                selection_menu_destroy(data, entries, name, action_frame, action_label, ability, functional = False)
+
             if can_pick_primary_target: selection_menu(data, entries, name)
 
             if "secondary_ability" in role.ability_type and not ("alternate" in role.ability_type and not role.ability_cancel):

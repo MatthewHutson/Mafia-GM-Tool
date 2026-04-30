@@ -2,7 +2,14 @@
 A Program to allocate roles in a game of mafia
 
 # -- Changes -- #
-Bug Fix - Gambler Could Still Start With Any Ability Rather Than Just Good Ones
+Unraised e in main
+Bug Fix - Force Ending During A Vote Crashes The Game
+Made Drunk Jester Not End Game But Still Win
+Bug Fix - None ability May Map To Testing Role When Its Holding No Ability
+README format change
+
+# -- Important -- #
+Never Give The Testing Role The None Ability
 
 # -- To Do -- #
 Check For Bugs With Drunk and New Code

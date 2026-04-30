@@ -159,10 +159,10 @@ class jester(Ability):
         
     # -- Ability -- #
     @enforce_types
-    def ability(self, user: str, data: Game_Data) -> None:
+    def ability(self, user: str, data: Game_Data, auto_end: bool = True) -> None:
         data.players[user].solo_win = data.players[user].was_voted_out
 
-        if data.settings["Early End"] == 1 and data.players[user].solo_win:
+        if data.settings["Early End"] == 1 and data.players[user].solo_win and auto_end:
             data.playing = False
 
     @enforce_types
@@ -171,8 +171,7 @@ class jester(Ability):
 
     @enforce_types
     def if_drunk(self, user: str, data: Game_Data) -> None:
-        pass
-        # data.players[user].solo_win = data.players[user].currently_alive
+        self.ability(user, data, auto_end = False)
 
 class stop_vote(Ability):
     @enforce_types

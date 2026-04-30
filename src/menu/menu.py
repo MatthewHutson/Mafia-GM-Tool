@@ -565,8 +565,11 @@ def selection_menu_destroy(data: Game_Data, entries: Menu_Entry, user: str, acti
         action_label.pack_forget()
 
     if functional:
-        role.selected_target = True
-        role.targets = role.targets + deepcopy(selected_players)
+        try:
+            role.selected_target = True
+            role.targets = role.targets + deepcopy(selected_players)
+        except:
+            pass
 
         for player in selected_players:
             data.players[player].visited_by.append(user)

@@ -1,9 +1,4 @@
 {
-    "Early End" : {
-        "description": "Make Jester End The Game As Soon As Their Condition Is Fufilled.",
-        "type": "checkbox",
-        "value": 1
-    },
     "Double Down": {
         "description": "Allow Every Role To Pick The Same Target Twice.",
         "type": "checkbox",

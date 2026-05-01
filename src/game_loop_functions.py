@@ -69,7 +69,7 @@ def remove_round_data(data: Game_Data, used_Death_ability: bool = False) -> None
                 targets.pop(0)
 
         role.recursion_fuck_up = False
-        role.poisoned = False
+        role.statuses.poisoned = False
         role.protected = False
         role.information = []
         role.visited_by = []

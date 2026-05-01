@@ -28,11 +28,11 @@ class Status_Manager():
         return [self.poisoned, self.drunk]
     
     @enforce_types
-    def get_data(self, user: str) -> list[str]:
+    def get_data(self, user: str, inverse = False) -> list[str]:
         output: list[str] = []
 
         for status, value in self.__dict__.items():
-            if value:
+            if value ^ inverse:
                 output.append(f"{user} is {status}.")
             else:
                 output.append(f"{user} is NOT {status}.")
@@ -84,7 +84,7 @@ class Ability():
     def __call__(self, user: str, data: Game_Data) -> None:
         match data.players[user].statuses.ability_conditions():
             case [True, False]: self.if_poisoned(user, data)
-            case [False, True]: self.if_drunk(user, data)
+            case [False, True]: self.if_poisoned(user, data)
             case _: self.ability(user, data)
 
     @enforce_types
@@ -438,7 +438,7 @@ class Game_Data():
     @enforce_types
     def set_drunk(self) -> None:
         if self.settings["Drunk"] == 1:
-            valid_players = list(self.good_aligned.keys())
+            valid_players: list = [name for name, role in self.players.items() if role.true_alignment == True]
             player = choice(valid_players)
             self.players[player].drunk = True
 

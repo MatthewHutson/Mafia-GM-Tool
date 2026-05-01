@@ -2,11 +2,12 @@
 A Program to allocate roles in a game of mafia
 
 # -- Changes -- #
-Unraised e in main
-Bug Fix - Force Ending During A Vote Crashes The Game
-Made Drunk Jester Not End Game But Still Win
-Bug Fix - None ability May Map To Testing Role When Its Holding No Ability
-README format change
+Made Neutrals Unable To Be Drunk
+Made Drunk Use Poisoned Effects (Kept The Original Drunk Code If Any Purpose)
+Jester Change - No Longer Ends Game Early But Instead Poisones Everyone When They Win
+Removed Early End Setting As It Is No Longer Used
+Gambler Changes - Removed Neutral Case And Made Good Roles More Likely (Thus None Less Likely)
+Creep Change - Made Poisoned Cree Now Select Random From Non-Visiting List
 
 # -- Important -- #
 Never Give The Testing Role The None Ability

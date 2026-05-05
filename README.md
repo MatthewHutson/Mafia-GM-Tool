@@ -2,26 +2,24 @@
 A Program to allocate roles in a game of mafia
 
 # -- Changes -- #
-Made Neutrals Unable To Be Drunk
-Made Drunk Use Poisoned Effects (Kept The Original Drunk Code If Any Purpose)
-Jester Change - No Longer Ends Game Early But Instead Poisones Everyone When They Win
-Removed Early End Setting As It Is No Longer Used
-Gambler Changes - Removed Neutral Case And Made Good Roles More Likely (Thus None Less Likely)
-Creep Change - Made Poisoned Cree Now Select Random From Non-Visiting List
+Made Lawyer See Clients Role (Technically Every Night)
+Made Ambusher No Longer Able To Reveal Themselves
+Removed Executioner From The Pool
 
 # -- Important -- #
 Never Give The Testing Role The None Ability
 
 # -- To Do -- #
+Rework Executioner - Make It More Interesting And Consequential
+Rework Bomber
+Rework Role Selection System - Dont Guarentee Specific Role
+
 Check For Bugs With Drunk and New Code
 Fix backed Up Abilities Keeping Extra Data
 Find More Backup related bugs
 Made The Defaults File Local Rather Than On The Global Repository
 
-Ponder The Idea Of Last Evil Standing Gets To Alternate Abilities (Likely Too Hard To Program)
-Ponder Lawyer Seeing Client's Role
-Ponder The Idea That Lovers Are Informed Upon Link
-Ponder the idea of psychic getting told all in game roles (regardless of poison)
+Think More About Lawyer - Possible Tampering To Help
 
 Make A Setting To Allow For Toggling Removing Guarenteed Roles
 Discord Bot Variant

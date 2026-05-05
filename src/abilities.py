@@ -182,12 +182,15 @@ class stop_vote(Ability):
     # -- Ability -- #
     @enforce_types
     def ability(self, user: str, data: Game_Data) -> None:
-        data.players[user].unemployed = False
-        data.players[user].solo_win = not data.players[data.players[user].targets[0]].was_voted_out
+        user_role = data.players[user]
+        target: str = user_role.targets[0]
+        user_role.information.append(f"{target} is {data.players[target].name}!")
+        user_role.statuses.unemployed = False
+        user_role.solo_win = not data.players[target].was_voted_out
 
-        if not (data.players[data.players[user].targets[0]].currently_alive or data.players[data.players[user].targets[0]].was_voted_out):
-            data.players[user].unemployed = True
-            data.players[user].solo_win = data.players[user].currently_alive
+        if not (data.players[target].currently_alive or data.players[target].was_voted_out):
+            user_role.statuses.unemployed = True
+            user_role.solo_win = data.players[user].currently_alive
 
     @enforce_types
     def if_poisoned(self, user: str, data: Game_Data) -> None:
@@ -493,7 +496,7 @@ class ambush(Ability):
                 pass
 
         for player in visitors:
-            data.players[player].information.append(f"{user} attempted to ambush {new_target}!")
+            data.players[player].information.append(f"Someone attempted to ambush {new_target}!")
 
     @enforce_types
     def if_poisoned(self, user: str, data: Game_Data) -> None:
@@ -741,3 +744,24 @@ class examine(Ability):
 
         for item in role.statuses.bullshit_data(target):
             data.players[user].information.append(item)
+
+class super_kill(Ability):
+    @enforce_types
+    def __init__(self) -> None:
+        super().__init__(targets = 1, p = 0, ability_type = ["singular", ""], priority = -1, can_pick_same_target = True)
+        
+    # -- Ability -- #
+    @enforce_types
+    def ability(self, user: str, data: Game_Data) -> None:
+        target: str = data.players[user].targets[0]
+        data.players[target].protected = False
+        data.players[target].die(data.players)
+
+    @enforce_types
+    def if_poisoned(self, user: str, data: Game_Data) -> None:
+        if data.players[user].secondary_ability == mayor:
+            data.players[user].secondary_ability(user, data)
+
+    @enforce_types
+    def if_drunk(self, user: str, data: Game_Data) -> None:
+        pass

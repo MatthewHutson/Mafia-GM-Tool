@@ -362,6 +362,11 @@ class Menu_Entry:
     def assign_roles(self) -> Players:
         shuffle(self.players)
         shuffle(self.roles)
+
+        # -- Fixing Sleepy Time Bug With Bogosort -- #
+        while self.roles[0].ability.targets == 0 or "on_demand" in self.roles[0].ability.ability_type or "alternate" in self.roles[0].ability.ability_type:
+            shuffle(self.roles)
+
         return Players({self.players[i]: self.roles[i] for i in range(len(self.players))})
     
     @enforce_types

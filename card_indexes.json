@@ -16,9 +16,8 @@
     "Bomber": "Black 9",
     "Librarian": "Black 10",
     "Examiner": "Black Jack",
-    "Villager": "None",
+    "Villager": "Any Other Card",
     "Jester": "Red Jack",
     "Lawyer": "Red Queen",
-    "Executioner": "Red King",
     "Testing": "Testing Role"
 }

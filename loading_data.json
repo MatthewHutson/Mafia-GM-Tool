@@ -1,0 +1,19 @@
+{
+    "good": {
+        "information": [["Sheriff"], ["Creep"], ["Librarian"], ["Examiner"]],
+        "defensive": [["Soldier"], ["Doctor"], ["Necromancer"]],
+        "other": [["Cupid"], ["Mayor"], ["Gambler"], ["Bomber"]]
+    },
+    "neutral": {
+        "roles": [["Jester"], ["Lawyer"]]
+    },
+    "evil": {
+        "lead": "Mafia",
+        "support": ["Poisoner", "Psychic", "Magnet", "Ambusher", "Chancellor"]
+    },
+    "boundaries": {
+        "guarenteed": ["lead", "information", "defensive"],
+        "overflow": ["Villager"],
+        "evil_support": [6, 12]
+    }
+}

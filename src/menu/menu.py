@@ -5,6 +5,7 @@ from menu.mimi_stand_counter import counter_init
 from menu.card_index import card_index, destroy_card_index
 from menu.settings import display_settings, remove_instances, update_settings
 from menu.timer import create_timer, delete_timer
+from menu.loading_system import *
 from tkinter import messagebox
 from copy import deepcopy
 from random import shuffle
@@ -58,79 +59,12 @@ load_from_backup: bool = False
 def none(): pass
 
 @enforce_types
-def new_load_system() -> None:
-    # -- Load System Version 3 -- #
-    global max_players, evil_role_dict, guarenteed_roles, other_role_dict, global_entries
-
-    # -- Loading The Files -- #
-    with open("evil_role_load.json", 'r') as file:
-        data: dict = json.load(file)
-        for key, value in data.items():
-            evil_role_dict[int(key) - 1] = value
-
-    with open("other_role_load.json", 'r') as file:
-        data: dict = json.load(file)
-        for key, value in data.items():
-            other_role_dict[int(key) - 1] = value
-
-    with open("guarenteed_role_load.json", 'r') as file:
-        data: dict = json.load(file)
-        guarenteed_roles = list(data.values())[0]
-
-    global_entries.all_roles_lists = list(evil_role_dict.values())[-1] + guarenteed_roles + list(other_role_dict.values())[-1]
-
-    # -- Managing Player Count -- #
-    max_guarenteed_roles: int = len(guarenteed_roles)
-    max_other_roles: int = len(list(other_role_dict.values())[-1])
-    max_players = max_guarenteed_roles + max_other_roles
-
-@enforce_types
 def get_roles_by_players(offset: int = 1) -> list[list[Role]]:
     return get_roles(len(players), offset)
 
 @enforce_types
-def get_roles(player_count: int, offset: int = 1) -> list[list[Role]]:
-    # -- Part Of Role Load System V3 -- #
-    roles: list[list[Role]] = deepcopy(list(evil_role_dict.values())[0])
-    player_count += offset
-    
-    for max, role_list in evil_role_dict.items():
-        if player_count > max:
-            roles = deepcopy(role_list)
-
-    role_count: int = len(roles)
-
-    for role_list in guarenteed_roles:
-        if role_count < player_count:
-            role_count += 1
-            roles.append(role_list)
-
-    other_role_boundaries: list[int] = list(other_role_dict.keys())
-    remaining_roles: list[list[int]] = []
-
-    for max in other_role_boundaries:
-        if max <= player_count:
-            remaining_roles = other_role_dict[max]
-
-    update_settings()
-        
-    shuffle(remaining_roles)
-    i = 0
-
-    if global_entries.settings["Testing Role"]["value"] == 1:
-        remaining_roles.insert(0, ["Testing"])
-
-    player_count -= len(roles)
-
-    while (player_count > 0) and i < len(remaining_roles):
-        roles.append(remaining_roles[i])
-
-        i += 1
-        player_count -= 1
-
-    shuffle(roles)
-
-    return roles
+def get_roles(player_count: int, offset: int = 1) -> list[list[str]]:
+    return new_get_roles(player_count, global_entries.settings, offset)
 
 @enforce_types
 def role_boundary_reset(roles: list[list[Role]]) -> None:
@@ -160,14 +94,11 @@ def add_player(players: list[Player_Select_Frame], roles: list[list[Role]], entr
             raise ValueError
         
         name_entry.delete(0, tk.END)
-
-        if len(players) >= max_players: raise OverflowError
         
         for frame in players:
             if frame == capitalise_words(name): raise NameError
 
-        if len(players) < max_players:
-            add_role_tile(len(players), roles, entries)
+        add_role_tile(len(players), roles, entries)
             
         player_frame = Player_Select_Frame(name, player_canvas, main_font, players, role_row_frames, role_boundary_reset_for_icons, bg_2, text_colour)
         player_canvas.update()
@@ -202,7 +133,7 @@ def add_player_from_entry(players: list[tk.Label], roles: list[list[Role]], entr
     add_player(players, roles, entries, user_input)
 
 @enforce_types
-def add_role_tile(player_count: int, roles: list[list[Role]], entries: Menu_Entry) -> None:
+def add_role_tile(player_count: int, roles: list[list[str]], entries: Menu_Entry) -> None:
     role_icon = Role_Icon(roles[player_count], main_font, entries)
     role_row_frames.add_item(role_icon)
 
@@ -347,12 +278,12 @@ def load_backup() -> None:
 @enforce_types
 def setup_menu(entries: Menu_Entry, default_names: list[str]) -> bool:
     # -- Globals Handling -- #
-    global global_entries, player_canvas, load_from_backup
+    global global_entries, player_canvas, load_from_backup, max_players
     global_entries = entries
     load_from_backup = False
 
     # -- File Handling -- #
-    new_load_system()
+    max_players = load_role_data()
     role_row_frames.get_role_reset_function(role_boundary_reset_for_icons)
     role_row_frames.add_entries(entries)
 

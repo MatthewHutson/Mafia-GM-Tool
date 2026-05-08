@@ -74,7 +74,8 @@ def nap_time(data: Game_Data) -> None:
 
 
     info: str = f"Wake up The Evil Team: {list(data.evil_aligned.keys())}. Show Them \n\n #1: Their Teammate(s): {evil_cards}. \n #2: Their Bluff Roles: {bluff_cards}. \n\nIs Everyone Ready To Procede?"
-    nap_time_info(info)
+    timer = threading.Timer(0.1, lambda: nap_time_info(info))
+    timer.start()
 
 @enforce_types
 def nap_time_info(info: str) -> None:

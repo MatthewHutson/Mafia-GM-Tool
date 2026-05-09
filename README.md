@@ -2,11 +2,7 @@
 A Program to allocate roles in a game of mafia
 
 # -- Changes -- #
-Removed Executioner From Card And Role Setup (Ability Still In Code)
-Bug Fix - Sleepy Time Clashing With Other Popups
-Load System V4 - Removing Specific Guarenteed Roles In Favour of Category-Based Guarentees
-Moved All Role Loading Data Into 1 Single json
-Villager Shuffle - Adds Villagers When There Are Too Many Players To Have A Unique Role (Take Any Unused Card)
+Made The Backup System Json Based
 
 # -- Important -- #
 Never Give The Testing Role The None Ability
@@ -16,13 +12,8 @@ Finish Lawyer Rework - Witness Protection / Evidence Tampering
 Rework Bomber
 Rework Role Selection System - Dont Guarentee Specific Role
 
-Find And Fix Crash Caused By Putting A Role As A String Parameter
-
-Check For Bugs With Drunk and New Code
-Fix backed Up Abilities Keeping Extra Data
-Fix backed Up Targets Formatted Wrong (Use Jsons?)
+Find And Fix Crash Caused By Putting A Role As A String Parameter Somewhere (Idk yet)
 Find More Backup related bugs
-Possibly Make The Backup System json file based
 
 Think More About Lawyer - Possible Tampering To Help
 

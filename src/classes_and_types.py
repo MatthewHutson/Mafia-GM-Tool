@@ -6,6 +6,7 @@ from random import shuffle, choice
 from copy import deepcopy
 import numpy as np
 import csv
+import json
 
 # -- Ability Template Class -- #
 @dataclass
@@ -95,6 +96,24 @@ class Ability():
             return str(self).lower() == "none" # -- Catches Null Value and None Ability -- #
         else:
             return type(ability2) == type(self)
+        
+    @enforce_types
+    def to_dict(self) -> dict:
+        dict: dict = self.__dict__
+
+        for key, item in dict.items():
+            if type(item) == set:
+                dict[key] = list(item)
+
+        return dict
+    
+    @enforce_types
+    def set_attribuite(self, name: str, value: Any) -> None:
+        if type(self.__getattribute__(name)) == set and type(value) == list:
+            value = set(value)
+
+        self.__setattr__(name, value)
+
 
 # -- Role Class -- #
 @dataclass
@@ -413,6 +432,15 @@ class Game_Data():
     @enforce_types
     def priority(self) -> Players:
         return Players(dict(sorted(self.players.items(), key = lambda item: item[1].priority)))
+    
+    @property
+    @enforce_types
+    def true_ability_names(self) -> dict[str, Ability]:
+        out_data: dict = {}
+        for ability in self.abilities.values():
+            out_data[ability.__name__] = ability
+
+        return out_data
 
     # -- Methods -- #
     @enforce_types
@@ -543,6 +571,78 @@ class Game_Data():
             final_data[lovers[1]].linked_to = lovers[0]
             final_data[lovers[0]].linker = cupid
             final_data[lovers[1]].linker = cupid
+
+        self.players = Players(final_data)
+        self.init(alter_drunk = False)
+
+    @enforce_types
+    def backup_to_json(self) -> None:
+        input_data: dict[str, dict] = {}
+
+        for name, role in self.players.items():
+            # -- Handling Nested Objects -- #
+            data: dict = role.__dict__
+            statuses: dict = role.statuses.__dict__
+            primary_ability: dict = role.ability.to_dict()
+            secondary_ability: dict = role.secondary_ability.to_dict()
+
+            primary_name, secondary_name = role.ability.__name__, role.secondary_ability.__name__
+
+            data["statuses"] = statuses
+            data["ability"] = primary_ability
+            data["secondary_ability"] = secondary_ability
+
+            # -- Extra Data For Reverse Operation -- #
+            data["ability"]["name"] = primary_name
+            data["secondary_ability"]["name"] = secondary_name
+
+            input_data[name] = data
+
+        with open("backup.json", "w") as file:
+            json.dump(input_data, file, indent = 4, ensure_ascii = False)
+
+    @enforce_types
+    def load_from_json_backup(self) -> None:
+        final_data: dict = {}
+
+        with open("backup.json", "r") as file:
+            out_data: dict = json.load(file)
+
+        for player, data in out_data.items():
+            # -- Dealing With Dictionaries of Nested Objects -- #
+            status_data: dict = data["statuses"]
+            ability_data: dict = data["ability"]
+            secondary_ability_data: dict = data["secondary_ability"]
+
+            primary_name, secondary_name = ability_data["name"], secondary_ability_data["name"]
+
+            del ability_data["name"]
+            del secondary_ability_data["name"]
+
+            statuses: Status_Manager = Status_Manager()
+            ability: Ability = deepcopy(self.true_ability_names[primary_name])
+            secondary_ability: Ability = deepcopy(self.true_ability_names[secondary_name])
+
+            for name, value in status_data.items():
+                statuses.__setattr__(name, value)
+
+            for name, value in ability_data.items():
+                ability.set_attribuite(name, value)
+
+            for name, value in secondary_ability_data.items():
+                secondary_ability.set_attribuite(name, value)
+
+            data["statuses"] = statuses
+            data["ability"] = ability
+            data["secondary_ability"] = secondary_ability
+
+            # -- Main Role Object -- #
+            role: Role = Role("temp", ability, True, False, 1, [], [], [], statuses)
+
+            for name, value in data.items():
+                role.__setattr__(name, value)
+
+            final_data[player] = role
 
         self.players = Players(final_data)
         self.init(alter_drunk = False)

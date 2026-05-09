@@ -265,7 +265,7 @@ def terminate() -> None:
 @enforce_types
 def load_backup() -> None:
     global load_from_backup
-    if Path("backup.csv").is_file():
+    if Path("backup.json").is_file():
         if messagebox.askyesno("Load Backup", "Do You Want To Load The Previous Backup And Thus Continue From That State?", icon = "question", default = "no"):
             load_from_backup = True
             remove_instances()

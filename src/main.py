@@ -112,7 +112,7 @@ def main() -> None:
     if normal_load:
         game_data.init()
     else:
-        game_data.load_from_backup()
+        game_data.load_from_json_backup()
 
     try:
         game(game_data, entries)
@@ -148,7 +148,7 @@ def main() -> None:
         show_victory(winners)
 
     except Exception as e:
-        game_data.backup_to_csv()
+        game_data.backup_to_json()
         raise e
     
 # -- On Run -- #

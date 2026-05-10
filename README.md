@@ -2,7 +2,12 @@
 A Program to allocate roles in a game of mafia
 
 # -- Changes -- #
-Made The Backup System Json Based
+Made The Gambler Unable To Override "Starting Role" When Loading From Backup
+Made The Librarian Able To See Sheriff And Soldier
+Bug Fix - Cycling Roles Wasn't Working As Menu Entry Had Not Updated All Roles List
+Bug Fix - Same Roles Each Randomisation Caused By Not Implementing Enough Deepcopies
+Added Technical Ability To Have Multiple Options For Mafia Lead
+Bug Fixes - The Psychic Was Being A Bitch
 
 # -- Important -- #
 Never Give The Testing Role The None Ability

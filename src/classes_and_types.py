@@ -81,12 +81,11 @@ class Ability():
     def if_drunk(self, user: str, data: Game_Data) -> None:
         ...
 
-    @enforce_types
-    def __call__(self, user: str, data: Game_Data) -> None:
+    def __call__(self, user: str, data: Game_Data, **kwargs) -> None:
         match data.players[user].statuses.ability_conditions():
-            case [True, False]: self.if_poisoned(user, data)
-            case [False, True]: self.if_poisoned(user, data)
-            case _: self.ability(user, data)
+            case [True, False]: self.if_poisoned(user, data, **kwargs)
+            case [False, True]: self.if_poisoned(user, data, **kwargs)
+            case _: self.ability(user, data, **kwargs)
 
     @enforce_types
     def __eq__(self, ability2: Union[Ability, type, None]) -> bool:
@@ -462,7 +461,8 @@ class Game_Data():
         
         # -- Secondary Ability Handling -- #
         for role in self.players.values():
-            role.secondary_ability = deepcopy(self.abilities["none"])
+            if role.secondary_ability is None:
+                role.secondary_ability = deepcopy(self.abilities["none"])
 
         # -- statuses.drunk Consideration -- #
         if alter_drunk:
@@ -643,6 +643,6 @@ class Game_Data():
                 role.__setattr__(name, value)
 
             final_data[player] = role
-
+    
         self.players = Players(final_data)
         self.init(alter_drunk = False)

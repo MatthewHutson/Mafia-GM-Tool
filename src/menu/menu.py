@@ -284,6 +284,7 @@ def setup_menu(entries: Menu_Entry, default_names: list[str]) -> bool:
 
     # -- File Handling -- #
     max_players = load_role_data()
+    entries.all_roles_lists = get_all_role_lists()
     role_row_frames.get_role_reset_function(role_boundary_reset_for_icons)
     role_row_frames.add_entries(entries)
 

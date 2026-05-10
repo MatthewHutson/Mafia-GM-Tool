@@ -8,7 +8,7 @@
         "roles": [["Jester"], ["Lawyer"]]
     },
     "evil": {
-        "lead": "Mafia",
+        "lead": ["Mafia"],
         "support": ["Poisoner", "Psychic", "Magnet", "Ambusher", "Chancellor"]
     },
     "boundaries": {

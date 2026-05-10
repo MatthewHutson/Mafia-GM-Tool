@@ -115,7 +115,7 @@ def main() -> None:
         game_data.load_from_json_backup()
 
     try:
-        game(game_data, entries)
+        game(game_data, entries, normal_load)
 
         for name, role in game_data.players.items():
             if "game_end" in role.ability_type:
@@ -160,4 +160,4 @@ if __name__ == "__main__":
             playing = messagebox.askyesno("Game Over", "Do you want to play another round?", icon = "question")
         except Exception as e:
             playing = False
-            #raise e
+            raise e

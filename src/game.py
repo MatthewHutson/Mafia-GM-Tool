@@ -99,9 +99,9 @@ def start_abilities(data: Game_Data) -> None:
                 role.secondary_ability.ability(user, data)
 
 @enforce_types
-def game(data: Game_Data, entries: Menu_Entry) -> None:
+def game(data: Game_Data, entries: Menu_Entry, normal_start: bool = True) -> None:
     # -- Game Setup -- #
-    start_abilities(data)
+    if normal_start: start_abilities(data)
     init_game_menu(entries, data)
     nap_time(data)
 

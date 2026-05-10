@@ -292,19 +292,19 @@ class telepathy(Ability):
     @enforce_types
     def __init__(self) -> None:
         super().__init__(targets = 1, p = 2.5, ability_type = ["repeat", "investigative"], priority = 4, can_pick_same_target = True)
-        self.examine: Ability = examine()
 
     # -- Methods -- #
-    def show_info(self, user: str, data: Game_Data, user_role: Role, target: str, role: Role, is_lover: bool) -> None:
+    def show_info(self, user: str, data: Game_Data, user_role: Role, target: str, role: Role) -> None:
         user_role.information.append(f"{target} is {role.name}, which is {data.get_card_by_role(role)}!")
-        self.examine(user, data)
+        temp_examine = examine()
+        temp_examine(user, data)
 
         if user_role.name == "Psychic":
             mafia_roles: dict[str, Role] = {name: role for name, role in data.evil_aligned.items() if role.name != "Psychic"}
 
             for name, evil_role in mafia_roles.items():
                 evil_role.information.append(f"{target} is {role.name}, which is {data.get_card_by_role(role)}!")
-                self.examine(name, data)
+                temp_examine(user, data, info_reciever = name)
     
     # -- Ability -- #
     @enforce_types
@@ -313,9 +313,8 @@ class telepathy(Ability):
         user_role = data.players[user]
 
         role: Role = data.players[target]
-        is_lover: bool = role.linked
         
-        self.show_info(data, user_role, target, role, is_lover)
+        self.show_info(user, data, user_role, target, role)
 
     @enforce_types
     def if_poisoned(self, user: str, data: Game_Data) -> None:
@@ -328,9 +327,8 @@ class telepathy(Ability):
             roles = list(data.roles.values())
 
         role: Role = choice(roles)
-        is_lover: bool = False
 
-        self.show_info(data, user_role, target, role, is_lover)
+        self.show_info(user, data, user_role, target, role)
 
     @enforce_types
     def if_drunk(self, user: str, data: Game_Data) -> None:
@@ -544,19 +542,19 @@ class gamble(Ability):
     # -- Ability -- #
     @enforce_types
     def ability(self, user: str, data: Game_Data, early_start: bool = False) -> None:
+        role: Role = data.players[user]
+
         if early_start:
             self.non_starting_abilities: set[str] = {role.ability.true_name for role in data.roles.values()} - {role.ability.true_name for role in data.roles.values() if role.true_alignment == True}
             self.non_starting_abilities = self.non_starting_abilities.union({"none", "vote", "instant_death"})
             role_data: list[str, Ability] = data.random_ability(self.non_starting_abilities)
             
             self.used_abilities.add(role_data[0])
-            data.players[user].secondary_ability = role_data[1]
+            role.secondary_ability = role_data[1]
 
             if data.settings["Instant Death"] == 0:
                 self.used_abilities.add("instant_death")
         else:
-            role: Role = data.players[user]
-            
             if role.ability_cancel:
                 role.secondary_ability(user, data)
 
@@ -663,7 +661,7 @@ class index(Ability):
     @enforce_types
     def __init__(self) -> None:
         super().__init__(targets = 0, p = 7.5, ability_type = ["passive", "investigative"], priority = 11)
-        self.seen_roles: set[str] = set(["Doctor", "Mafia", "Sheriff"])
+        self.seen_roles: set[str] = {"Mafia"}
 
     # -- Properties -- #
     @property
@@ -722,28 +720,40 @@ class examine(Ability):
 
     # -- Ability -- #
     @enforce_types
-    def ability(self, user: str, data: Game_Data) -> None:
+    def ability(self, user: str, data: Game_Data, info_reciever: str = None) -> None:
         target: str = data.players[user].targets[0]
         role: Role = data.players[target]
 
-        for item in role.statuses.get_data(target):
-            data.players[user].information.append(item)
+        if info_reciever is None:
+            for item in role.statuses.get_data(target):
+                data.players[user].information.append(item)
+        else:
+            for item in role.statuses.get_data(target):
+                data.players[info_reciever].information.append(item)
 
     @enforce_types
-    def if_poisoned(self, user: str, data: Game_Data) -> None:
+    def if_poisoned(self, user: str, data: Game_Data, info_reciever: str = None) -> None:
         target: str = data.players[user].targets[0]
         role: Role = data.players[target]
 
-        for item in role.statuses.get_data(target, inverse = True):
-            data.players[user].information.append(item)
+        if info_reciever is None:
+            for item in role.statuses.get_data(target, inverse = True):
+                data.players[user].information.append(item)
+        else:
+            for item in role.statuses.get_data(target, inverse = True):
+                data.players[info_reciever].information.append(item)
 
     @enforce_types
-    def if_drunk(self, user: str, data: Game_Data) -> None:
+    def if_drunk(self, user: str, data: Game_Data, info_reciever: str = None) -> None:
         target: str = data.players[user].targets[0]
         role: Role = data.players[target]
 
-        for item in role.statuses.bullshit_data(target):
-            data.players[user].information.append(item)
+        if info_reciever is None:
+            for item in role.statuses.bullshit_data(target, inverse = True):
+                data.players[user].information.append(item)
+        else:
+            for item in role.statuses.bullshit_data(target, inverse = True):
+                data.players[info_reciever].information.append(item)
 
 class super_kill(Ability):
     @enforce_types

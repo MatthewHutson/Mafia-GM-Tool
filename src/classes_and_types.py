@@ -72,13 +72,13 @@ class Ability():
         return type(self).__name__
 
     # -- Methods -- #
-    def ability(self, user: str, data: Game_Data) -> None:
+    def ability(self, user: str, data: Game_Data, **kwargs) -> None:
         ...
 
-    def if_poisoned(self, user: str, data: Game_Data) -> None:
+    def if_poisoned(self, user: str, data: Game_Data, **kwargs) -> None:
         ...
 
-    def if_drunk(self, user: str, data: Game_Data) -> None:
+    def if_drunk(self, user: str, data: Game_Data, **kwargs) -> None:
         ...
 
     def __call__(self, user: str, data: Game_Data, **kwargs) -> None:
@@ -415,6 +415,7 @@ class Game_Data():
     good_win: bool = False
     evil_win: bool = False
     evil_count: int = 0
+    turn_count: int = 0
 
     # -- Properties -- #
     @property
@@ -425,7 +426,10 @@ class Game_Data():
         else:
             player = list(self.evil_aligned)[self.evil_count]
             self.evil_count += 1
-            return player 
+            if self.players[player].currently_alive:
+                return player 
+            else:
+                return self.next_evil_player
     
     @property
     @enforce_types

@@ -16,8 +16,12 @@ import abilities as a
 def on_demand(data: Game_Data, role: Role, ability: Ability, is_primary_ability: bool, name: str) -> None:
     if "on_demand" in ability.ability_type and (not ("singular" in ability.ability_type and (role.selected_target))):
         sleep(0.5)
-        use_ability = messagebox.askyesno("Ability", f"Does {name}, the {role.name} want to use their ability ({ability.__name__})?", default = "no", icon = "question")
         
+        use_ability = None
+        while use_ability is None:
+            use_ability = messagebox.askyesnocancel("Ability", f"Does {name}, the {role.name} want to use their ability ({ability.__name__})?\n\n   Yes: Use Ability\n   No: Do Nothing", default = "cancel", icon = "question")
+            sleep(0.5)
+
         if is_primary_ability:
             role.ability_cancel = not use_ability
         else:
@@ -29,7 +33,12 @@ def on_demand(data: Game_Data, role: Role, ability: Ability, is_primary_ability:
 def alternate(data: Game_Data, role: Role, ability: Ability, name: str) -> None:
     if "alternate" in ability.ability_type and (not ("singular" in ability.ability_type and (role.selected_target))):
         sleep(0.5)
-        use_ability = messagebox.askyesno("Ability", f"Does {name}, the {role.name} want to usre their primary ability ({ability.__name__}) instead of their secondary ability ({role.secondary_ability.__name__})?", icon = "question")
+
+        use_ability = None
+        while use_ability is None:
+            use_ability = messagebox.askyesnocancel("Ability", f"Does {name}, the {role.name} want to usre their primary ability instead of their secondary ability?\n\n   Yes: {ability.__name__}\n   No: {role.secondary_ability.__name__}", icon = "question", default = "cancel")
+            sleep(0.5)
+
         role.ability_cancel = not use_ability
         role.secondary_ability_cancel = use_ability
         role.made_choice = True
@@ -108,6 +117,8 @@ def game(data: Game_Data, entries: Menu_Entry, normal_start: bool = True) -> Non
      # -- Game Loop -- #
     while data.playing:
         # -- Game Loop -- #
+        data.turn_count += 1
+
         for name, role in data.alive_players.items():
             if data.playing:
                 action_frame, action_label, ability = selection_menu_create(data, entries, name, functional = False)
@@ -132,10 +143,17 @@ def game(data: Game_Data, entries: Menu_Entry, normal_start: bool = True) -> Non
 
         if data.playing:
             use_abilities(data)
+
+             # -- Ensures Mafia Evil Roles Will Have Kill Switch -- #
+            init_evil_alternative(data)
+            revert_to_mafia(data)
+
+            # -- Player And GM Info -- #
             information(data)
             life_death_sort(data)
             information(data, False)
 
+            # -- Resetting The Player Data -- #
             update_all_targets(data)
             remove_round_data(data)
 

@@ -30,6 +30,9 @@ def use_abilities(data: Game_Data, can_recurse: bool = True) -> None:
             if not (can_recurse or "secondary_ability" in role.ability_type) and not role.recursion_fuck_up:
                 role.used_ability = True
 
+        elif "first_night" in role.ability.ability_type:
+            role.ability(name, data, first_night = True)
+
     for name, role in priority.items():
         if "late" in role.ability.ability_type:
             role.ability(name, data)
@@ -38,7 +41,6 @@ def use_abilities(data: Game_Data, can_recurse: bool = True) -> None:
 
 @enforce_types
 def life_death_sort(data: Game_Data) -> None:
-    init_evil_alternative(data) # -- Ensures Mafia Evil Roles Will Have Kill Switch -- #
     for name, role in data.players.items():
         if name in data.alive_players.keys():
                 if not role.currently_alive:
@@ -57,8 +59,6 @@ def life_death_sort(data: Game_Data) -> None:
                     data.good_aligned[name] = role
                 else:
                     data.evil_aligned[name] = role
-
-    revert_to_mafia(data)
 
 @enforce_types
 def remove_round_data(data: Game_Data, used_Death_ability: bool = False) -> None:
@@ -87,7 +87,7 @@ def select_player(user: str, players: Players) -> None: # -- Outdated To Be Repl
         players[user].targets.append(valid_input_list(f"{user} is {players[user].name}, pick a player to {players[user].ability.__name__}", "Invalid Player!", [*players.keys()]).lower().capitalize())
 
 @enforce_types
-def show_victory(victory_data: list[str]) -> None:
+def show_victory(victory_data: list[str], turn_count: int) -> None:
     victory_str = "Winners:\n"
     for item in victory_data:
         victory_str += item + ", "
@@ -97,7 +97,7 @@ def show_victory(victory_data: list[str]) -> None:
     else:
         victory_str += "None"
 
-    messagebox.showinfo("Game Over", victory_str, icon = "info")
+    messagebox.showinfo(f"Game Over On Turn {turn_count}", victory_str, icon = "info")
 
 @enforce_types
 def check_for_victory(data: Game_Data) -> None:
@@ -119,8 +119,8 @@ def check_for_victory(data: Game_Data) -> None:
 @enforce_types
 def revert_to_mafia(data: Game_Data) -> None:
     mafia_count = 0
-    for role in data.alive_players.values():
-        if role.ability == data.mafia_role.ability and not role.alignment:
+    for role in data.players.values():
+        if role.ability == data.mafia_role.ability and not role.alignment and role.currently_alive:
             mafia_count += 1
 
     if mafia_count == 0:
@@ -129,10 +129,10 @@ def revert_to_mafia(data: Game_Data) -> None:
             ability_swap(data, next_evil_player)
     
     elif mafia_count > 1:
-        for name, role in data.evil_aligned.items():
-            print(role.name)
-            if role.ability == data.mafia_role.ability and role.name != "Mafia":
-                ability_swap(data, name)
+        for name, role in data.players.items():
+            if role.currently_alive and not role.alignment:
+                if role.ability == data.mafia_role.ability and role.name != "Mafia":
+                    ability_swap(data, name)
 
         data.evil_count = 0
 
@@ -144,7 +144,7 @@ def role_switch(data: Game_Data, player: str, new_role: Role) -> None:
     players[player] = deepcopy(new_role)
     players[player].ability = deepcopy(new_role.ability)
     data.priority[player] = players[player]
-    players[player].linked = role.linked
+    players[player].statuses.linked = role.linked
     players[player].linked_to = role.linked_to
     players[player].linker = role.linker
     players[player].information = information

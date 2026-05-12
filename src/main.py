@@ -145,7 +145,7 @@ def main() -> None:
         if game_data.good_win: winners.append("\nThe Good Team!")
         if game_data.evil_win: winners.append("\nThe Evil Team!")
 
-        show_victory(winners)
+        show_victory(winners, game_data.turn_count)
 
     except Exception as e:
         game_data.backup_to_json()
@@ -160,4 +160,4 @@ if __name__ == "__main__":
             playing = messagebox.askyesno("Game Over", "Do you want to play another round?", icon = "question")
         except Exception as e:
             playing = False
-            raise e
+            #raise e

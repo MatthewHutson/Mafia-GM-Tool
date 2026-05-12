@@ -2,12 +2,8 @@
 A Program to allocate roles in a game of mafia
 
 # -- Changes -- #
-Made The Gambler Unable To Override "Starting Role" When Loading From Backup
-Made The Librarian Able To See Sheriff And Soldier
-Bug Fix - Cycling Roles Wasn't Working As Menu Entry Had Not Updated All Roles List
-Bug Fix - Same Roles Each Randomisation Caused By Not Implementing Enough Deepcopies
-Added Technical Ability To Have Multiple Options For Mafia Lead
-Bug Fixes - The Psychic Was Being A Bitch
+Bug Fixes - Made Lawyer & Mafia Switch Info Appear On The Correct Night
+Added Default Cancel Options To Alternate And Singular, Meaning You Cannot Butterfingers An Option
 
 # -- Important -- #
 Never Give The Testing Role The None Ability

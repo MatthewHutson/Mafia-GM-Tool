@@ -177,14 +177,14 @@ class jester(Ability):
 class stop_vote(Ability):
     @enforce_types
     def __init__(self) -> None:
-        super().__init__(targets = 1, p = 0, ability_type = ["singular", "on_vote"])
+        super().__init__(targets = 1, p = 0, ability_type = ["singular", "on_vote", "first_night"])
         
     # -- Ability -- #
     @enforce_types
-    def ability(self, user: str, data: Game_Data) -> None:
+    def ability(self, user: str, data: Game_Data, first_night: bool = False) -> None:
         user_role = data.players[user]
         target: str = user_role.targets[0]
-        user_role.information.append(f"{target} is {data.players[target].name}!")
+        if first_night: user_role.information.append(f"{target} is {data.players[target].name}!")
         user_role.statuses.unemployed = False
         user_role.solo_win = not data.players[target].was_voted_out
 
@@ -193,8 +193,8 @@ class stop_vote(Ability):
             user_role.solo_win = data.players[user].currently_alive
 
     @enforce_types
-    def if_poisoned(self, user: str, data: Game_Data) -> None:
-        self.ability(user, data)
+    def if_poisoned(self, user: str, data: Game_Data, first_night: bool = False) -> None:
+        self.ability(user, data, first_night)
 
     @enforce_types
     def if_drunk(self, user: str, data: Game_Data) -> None:
@@ -393,7 +393,8 @@ class stalk(Ability):
         can_see = set(data.players.keys()) - visitors
 
         random_num: int = randint(0, len(can_see))
-        for i in range(random_num): selected_players.add(choice(can_see))
+        can_see_too = list(can_see)
+        for i in range(random_num): selected_players.add(choice(can_see_too))
         visitors = list(selected_players)
 
         self.information(data, user, target, visitors)

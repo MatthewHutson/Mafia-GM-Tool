@@ -9,7 +9,7 @@ from menu.menu_classes import *
 def ability_conditions(role: Role, has_recursed: bool, data: Game_Data) -> bool:
     life = role in data.alive_players.values()
     not_cancel = (not role.ability_cancel or "passive" in role.ability_type or "alternate" in role.ability_type)
-    singular = not ("singular" in role.ability_type and (role.used_ability))
+    can_use = role.ability.number_of_uses != 0
     normal_activation = not ("on_vote" in role.ability_type or "on_death" in role.ability_type)
 
     if has_recursed:
@@ -17,7 +17,7 @@ def ability_conditions(role: Role, has_recursed: bool, data: Game_Data) -> bool:
     else:
         recurse_case = True
 
-    return life and singular and recurse_case and normal_activation and not_cancel
+    return life and can_use and recurse_case and normal_activation and not_cancel
 
 @enforce_types
 def use_abilities(data: Game_Data, can_recurse: bool = True) -> None:
@@ -26,9 +26,6 @@ def use_abilities(data: Game_Data, can_recurse: bool = True) -> None:
     for name, role in priority.items():
         if ability_conditions(role, not can_recurse, data):
             role.ability(name, data)
-
-            if not (can_recurse or "secondary_ability" in role.ability_type) and not role.recursion_fuck_up:
-                role.used_ability = True
 
         elif "first_night" in role.ability.ability_type:
             role.ability(name, data, first_night = True)
@@ -63,7 +60,7 @@ def life_death_sort(data: Game_Data) -> None:
 @enforce_types
 def remove_round_data(data: Game_Data, used_Death_ability: bool = False) -> None:
     for role in data.players.values():
-        if (not "singular" in role.ability_type) and (used_Death_ability or not ("on_death" in role.ability_type or "on_vote" in role.ability_type)): 
+        if (role.ability.number_of_uses != 0) and (used_Death_ability or not ("on_death" in role.ability_type or "on_vote" in role.ability_type)): 
             targets = role.targets
             for i in range(len(targets)):
                 targets.pop(0)

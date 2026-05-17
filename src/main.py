@@ -14,55 +14,6 @@ from game import game
 from pathlib import Path
 import abilities as a
 
-# -- Functions -- #
-@enforce_types
-def on_demand(data: Game_Data, role: Role, ability: Ability, is_primary_ability: bool, name: str) -> None:
-    if "on_demand" in ability.ability_type and (not ("singular" in ability.ability_type and (role.selected_target))):
-        sleep(0.5)
-        use_ability = messagebox.askyesno("Ability", f"Does {name}, the {role.name} want to use their ability ({ability.__name__})?", icon = "question")
-        
-        if is_primary_ability:
-            role.ability_cancel = not use_ability
-        else:
-            role.secondary_ability_cancel = not use_ability
-
-        role.made_choice = True
-
-@enforce_types
-def alternate(data: Game_Data, role: Role, ability: Ability, name: str) -> None:
-    if "alternate" in ability.ability_type and (not ("singular" in ability.ability_type and (role.selected_target))):
-        sleep(0.5)
-        use_ability = messagebox.askyesno("Ability", f"Does {name}, the {role.name} want to usre their primary ability ({ability.__name__}) instead of their secondary ability ({role.secondary_ability.__name__})?", icon = "question")
-        role.ability_cancel = not use_ability
-        role.secondary_ability_cancel = use_ability
-        role.made_choice = True
-
-@enforce_types
-def selection_coindition(data: Game_Data, role: Role, name: str, is_primary_ability: bool) -> bool:
-    if is_primary_ability:
-        ability = role.ability
-    else:
-        ability = role.secondary_ability
-
-    ability_type = ability.ability_type
-    singular = (not ("singular" in ability_type and (role.selected_target)))
-    targets = ability.targets > 0 
-
-    dead_targets = (ability.target_living or len(data.dead_players) > 0)
-
-    if singular and data.playing and dead_targets:
-        alternate(data, role, ability, name)
-        on_demand(data, role, ability, is_primary_ability, name)
-    
-    if is_primary_ability:
-        use_ability = not role.ability_cancel
-        role.ability_cancel = not (singular and data.playing and use_ability and dead_targets)
-    else:
-        use_ability = not role.secondary_ability_cancel
-        role.secondary_ability_cancel = not (singular and data.playing and use_ability and dead_targets)
-
-    return singular and data.playing and use_ability and dead_targets and targets
-
 # -- Main -- #
 @enforce_types
 def main() -> None:
@@ -86,6 +37,8 @@ def main() -> None:
             data["_alignment"] = data["alignment"]
 
             del data["alignment"]
+
+            data["abilities"] = {} #{0, data["ability"]}
             
             roles[data["name"]] = Role.new(**data)
 
@@ -160,4 +113,4 @@ if __name__ == "__main__":
             playing = messagebox.askyesno("Game Over", "Do you want to play another round?", icon = "question")
         except Exception as e:
             playing = False
-            #raise e
+            raise e

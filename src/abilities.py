@@ -47,12 +47,21 @@ class reveal(Ability):
     @enforce_types
     def __init__(self) -> None:
         super().__init__(targets = 1, p = 7.5, ability_type = ["repeat", "investigative"], priority = 9, can_pick_same_target = True)
+        self.override: Literal[None, True, False] = None # -- Useful For Roles That Force A Specific Result -- #
 
     # -- Methods -- #
     @enforce_types
     def information(self, data: Game_Data, user: str, result: bool) -> None:
-        if result: data.players[user].information.append(f"Your target is GOOD!")
-        else: data.players[user].information.append(f"Your target is EVIL!")
+        match self.override:
+            case True: 
+                data.players[user].information.append(f"Your target is GOOD!")
+            case False: 
+                data.players[user].information.append(f"Your target is EVIL!")
+            case None:
+                if result: data.players[user].information.append(f"Your target is GOOD!")
+                else: data.players[user].information.append(f"Your target is EVIL!")
+
+        self.override = None
     
     # -- Ability -- #
     @enforce_types
@@ -122,7 +131,7 @@ class protect(Ability):
 class link(Ability):
     @enforce_types
     def __init__(self) -> None:
-        super().__init__(targets = 2, p = 0, ability_type = ["singular", "on_demand"], priority = 4)
+        super().__init__(targets = 2, p = 0, ability_type = ["on_demand"], priority = 4, uses = 1)
 
     # -- Extra Methods -- #
     @enforce_types
@@ -177,7 +186,7 @@ class jester(Ability):
 class stop_vote(Ability):
     @enforce_types
     def __init__(self) -> None:
-        super().__init__(targets = 1, p = 0, ability_type = ["singular", "on_vote", "first_night"])
+        super().__init__(targets = 1, p = 0, ability_type = ["on_vote", "first_night"], uses = 1)
         
     # -- Ability -- #
     @enforce_types
@@ -185,11 +194,9 @@ class stop_vote(Ability):
         user_role = data.players[user]
         target: str = user_role.targets[0]
         if first_night: user_role.information.append(f"{target} is {data.players[target].name}!")
-        user_role.statuses.unemployed = False
         user_role.solo_win = not data.players[target].was_voted_out
 
         if not (data.players[target].currently_alive or data.players[target].was_voted_out):
-            user_role.statuses.unemployed = True
             user_role.solo_win = data.players[user].currently_alive
 
     @enforce_types
@@ -199,11 +206,9 @@ class stop_vote(Ability):
     @enforce_types
     def if_drunk(self, user: str, data: Game_Data) -> None:
         pass
-        # data.players[user].unemployed = False
         # data.players[user].solo_win = data.players[data.players[user].targets[0]].was_voted_out
 
         # if not (data.players[data.players[user].targets[0]].currently_alive or data.players[data.players[user].targets[0]].was_voted_out):
-        #     data.players[user].unemployed = True
         #     data.players[user].solo_win = data.players[user].was_voted_out
 
         #     if data.settings["Early End"] == 1 and data.players[user].solo_win:
@@ -212,16 +217,14 @@ class stop_vote(Ability):
 class execute(Ability):
     @enforce_types
     def __init__(self) -> None:
-        super().__init__(targets = 1, p = 0, ability_type = ["singular", "on_vote"])
+        super().__init__(targets = 1, p = 0, ability_type = ["on_vote"], uses = 1)
         
     # -- Ability -- #
     @enforce_types
     def ability(self, user: str, data: Game_Data) -> None:
-        data.players[user].unemployed = False
         data.players[user].solo_win = data.players[data.players[user].targets[0]].was_voted_out
 
         if not (data.players[data.players[user].targets[0]].currently_alive or data.players[data.players[user].targets[0]].was_voted_out):
-            data.players[user].unemployed = True
             data.players[user].solo_win = data.players[user].currently_alive
 
     @enforce_types
@@ -231,11 +234,9 @@ class execute(Ability):
     @enforce_types
     def if_drunk(self, user: str, data: Game_Data) -> None:
         pass
-        # data.players[user].unemployed = False
         # data.players[user].solo_win = not data.players[data.players[user].targets[0]].was_voted_out
 
         # if not (data.players[data.players[user].targets[0]].currently_alive or data.players[data.players[user].targets[0]].was_voted_out):
-        #     data.players[user].unemployed = True
         #     data.players[user].solo_win = data.players[user].was_voted_out
 
         #     if data.settings["Early End"] == 1 and data.players[user].solo_win:
@@ -338,12 +339,17 @@ class stalk(Ability):
     @enforce_types
     def __init__(self) -> None:
         super().__init__(targets = 1, p = 7.5, ability_type = ["repeat", "investigative"], can_pick_same_target = True)
+        self.invisible_players: set[str] = {}
 
     # -- Methods -- #
     @enforce_types
     def information(self, data: Game_Data, user: str, target: str, visitors: list[str]) -> None:
         target_str: str = f"{target} was visited by "
         count: int = 0
+
+        # -- Removing Invisible Players -- #
+        visitors = list(set(visitors) - self.invisible_players)
+        self.invisible_players = {}
 
         # -- Filtering For " " and Case -- #
         for i in range(len(visitors)):
@@ -407,7 +413,7 @@ class stalk(Ability):
 class resurrect(Ability):
     @enforce_types
     def __init__(self) -> None:
-        super().__init__(targets = 1, p = 7.5, ability_type = ["singular", "on_demand", "defensive"], target_living = False)  
+        super().__init__(targets = 1, p = 7.5, ability_type = ["on_demand", "defensive"], target_living = False, uses = 1)  
     
     # -- Ability -- #
     @enforce_types
@@ -434,8 +440,6 @@ class resurrect(Ability):
                 for role in data.evil_aligned.values():
                     role.information.append(f"{user_role.targets[0]} has been resurrected! They are now evil!")
 
-        elif ability_cancel:
-           user_role.used_ability = False
 
     @enforce_types
     def if_poisoned(self, user: str, data: Game_Data) -> None:
@@ -562,8 +566,6 @@ class gamble(Ability):
             else:
                 role_data: list[str, Ability] = data.random_ability(self.used_abilities)
                 role.secondary_ability = role_data[1]
-                role.secondary_ability.used_ability = False
-                self.used_ability = False
 
                 if role.secondary_ability == instant_death:
                     role.information.append(f"They rolled {role.secondary_ability.__name__}!")
@@ -663,6 +665,7 @@ class index(Ability):
     def __init__(self) -> None:
         super().__init__(targets = 0, p = 7.5, ability_type = ["passive", "investigative"], priority = 11)
         self.seen_roles: set[str] = {"Mafia"}
+        self.blind_roles: set[str] = {} # -- Roles That Cannot Be Seen On A Temporary Basis -- #
 
     # -- Properties -- #
     @property
@@ -689,9 +692,9 @@ class index(Ability):
         user_role: Role = data.players[user]
         self.seen_roles.add(user_role.name)
 
-        selected_set: set[str] = normal_roles - self.seen_roles
-
+        selected_set: set[str] = normal_roles - (self.seen_roles | self.blind_roles)
         self.information(data, user_role, selected_set)
+        self.blind_roles = {}
 
     @enforce_types
     def if_poisoned(self, user: str, data: Game_Data) -> None:
@@ -759,7 +762,7 @@ class examine(Ability):
 class super_kill(Ability):
     @enforce_types
     def __init__(self) -> None:
-        super().__init__(targets = 1, p = 0, ability_type = ["singular", ""], priority = -1, can_pick_same_target = True)
+        super().__init__(targets = 1, p = 0, ability_type = [], priority = -1, can_pick_same_target = True, uses = 1)
         
     # -- Ability -- #
     @enforce_types
@@ -776,3 +779,48 @@ class super_kill(Ability):
     @enforce_types
     def if_drunk(self, user: str, data: Game_Data) -> None:
         pass
+
+class witness_protection(protect):
+    @enforce_types
+    def __init__(self):
+        # -- A Variant of Protection For Lawyer -- #
+        super().__init__()
+        self.number_of_uses = "x"
+        self.ability_type.append("on_demand")
+        self.p = 0
+        self.if_poisoned = self.ability
+
+class evidence_tampering(Ability):
+    @enforce_types
+    def __init__(self):
+        # -- A Variant of Protection For Lawyer -- #
+        super().__init__(targets = 0, p = 0, ability_type = ["on_demand"], priority = -2, uses = "x")
+
+    # -- Ability -- #
+    @enforce_types
+    def ability(self, user: str, data: Game_Data) -> None:
+        # -- Fucks With Any Attempt To Catch Out The Client That Night -- #
+        informational_roles: list[tuple[Role, Ability]] = [[role, role.ability] for role in data.good_aligned.values() if "investigative" in  role.ability.ability_type]
+        client: str = data.players[user].targets[0]
+        client_role_name: str = data.players[client].name
+
+        for role in data.good_aligned.values():
+            if role.ability == gamble:
+                if "investigative" in role.secondary_ability.ability_type:
+                    informational_roles.append((role, role.secondary_ability))
+
+        for role, ability in informational_roles:
+            if client in role.targets:
+                match ability:
+                    case reveal():
+                        ability.override = True
+                    case stalk():
+                        ability.invisible_players.add(client)
+                    case _:
+                        pass
+            else:
+                match ability:
+                    case index():
+                        ability.blind_roles.add(client_role_name)
+                    case _:
+                        pass

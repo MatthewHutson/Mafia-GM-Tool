@@ -14,7 +14,7 @@ import abilities as a
 # -- Functions -- #
 @enforce_types
 def on_demand(data: Game_Data, role: Role, ability: Ability, is_primary_ability: bool, name: str) -> None:
-    if "on_demand" in ability.ability_type and (not ("singular" in ability.ability_type and (role.selected_target))):
+    if "on_demand" in ability.ability_type and ability.number_of_uses != 0:
         sleep(0.5)
         
         use_ability = None
@@ -31,7 +31,7 @@ def on_demand(data: Game_Data, role: Role, ability: Ability, is_primary_ability:
 
 @enforce_types
 def alternate(data: Game_Data, role: Role, ability: Ability, name: str) -> None:
-    if "alternate" in ability.ability_type and (not ("singular" in ability.ability_type and (role.selected_target))):
+    if "alternate" in ability.ability_type and ability.number_of_uses != 0:
         sleep(0.5)
 
         use_ability = None
@@ -46,28 +46,27 @@ def alternate(data: Game_Data, role: Role, ability: Ability, name: str) -> None:
 @enforce_types
 def selection_coindition(data: Game_Data, role: Role, name: str, is_primary_ability: bool) -> bool:
     if is_primary_ability:
-        ability = role.ability
+        ability: Ability = role.ability
     else:
-        ability = role.secondary_ability
+        ability: Ability = role.secondary_ability
 
-    ability_type = ability.ability_type
-    singular = (not ("singular" in ability_type and (role.selected_target)))
+    can_use = ability.number_of_uses != 0
     targets = ability.targets > 0 
 
     dead_targets = (ability.target_living or len(data.dead_players) > 0)
 
-    if singular and data.playing and dead_targets:
+    if can_use and data.playing and dead_targets:
         alternate(data, role, ability, name)
         on_demand(data, role, ability, is_primary_ability, name)
     
     if is_primary_ability:
         use_ability = not role.ability_cancel
-        role.ability_cancel = not (singular and data.playing and use_ability and dead_targets)
+        role.ability_cancel = not (can_use and data.playing and use_ability and dead_targets)
     else:
         use_ability = not role.secondary_ability_cancel
-        role.secondary_ability_cancel = not (singular and data.playing and use_ability and dead_targets)
+        role.secondary_ability_cancel = not (can_use and data.playing and use_ability and dead_targets)
 
-    return singular and data.playing and use_ability and dead_targets and targets
+    return can_use and data.playing and use_ability and dead_targets and targets
 
 @enforce_types
 def nap_time(data: Game_Data) -> None:

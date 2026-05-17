@@ -14,8 +14,8 @@ class Status_Manager():
     # -- Statuses -- #
     poisoned: bool = False
     drunk: bool = False
+    protected: bool = False
     linked: bool = False
-    unemployed: bool = False # Only Used For Neutrals #
 
     # -- Properties -- #
     @property
@@ -51,15 +51,15 @@ class Status_Manager():
 
 class Ability():
     @enforce_types
-    def __init__(self, targets: int, p: Union[int, float], ability_type: list[str], target_living: bool = True, priority: int = 255, can_pick_same_target: bool = False) -> None:
+    def __init__(self, targets: int, p: Union[int, float], ability_type: list[str], target_living: bool = True, priority: int = 255, can_pick_same_target: bool = False, uses: Union[Literal["x"], int] = None) -> None:
         # -- Attributes -- #
         self.targets: int = targets
         self.p: int | float = p
         self.ability_type: list[str] = ability_type
         self.target_living: bool = target_living
         self.priority: float = priority
-        self.used_ability: bool = False
         self.can_pick_same_target: bool = can_pick_same_target
+        self.number_of_uses = uses
     
     @property
     @enforce_types
@@ -82,6 +82,9 @@ class Ability():
         ...
 
     def __call__(self, user: str, data: Game_Data, **kwargs) -> None:
+        if self.number_of_uses is not None:
+            self.number_of_uses -= 1
+
         match data.players[user].statuses.ability_conditions():
             case [True, False]: self.if_poisoned(user, data, **kwargs)
             case [False, True]: self.if_poisoned(user, data, **kwargs)
@@ -127,10 +130,10 @@ class Role:
     information: list[str]
     visited_by: list[str]
     statuses: Status_Manager
+    abilities: dict[int, Ability]
     secondary_ability: Ability = None
     new_mafia = False # For Mafia Alternative Handling
     currently_alive: bool = True
-    protected: bool = False
     linker: str = None
     linked_to: str = None
     selected_target = False
@@ -160,7 +163,7 @@ class Role:
     
     @property
     @enforce_types
-    def ability_type(self) -> list[str]: # Can contain "singular", "passive", "repeat", "on death", "on vote", "on_demand", "recurse_targets", "activate_again", "game_end" #
+    def ability_type(self) -> list[str]: # Can contain "passive", "on death", "on vote", "on_demand", "recurse_targets", "activate_again", "game_end" #
         return self.ability.ability_type
     
     @property
@@ -181,30 +184,6 @@ class Role:
     @enforce_types
     def priority(self) -> float: # Order of Execution of Abilities From Lowest To Highest #
         return self.ability.priority
-    
-    @property
-    @enforce_types
-    def used_ability(self) -> bool:
-        return self.ability.used_ability
-    
-    @used_ability.setter
-    @enforce_types
-    def used_ability(self, value: bool) -> None:
-        self.ability.used_ability = value
-
-    @property
-    @enforce_types
-    def used_secondary_ability(self) -> bool:
-        if self.secondary_ability is not None:
-            return self.secondary_ability.used_ability
-        else:
-            return False
-    
-    @used_secondary_ability.setter
-    @enforce_types
-    def used_secondary_ability(self, value: bool) -> None:
-        if self.secondary_ability is not None:
-            self.secondary_ability.used_ability = value
 
     @property
     @enforce_types
@@ -293,7 +272,10 @@ class Role:
         self.previous_targets = deepcopy(self.targets)
 
     def new(*args, **kwargs) -> Role:
-        return Role(*args, **kwargs, current_targets = [], information = [], visited_by = [], statuses = Status_Manager())
+        try: # Fix This Later
+            return Role(*args, **kwargs, current_targets = [], information = [], visited_by = [], statuses = Status_Manager())
+        except:
+            return Role(*args, **kwargs, current_targets = [], information = [], visited_by = [], statuses = Status_Manager(), abilities = {})
     
 # -- Type Definitions -- #
 class Players(dict[str, Role]):
@@ -400,7 +382,7 @@ class Game_Data():
     # -- Attributes -- #
     players: Players
     roles: dict[str, Role]
-    abilities: dict[str, Callable]
+    abilities: dict[str, Ability]
     ablity_distribution: dict[str, float]
     card_dict: dict[str, str]
     menu_entries: Menu_Entry
@@ -460,6 +442,13 @@ class Game_Data():
 
         self.settings = {name: data["value"] for name, data in self.menu_entries.settings.items()}
 
+        # -- X Count Considerations -- #
+        total_evil_count: int = len(self.evil_aligned)
+
+        for ability in self.abilities.values():
+            if ability.number_of_uses == "x":
+                ability.number_of_uses = total_evil_count
+
         # -- Using A Role For Menu Purposes -- #
         self.vote_role: Role = Role.new("Voting", self.abilities["vote"], True, False, 999)
         
@@ -503,7 +492,7 @@ class Game_Data():
         # -- Saves Game State To The Backup csv When Crash Occurs -- #
         file_name: str = "backup.csv"
         data: list[list[str]] = [["Name", "Role", "Alignment", "Has Selected Target", "Used Primary", "Used Secondary", "Alive", "Solo Win", "Drunk", "Lover", "Targets"]]
-        data: list[list[str]] = data + [[name, role.name, role._alignment, role.selected_target, role.ability.used_ability, role.secondary_ability.used_ability, role.currently_alive, role.solo_win, role.statuses.drunk, role.statuses.linked, str(role.targets)] for name, role in self.players.items()]
+        data: list[list[str]] = data + [[name, role.name, role._alignment, role.selected_target, role.currently_alive, role.solo_win, role.statuses.drunk, role.statuses.linked, str(role.targets)] for name, role in self.players.items()]
 
         with open(file_name, "w") as file:
             writer = csv.writer(file, delimiter = ",", lineterminator = "\n")
@@ -553,8 +542,6 @@ class Game_Data():
             role: Role = self.roles[row[1]]
             role._alignment = row[2]
             role.selected_target = row[3]
-            role.used_ability = row[4]
-            role.used_secondary_ability = row[5]
             role.currently_alive = row[6]
             role.solo_win = row[7]
             role.statuses.drunk = row[8]

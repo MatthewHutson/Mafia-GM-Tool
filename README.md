@@ -2,8 +2,7 @@
 A Program to allocate roles in a game of mafia
 
 # -- Changes -- #
-Bug Fixes - Made Lawyer & Mafia Switch Info Appear On The Correct Night
-Added Default Cancel Options To Alternate And Singular, Meaning You Cannot Butterfingers An Option
+Replaced "singular" tag with a uses count that defaults to none for infinite use abilities.
 
 # -- Important -- #
 Never Give The Testing Role The None Ability

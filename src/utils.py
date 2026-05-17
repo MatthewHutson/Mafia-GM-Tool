@@ -1,5 +1,5 @@
 # -- Imports -- #
-from typing import get_type_hints, get_origin, get_args, Callable, TypeAlias, Any, Protocol, Union
+from typing import get_type_hints, get_origin, get_args, Callable, TypeAlias, Any, Protocol, Union, Literal
 
 # -- Decerators -- #
 def add_attributes(**attributes) -> Callable:
@@ -33,17 +33,26 @@ def get_union(hint: type | TypeAlias) -> list[type | TypeAlias]:
 
     return hints
 
+def literal_test(value: Any, hint: type) -> bool:
+    if value in list(get_args(hint)):
+        return True
+
 def is_instance(value: Any, hint: type | TypeAlias) -> bool:
     # -- Placing Type Cleaning Into Instance Check -- #
-    if type(hint) is type:
-        return isinstance(value, hint)
-    else: 
+    if type(hint) is Literal:
+        return literal_test(value, hint)
+    elif type(hint) is TypeAlias:
         return type(value) is TypeAlias
+    elif type(hint) is type: 
+        return isinstance(value, hint)
+    return False
     
-def ignored_exceptions(hint: type | TypeAlias) -> bool:
+def ignored_exceptions(value: Any, hint: type | TypeAlias) -> bool:
     for subclass in Protocol.__subclasses__():
         if hint == subclass or hint == Any:
             return True
+        elif subclass is Literal:
+            return literal_test()
     
     return False
     
@@ -55,7 +64,7 @@ def any_instance(value: Any, hint: type | TypeAlias) -> bool:
         if is_instance(value, int) and (hint == float) and (not result): 
             value = float(value) # -- Removes Half-Correct floats as int -- #
 
-        result = result or is_instance(value, hint) or ignored_exceptions(hint)
+        result = result or is_instance(value, hint) or ignored_exceptions(value, hint)
 
     return result
 

@@ -385,7 +385,7 @@ def init_game_menu(entries: Menu_Entry, data: Game_Data) -> None:
     card_index(root, bg_2, main_font, text_colour, entries, data) # -- Gives Role Card Before Popups Appear -- #
 
 @enforce_types
-def selection_menu_create(data: Game_Data, entries: Menu_Entry, user: str, target: str = "", is_primary_ability: bool = True, functional: bool = True) -> Any:
+def selection_menu_create(data: Game_Data, entries: Menu_Entry, user: str, target: str = "", is_primary_ability: bool = True, functional: bool = True) -> tuple[tk.Frame, tk.Label, Ability]:
     # -- Setup -- #
     global selected_players
     selected_players = []
@@ -465,8 +465,8 @@ def selection_menu_create(data: Game_Data, entries: Menu_Entry, user: str, targe
         primary_name.update()
         size: tuple = (primary_name.winfo_width(), 3)
 
-        Role_Icon([data.get_role_by_ability(ability).name], main_font, entries, size, command = none, data = data).pack(primary_frame, side = tk.TOP)
-        tk.Label(primary_frame, text = f"Card:\n{data.get_card_by_role(data.get_role_by_ability(ability))}", bg = bg_2).pack(side = tk.BOTTOM, fill = "both", padx = 2, pady = 2, expand = True, anchor = "w")
+        Role_Icon([data.get_role_by_ability(ability, user).name], main_font, entries, size, command = none, data = data).pack(primary_frame, side = tk.TOP)
+        tk.Label(primary_frame, text = f"Card:\n{data.get_card_by_role(data.get_role_by_ability(ability, user))}", bg = bg_2).pack(side = tk.BOTTOM, fill = "both", padx = 2, pady = 2, expand = True, anchor = "w")
 
         if role.secondary_ability is not None:
             if role.secondary_ability.__name__.lower() != "none":

@@ -51,7 +51,7 @@ class Status_Manager():
 
 class Ability():
     @enforce_types
-    def __init__(self, targets: int, p: Union[int, float], ability_type: list[str], target_living: bool = True, priority: int = 255, can_pick_same_target: bool = False, uses: Union[Literal["x"], int] = None) -> None:
+    def __init__(self, targets: int, p: int | float, ability_type: list[str], target_living: bool = True, priority: int = 255, can_pick_same_target: bool = False, uses: Literal["x"] | int = None) -> None:
         # -- Attributes -- #
         self.targets: int = targets
         self.p: int | float = p
@@ -91,7 +91,7 @@ class Ability():
             case _: self.ability(user, data, **kwargs)
 
     @enforce_types
-    def __eq__(self, ability2: Union[Ability, type, None]) -> bool:
+    def __eq__(self, ability2: Ability | type | None) -> bool:
         if type(ability2) == type:
             return type(self) == ability2
         elif ability2 is None:
@@ -158,7 +158,7 @@ class Role:
 
     @property
     @enforce_types
-    def true_alignment(self) -> Union[bool, None]:
+    def true_alignment(self) -> bool | Literal[None]:
         return self._alignment
     
     @property
@@ -402,7 +402,7 @@ class Game_Data():
     # -- Properties -- #
     @property
     @enforce_types
-    def next_evil_player(self) -> Union[str, None]:
+    def next_evil_player(self) -> str | None:
         if self.evil_count >= len(self.evil_aligned):
             return None
         else:
@@ -469,10 +469,14 @@ class Game_Data():
             self.players[player].drunk = True
 
     @enforce_types
-    def get_role_by_ability(self, ability: Ability) -> Union[Role, None]:
+    def get_role_by_ability(self, ability: Ability, user: str = None) -> Role:
         for role in self.roles.values():
             if role.ability == ability:
                 return role
+            
+        if user is not None:
+            return deepcopy(self.players[user])
+        
         return None
     
     @enforce_types
@@ -628,7 +632,7 @@ class Game_Data():
             data["secondary_ability"] = secondary_ability
 
             # -- Main Role Object -- #
-            role: Role = Role("temp", ability, True, False, 1, [], [], [], statuses)
+            role: Role = Role("temp", ability, True, False, 1, [], [], [], statuses, abilities = {})
 
             for name, value in data.items():
                 role.__setattr__(name, value)

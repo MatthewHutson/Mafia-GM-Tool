@@ -1,5 +1,6 @@
 # -- Imports -- #
 from typing import get_type_hints, get_origin, get_args, Callable, TypeAlias, Any, Protocol, Union, Literal
+from types import UnionType, FunctionType
 
 # -- Decerators -- #
 def add_attributes(**attributes) -> Callable:
@@ -23,19 +24,18 @@ def origin(hint: type) -> type | TypeAlias:
 
     return hint
 
-def get_union(hint: type | TypeAlias) -> list[type | TypeAlias]:
-    hint = origin(hint)
-
-    try: hints = hint.__args__
-    except: hints = [hint]
-
-    hints = [origin(hint) for hint in hints]
-
-    return hints
+def union_handler(hint: type | TypeAlias) -> list[type]:
+    hint_origin: type = origin(hint)
+    
+    if hint_origin is Union:
+        return list(get_args(hint))
+    elif hint_origin is UnionType:
+        return list(get_args(hint))
+    else:
+        return [hint]
 
 def literal_test(value: Any, hint: type) -> bool:
-    if value in list(get_args(hint)):
-        return True
+    return value in list(get_args(hint))
 
 def is_instance(value: Any, hint: type | TypeAlias) -> bool:
     # -- Placing Type Cleaning Into Instance Check -- #
@@ -48,23 +48,30 @@ def is_instance(value: Any, hint: type | TypeAlias) -> bool:
     return False
     
 def ignored_exceptions(value: Any, hint: type | TypeAlias) -> bool:
+    if hint == Any: return True
+
     for subclass in Protocol.__subclasses__():
-        if hint == subclass or hint == Any:
+        if hint == subclass:
             return True
-        elif subclass is Literal:
-            return literal_test()
+        
+    if hint == Literal: return literal_test(value, hint)
     
     return False
     
 def any_instance(value: Any, hint: type | TypeAlias) -> bool:
-    result: bool = False
-    hints = get_union(hint)
+    result: bool = True
+    
+    for subhint in get_args(hint):
+        if not ignored_exceptions(value, subhint):
+            result = result and any_instance(value, get_origin(subhint))
 
-    for hint in hints:
-        if is_instance(value, int) and (hint == float) and (not result): 
-            value = float(value) # -- Removes Half-Correct floats as int -- #
+    hints: list[type] = union_handler(hint)
+    intermediate_result: bool = False
 
-        result = result or is_instance(value, hint) or ignored_exceptions(value, hint)
+    for subhint in hints:
+        intermediate_result = intermediate_result or (is_instance(value, hint) or ignored_exceptions(value, hint))
+
+    result = result or intermediate_result
 
     return result
 

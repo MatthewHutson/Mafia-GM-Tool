@@ -87,9 +87,12 @@ def nap_time(data: Game_Data) -> None:
 
 @enforce_types
 def nap_time_info(info: str) -> None:
-    if not messagebox.askyesno("Sleepy Time", info, default = "no", icon = "info"):
-        timer = threading.Timer(3.0, lambda: nap_time_info(info))
-        timer.start()
+    try:
+        if not messagebox.askyesno("Sleepy Time", info, default = "no", icon = "info"):
+            timer = threading.Timer(3.0, lambda: nap_time_info(info))
+            timer.start()
+    except:
+        pass
 
 @enforce_types
 def start_abilities(data: Game_Data) -> None:

@@ -10,14 +10,15 @@ def ability_conditions(role: Role, has_recursed: bool, data: Game_Data) -> bool:
     life = role in data.alive_players.values()
     not_cancel = (not role.ability_cancel or "passive" in role.ability_type or "alternate" in role.ability_type)
     can_use = role.ability.number_of_uses != 0
-    normal_activation = not ("on_vote" in role.ability_type or "on_death" in role.ability_type)
+    normal_activation = not ("no_action_round" in role.ability_type)
+    first_night_special: bool = not ("first_night" in role.ability.ability_type and data.turn_count == 1)
 
     if has_recursed:
         recurse_case = "activate_again" in role.ability_type
     else:
         recurse_case = True
 
-    return life and can_use and recurse_case and normal_activation and not_cancel
+    return life and can_use and recurse_case and normal_activation and not_cancel and first_night_special
 
 @enforce_types
 def use_abilities(data: Game_Data, can_recurse: bool = True) -> None:
@@ -27,7 +28,7 @@ def use_abilities(data: Game_Data, can_recurse: bool = True) -> None:
         if ability_conditions(role, not can_recurse, data):
             role.ability(name, data)
 
-        elif "first_night" in role.ability.ability_type:
+        elif "first_night" in role.ability.ability_type and data.turn_count == 1:
             role.ability(name, data, first_night = True)
 
     for name, role in priority.items():
@@ -60,14 +61,15 @@ def life_death_sort(data: Game_Data) -> None:
 @enforce_types
 def remove_round_data(data: Game_Data, used_Death_ability: bool = False) -> None:
     for role in data.players.values():
-        if (role.ability.number_of_uses != 0) and (used_Death_ability or not ("on_death" in role.ability_type or "on_vote" in role.ability_type)): 
+        if ("keep_targets" not in role.ability.ability_type) and (used_Death_ability or not ("on_death" in role.ability_type or "on_vote" in role.ability_type)): 
             targets = role.targets
+            
             for i in range(len(targets)):
                 targets.pop(0)
 
         role.recursion_fuck_up = False
         role.statuses.poisoned = False
-        role.protected = False
+        role.statuses.protected = False
         role.information = []
         role.visited_by = []
 
@@ -151,7 +153,7 @@ def ability_swap(data: Game_Data, player: str) -> None:
     players = data.players
     role = players[player]
     role.ability, role.secondary_ability = role.secondary_ability, role.ability
-    role.information.append(f"Your ability is now {data.get_role_by_ability(role.ability).name} ({role.ability.__name__})")
+    role.information.append(f"Your ability is now {data.get_role_by_ability(role.ability, player).name} ({role.ability.__name__})")
     
 @enforce_types
 def use_vote_abiltities(data: Game_Data) -> None:
@@ -164,10 +166,7 @@ def use_vote_abiltities(data: Game_Data) -> None:
 
         if role.secondary_ability != None:
             if "on_vote" in role.secondary_ability.ability_type:
-                    try:
-                        role.ability(user, data)
-                    except IndexError: # -- Dealing With Gambler Drawing Neutrals And Not Being Able To Pick Targets
-                        pass
+                role.secondary_ability(user, data)
 
 @enforce_types
 def use_death_abilities(data: Game_Data) -> None:

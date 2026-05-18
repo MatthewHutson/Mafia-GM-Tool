@@ -12,7 +12,7 @@ from typing import Union
 # -- Classes -- #
 class Vertical_Scroll_Frame(tk.Frame):
     @enforce_types
-    def __init__(self, master: Union[tk.Tk, tk.Toplevel, tk.Frame], bg: str = "#F0F0F0", bg_2: str = "#d3d3d3", pack: bool = True) -> None:
+    def __init__(self, master: tk.Tk | tk.Toplevel | tk.Frame, bg: str = "#F0F0F0", bg_2: str = "#d3d3d3", pack: bool = True) -> None:
         # -- Style Given Using Non_Default -- #
         # self.scroll_colour: str = bg_2 #4F4F4F
         # style = ttk.Style()
@@ -66,7 +66,7 @@ class Vertical_Scroll_Frame(tk.Frame):
         self.canvas.master.bind("<MouseWheel>", self.scroll_event)
 
     @enforce_types
-    def bind_all_children(self, widget: tk.Widget, sequence: str, func: Any) -> None:
+    def bind_all_children(self, widget: tk.Widget, sequence: str, func: FunctionType) -> None:
         for child in widget.winfo_children():
             self.bind_all_children(child, sequence, func)
 
@@ -101,7 +101,7 @@ class Vertical_Scroll_Frame(tk.Frame):
 class Role_Icon:
     # -- Constructors -- #
     @enforce_types
-    def __init__(self, roles: list[str], main_font: tuple[str, int], entries: Menu_Entry, size: tuple[int] = (16, 4), padding: tuple[int] = (2, 0), command: Any = None, data: Game_Data = None) -> None:
+    def __init__(self, roles: list[str], main_font: tuple[str, int], entries: Menu_Entry, size: tuple[int] = (16, 4), padding: tuple[int] = (2, 0), command: FunctionType = None, data: Game_Data = None) -> None:
         self.font = main_font
         self.entries = entries
         self.data = data
@@ -279,7 +279,7 @@ class Role_Row:
 
     # -- Methods -- #
     @enforce_types
-    def get_role_reset_function(self, role_boundary_reset: Any) -> None:
+    def get_role_reset_function(self, role_boundary_reset: FunctionType) -> None:
         self.role_boundary_reset: Callable = role_boundary_reset
 
     @enforce_types
@@ -362,7 +362,7 @@ class Role_Row:
         
 class Player_Frame:
     # -- Constructor -- #
-    def __init__(self, user_input: str, main_frame: Union[tk.Frame, Vertical_Scroll_Frame], main_font: tuple[str, int], bg: str, fg: str) -> None:
+    def __init__(self, user_input: str, main_frame: tk.Frame | Vertical_Scroll_Frame, main_font: tuple[str, int], bg: str, fg: str) -> None:
         self.frame = tk.Frame(main_frame, bg = bg)
         self.name_label = tk.Label(self.frame, text = capitalise_words(user_input), font = main_font, bg = bg, fg = fg).pack(side = tk.LEFT, fill = "x", padx = 4)
         self.frame.pack_propagate(False)
@@ -410,7 +410,7 @@ class Player_Frame:
 class Player_Select_Frame(Player_Frame):
     # -- Constructor -- #
     @enforce_types
-    def __init__(self, user_input: str, main_frame: tk.Frame, main_font: tuple[str, int], players: list[object], icon_frame: Role_Row, role_update: Any, bg: str, fg: str) -> None:
+    def __init__(self, user_input: str, main_frame: tk.Frame, main_font: tuple[str, int], players: list[object], icon_frame: Role_Row, role_update: FunctionType, bg: str, fg: str) -> None:
         super().__init__(user_input, main_frame, main_font, bg, fg)
         self.players = players
         self.icon_frame = icon_frame
@@ -434,7 +434,7 @@ class Player_Select_Frame(Player_Frame):
 class Player_Role_Frame(Player_Frame):
     # -- Constructor -- #
     @enforce_types
-    def __init__(self, name: str, data: Game_Data, main_frame: Union[tk.Frame, Vertical_Scroll_Frame], main_font: tuple[str, int], selected_players: list[str], selected_role: Role, number_of_targets: int, pack_alive_and_dead: Any, bg: str, fg: str) -> None:
+    def __init__(self, name: str, data: Game_Data, main_frame: tk.Frame | Vertical_Scroll_Frame, main_font: tuple[str, int], selected_players: list[str], selected_role: Role, number_of_targets: int, pack_alive_and_dead: FunctionType, bg: str, fg: str) -> None:
         super().__init__(name, main_frame, main_font, bg, fg)
         self.data = data
         self.alignment = self.role.true_alignment

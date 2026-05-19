@@ -11,7 +11,7 @@ import colorist
 class none(Ability):
     @enforce_types
     def __init__(self) -> None:
-        super().__init__(targets = 0, p = 17.5, ability_type = ["passive"])
+        super().__init__(targets = 0, p = 15, ability_type = ["passive"])
     
     # -- Ability -- #
     @enforce_types
@@ -510,7 +510,7 @@ class mayor(Ability):
 class gamble(Ability):
     @enforce_types
     def __init__(self) -> None:
-        super().__init__(targets = 0, p = 0, ability_type = ["alternate", "secondary_ability", "passive", "game_start"], priority = 8)
+        super().__init__(targets = 0, p = 0, ability_type = ["secondary_ability", "passive", "game_start"], priority = 8)
         self.used_abilities: set[str] = set([])
         self.non_starting_abilities: set[str] = set([])
         
@@ -521,7 +521,7 @@ class gamble(Ability):
 
         if early_start:
             self.non_starting_abilities: set[str] = {role.ability.true_name for role in data.roles.values()} - {role.ability.true_name for role in data.roles.values() if role.true_alignment == True}
-            self.non_starting_abilities = self.non_starting_abilities.union({"none", "vote", "instant_death"})
+            self.non_starting_abilities = self.non_starting_abilities.union({"none", "vote", "instant_death", "jackpot"})
             role_data: list[str, Ability] = data.random_ability(self.non_starting_abilities)
             
             self.used_abilities.add(role_data[0])
@@ -530,29 +530,29 @@ class gamble(Ability):
             if data.settings["Instant Death"] == 0:
                 self.used_abilities.add("instant_death")
         else:
-            if role.ability_cancel:
+            role.secondary_ability(user, data)
+
+            role_data: list[str, Ability] = data.random_ability(self.used_abilities)
+            role.secondary_ability = role_data[1]
+
+            if role.secondary_ability == instant_death or role.secondary_ability == none or role.secondary_ability == jackpot:
+                role.information.append(f"They rolled {role.secondary_ability.__name__}!")
+            else:
+                new_role: Role = data.get_role_by_ability(role.secondary_ability)
+                new_card: str = data.get_card_by_role(new_role)
+
+                role.information.append(f"They rolled {new_role.name}, which has the card {new_card}!")
+
+            role.ability.priority = role.secondary_ability.priority + 0.5
+
+            if "instant" in role.secondary_ability.ability_type:
                 role.secondary_ability(user, data)
 
-            else:
-                role_data: list[str, Ability] = data.random_ability(self.used_abilities)
-                role.secondary_ability = role_data[1]
+            # -- Removed The Ability From Being Drawn Again -- #
+            if not (role.secondary_ability == none or role.secondary_ability is None):
+                self.used_abilities.add(role_data[0])
 
-                if role.secondary_ability == instant_death:
-                    role.information.append(f"They rolled {role.secondary_ability.__name__}!")
-                else:
-                    new_role: Role = data.get_role_by_ability(role.secondary_ability)
-                    new_card: str = data.get_card_by_role(new_role)
-
-                    role.information.append(f"They rolled {new_role.name}, which has the card {new_card}!")
-
-                role.ability.priority = role.secondary_ability.priority + 0.5
-
-                if "instant" in role.secondary_ability.ability_type:
-                    role.secondary_ability(user, data)
-
-                # -- Removed The Ability From Being Drawn Again -- #
-                if not (role.secondary_ability == none or role.secondary_ability is None):
-                    self.used_abilities.add(role_data[0])
+            print(self.used_abilities)
 
     @enforce_types
     def if_poisoned(self, user: str, data: Game_Data) -> None:
@@ -579,6 +579,31 @@ class instant_death(Ability):
     @enforce_types
     def if_drunk(self, user: str, data: Game_Data) -> None:
         pass
+
+class jackpot(Ability):
+    @enforce_types
+    def __init__(self) -> None:
+        super().__init__(targets = 0, p = 2.5, ability_type = [], priority = -777)
+        
+    # -- Ability -- #
+    @enforce_types
+    def ability(self, user: str, data: Game_Data) -> None:
+        player_role = data.players[user]
+        player_role.statuses.blessed = True
+        ability: gamble = player_role.ability
+
+        for role in data.evil_aligned.values():
+            role.statuses.poisoned = True
+
+        ability.used_abilities = {"instant_death", "jackpot"}
+
+    @enforce_types
+    def if_poisoned(self, user: str, data: Game_Data) -> None:
+        self.ability(user, data)
+
+    @enforce_types
+    def if_drunk(self, user: str, data: Game_Data) -> None:
+        self.ability(user, data)
 
 class magnet(Ability):
     @enforce_types
@@ -872,7 +897,7 @@ class stop_vote(Ability):
 class bless(Ability):
     @enforce_types
     def __init__(self) -> None:
-        super().__init__(targets = 1, p = 0, ability_type = ["on_demand"], uses = 1, priority = -2)
+        super().__init__(targets = 1, p = 0, ability_type = ["on_demand"], uses = 1, priority = 1)
         
     # -- Ability -- #
     @enforce_types
@@ -899,10 +924,14 @@ class vulnerable(Ability):
     # -- Ability -- #
     @enforce_types
     def ability(self, user: str, data: Game_Data) -> None:
-        data.playing = not data.players[user].was_voted_out
+        player: Role = data.players[user]
 
-        if not data.playing:
-            data.evil_win = True
+        if player.was_voted_out:
+            while not player.currently_alive or player.true_alignment == None:
+                player = choice(data.good_aligned.values())
+
+            player.remaining_life_counter = 1
+
 
     @enforce_types
     def if_poisoned(self, user: str, data: Game_Data) -> None:

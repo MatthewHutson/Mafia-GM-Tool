@@ -11,12 +11,9 @@ The Stand Counter Button Will Show The Current Count
 The Counter Will Remain Between Games As Long As the Program Runs
 
 # -- Changelog -- #
-Added Colour Enum For Statuses And Alignments (May Not Use Due To Messagebox Issues)
-Replaced Status Icons With Button 7 Popup System (Like Examiner)
-Added The Ability To Load A Secondary Ability From The Role JSON Files
-Made It Possible To Decide Outcome Before Normal Check
-
-Added The Saint Role
+Saint No Longer Ends Game - Instead Killing A Random Good Role At Night
+Gambler No Longer Manually Re-Rolls
+Jackpot - The Gambler Has A Small Chance Of Winning Big
 
 # -- To Do -- #
 Test Lawyer Rework

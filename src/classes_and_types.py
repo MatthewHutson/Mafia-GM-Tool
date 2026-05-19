@@ -190,6 +190,7 @@ class Role:
     alternative_end_count: int = 0
     made_choice: bool = False
     previous_targets: list = None
+    remaining_life_counter: int = None
     
     # -- Properties -- #
     @property

@@ -449,7 +449,6 @@ class Player_Role_Frame(Player_Frame):
         # -- Role Colours -- #
         self.role_fg = "#000000"
 
-
         if self.role.name == "Testing":
             self.role_bg = "#36eeee"
         elif self.alignment == None:
@@ -460,28 +459,9 @@ class Player_Role_Frame(Player_Frame):
             self.role_bg = "#c72e2e"
             self.role_fg = "#ffffff"
 
-        # -- Linked Icons -- #
-        if self.role.linked:
-            self.linked_bg = "#f94af9"
-            self.linked_fg = "#ffffff"
-        else:
-            self.linked_bg = "#a0ddbe"
-            self.linked_fg = "#000000"
-
-        if self.role.drunk:
-            self.drunk_bg = "#e69138"
-        else:
-            self.drunk_bg = "#DBC1FC"
-
-        # -- Solo Win Icons -- #
-        if self.role.solo_win:
-            self.solo_win_bg = "#48f748"
-        else:
-            self.solo_win_bg = "#d1d1d1"
-
         # -- Extra Icons -- #
         self.select_icon = tk.Button(self.frame, text = "Select", bg = "#5D9FF0", activebackground = "#4980C4", fg = "#FFFFFF", activeforeground = "#FFFFFF", width = 6, height = 4, command = self.select)
-        self.stats_icon = tk.Button(self.frame, text = f"Statuses ({self.status_num})", bg = "#ccffc0", fg = "#000000", activebackground = "#36eeee", activeforeground = "#000000", width = 10, height = 4, command = self.show_statuses)
+        self.stats_icon = tk.Button(self.frame, text = f"Statuses ({self.status_num})", bg = "#DBC1FC", fg = "#000000", activebackground = "#DBC1FC", activeforeground = "#000000", width = 10, height = 4, command = self.show_statuses)
 
         if type(self.master) == Vertical_Scroll_Frame:
             self.master.add_player_frame(self)

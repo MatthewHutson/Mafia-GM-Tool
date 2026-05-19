@@ -31,6 +31,12 @@ def use_abilities(data: Game_Data, can_recurse: bool = True) -> None:
         elif "first_night" in role.ability.ability_type and data.turn_count == 1:
             role.ability(name, data, first_night = True)
 
+        if role.remaining_life_counter is not None:
+            role.remaining_life_counter -= 1
+
+            if role.remaining_life_counter == 0:
+                role.die()
+
     for name, role in priority.items():
         if "late" in role.ability.ability_type:
             role.ability(name, data)

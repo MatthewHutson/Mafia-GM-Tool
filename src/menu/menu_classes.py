@@ -480,11 +480,8 @@ class Player_Role_Frame(Player_Frame):
             self.solo_win_bg = "#d1d1d1"
 
         # -- Extra Icons -- #
-        self.linked_icon = tk.Button(self.frame, text = "", bg = self.linked_bg, activebackground = self.linked_bg, fg = self.linked_fg, activeforeground = self.linked_fg, width = 2, height = 2)
-        self.drunk_icon = tk.Button(self.frame, text = "", bg = self.drunk_bg, activebackground = self.drunk_bg, fg = "#000000", activeforeground = "#000000", width = 2, height = 2)
-        self.solo_win_icon = tk.Button(self.frame, text = "", bg = self.solo_win_bg, activebackground = self.solo_win_bg, fg = "#000000", activeforeground = "#000000", width = 2, height = 2)
         self.select_icon = tk.Button(self.frame, text = "Select", bg = "#5D9FF0", activebackground = "#4980C4", fg = "#FFFFFF", activeforeground = "#FFFFFF", width = 6, height = 4, command = self.select)
-
+        self.stats_icon = tk.Button(self.frame, text = f"Statuses ({self.status_num})", bg = "#ccffc0", fg = "#000000", activebackground = "#36eeee", activeforeground = "#000000", width = 10, height = 4, command = self.show_statuses)
 
         if type(self.master) == Vertical_Scroll_Frame:
             self.master.add_player_frame(self)
@@ -516,6 +513,10 @@ class Player_Role_Frame(Player_Frame):
             self._kill_icon = tk.Button(self.frame, text = "Revive", bg = "#474747", activebackground = "#2B2B2B", fg = "#FFFFFF", activeforeground = "#FFFFFF", width = 6, height = 4, command = self.revive)
 
         return self._kill_icon
+    
+    @property
+    def status_num(self) -> int:
+        return self.role.statuses.count_statuses()
 
     # -- Methods -- #
     @enforce_types
@@ -523,9 +524,7 @@ class Player_Role_Frame(Player_Frame):
         self.role_icon.pack(side = tk.RIGHT, padx = 2, expand = False)
         self.select_icon.pack(side = tk.RIGHT, padx = 2, expand = False)
         self.kill_icon.pack(side = tk.RIGHT, padx = 2, expand = False)
-        self.linked_icon.pack(side = tk.RIGHT, padx = 2, pady = 4, expand = False)
-        self.drunk_icon.pack(side = tk.RIGHT, padx = 2, pady = 4, expand = False)
-        self.solo_win_icon.pack(side = tk.RIGHT, padx = 2, pady = 4, expand = False)
+        self.stats_icon.pack(side = tk.RIGHT, padx = 2, expand = False)
         super().pack()
 
     @enforce_types
@@ -535,9 +534,7 @@ class Player_Role_Frame(Player_Frame):
         try: self._kill_icon.pack_forget()
         except: pass
 
-        self.linked_icon.pack_forget()
-        self.drunk_icon.pack_forget()
-        self.solo_win_icon.pack_forget()
+        self.stats_icon.pack_forget
         super().forget()
 
     @enforce_types
@@ -587,6 +584,16 @@ class Player_Role_Frame(Player_Frame):
                 self.data.evil_aligned[self.name] = self.role
 
             self.pack_alive_and_dead(self.data, self.selected_role, self.number_of_targets)
+
+    @enforce_types
+    def show_statuses(self) -> None:
+        statuses: Status_Manager = self.role.statuses
+        output: str = f"The player {self.name} ({self.role.name})\n\n"
+
+        for item in statuses.get_data(additions = {"winning": self.role.solo_win}):
+            output += item + "\n"
+
+        messagebox.showinfo(f"{self.name}'s Statuses", output, icon = "info")
 
 # -- Protocols -- #
 class Has_Widget_Children(Protocol):

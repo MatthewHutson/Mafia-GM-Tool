@@ -4,9 +4,26 @@ from dataclasses import dataclass
 from utils import *
 from random import shuffle, choice
 from copy import deepcopy
+from colorist import style_text, ColorHex
+from enum import Enum
 import numpy as np
 import csv
 import json
+
+# -- Enums -- #
+class colours(Enum):
+    winning = "#00ff00"
+    poisoned = "#96466e"
+    drunk = "#de8c36"
+    protected = "#c671ff"
+    linked = "#ff00ff"
+    blessed = "#22ffed"
+    silenced = "#424242"
+    doused = "#ff5e00"
+    good = "#00ff00"
+    evil = "#ff0000"
+    neutral = "#ffffff"
+    testing = "#36eeee"
 
 # -- Ability Template Class -- #
 @dataclass
@@ -16,6 +33,8 @@ class Status_Manager():
     drunk: bool = False
     protected: bool = False
     linked: bool = False
+    blessed: bool = False
+    # silenced: bool = False
 
     # -- Properties -- #
     @property
@@ -29,16 +48,31 @@ class Status_Manager():
         return [self.poisoned, self.drunk]
     
     @enforce_types
-    def get_data(self, user: str, inverse = False) -> list[str]:
+    def get_data(self, user: str = "", inverse = False, add_colours: bool = False, additions: dict[str, bool] = {}) -> list[str]:
         output: list[str] = []
 
-        for status, value in self.__dict__.items():
-            if value ^ inverse:
-                output.append(f"{user} is {status}.")
+        for status, value in (self.__dict__ | additions).items():
+            if add_colours:
+                colour: ColorHex = ColorHex(colours[status].value)
+                out_string: str = style_text(status, colour)
             else:
-                output.append(f"{user} is NOT {status}.")
+                out_string: str = status
+
+            if value ^ inverse:
+                output.append(f"{user} is {out_string}.")
+            else:
+                output.append(f"{user} is NOT {out_string}.")
 
         return output
+    
+    @enforce_types
+    def count_statuses(self, additions: dict[str, bool] = {}) -> int:
+        count: int = 0
+
+        for value in (self.__dict__ | additions).values():
+            count += int(value)
+
+        return count
 
     @enforce_types
     def bullshit_data(self, user: str) -> list[str]:
@@ -48,6 +82,14 @@ class Status_Manager():
             output.append(f"{user} is{extra} {status}.")
 
         return output
+    
+    def __setattr__(self, name: str, value: Any) -> None:
+        super().__setattr__(name, value)
+
+        if self.blessed:
+            cleared_effects: list[str] = ["poisoned", "drunk"] #add Silenced
+            for effect in cleared_effects:
+                super().__setattr__(effect, False)
 
 class Ability():
     @enforce_types
@@ -477,7 +519,7 @@ class Game_Data():
         if user is not None:
             return deepcopy(self.players[user])
         
-        return None
+        return self.roles["Testing"]
     
     @enforce_types
     def get_card_by_role(self, role: Role) -> str:

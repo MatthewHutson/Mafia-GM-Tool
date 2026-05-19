@@ -5,6 +5,7 @@ from game_loop_functions import *
 from random import choice
 from time import sleep
 from re import fullmatch
+import colorist
 
 # -- Roles -- #
 class none(Ability):
@@ -136,8 +137,8 @@ class link(Ability):
     # -- Extra Methods -- #
     @enforce_types
     def link(self, data: Game_Data, user: str, link_1: str, link_2: str) -> None:
-        data.players[link_1].linked = True
-        data.players[link_2].linked = True
+        data.players[link_1].statuses.linked = True
+        data.players[link_2].statuses.linked = True
 
         data.players[link_1].linker = user
         data.players[link_2].linker = user
@@ -317,7 +318,7 @@ class stalk(Ability):
         count: int = 0
 
         # -- Removing Invisible Players -- #
-        visitors = list(set(visitors) - self.invisible_players)
+        visitors = list(set(visitors).difference(self.invisible_players))
         self.invisible_players = {}
 
         # -- Filtering For " " and Case -- #
@@ -834,7 +835,7 @@ class evidence_tampering(Ability):
 class stop_vote(Ability):
     @enforce_types
     def __init__(self) -> None:
-        super().__init__(targets = 1, p = 0, ability_type = ["singular", "on_vote", "first_night", "keep_targets"])
+        super().__init__(targets = 1, p = 0, ability_type = ["on_vote", "first_night", "keep_targets"])
         
     # -- Ability -- #
     @enforce_types
@@ -867,11 +868,46 @@ class stop_vote(Ability):
     @enforce_types
     def if_drunk(self, user: str, data: Game_Data) -> None:
         pass
-        # data.players[user].unemployed = False
-        # data.players[user].solo_win = data.players[data.players[user].targets[0]].was_voted_out
 
-        # if not (data.players[data.players[user].targets[0]].currently_alive or data.players[data.players[user].targets[0]].was_voted_out):
-        #     data.players[user].solo_win = data.players[user].was_voted_out
+class bless(Ability):
+    @enforce_types
+    def __init__(self) -> None:
+        super().__init__(targets = 1, p = 0, ability_type = ["on_demand"], uses = 1, priority = -2)
+        
+    # -- Ability -- #
+    @enforce_types
+    def ability(self, user: str, data: Game_Data) -> None:
+        user_role: Role = data.players[user]
+        target: str = user_role.targets[0]
+        target_role: Role = data.players[target]
 
-        #     if data.settings["Early End"] == 1 and data.players[user].solo_win:
-        #         data.playing = False
+        target_role.statuses.blessed = True
+
+    @enforce_types
+    def if_poisoned(self, user: str, data: Game_Data) -> None:
+        pass
+
+    @enforce_types
+    def if_drunk(self, user: str, data: Game_Data) -> None:
+        pass
+
+class vulnerable(Ability):
+    @enforce_types
+    def __init__(self) -> None:
+        super().__init__(targets = 0, p = 0, ability_type = ["on_death", "no_action_round"])
+        
+    # -- Ability -- #
+    @enforce_types
+    def ability(self, user: str, data: Game_Data) -> None:
+        data.playing = not data.players[user].was_voted_out
+
+        if not data.playing:
+            data.evil_win = True
+
+    @enforce_types
+    def if_poisoned(self, user: str, data: Game_Data) -> None:
+        self.ability(user, data)
+
+    @enforce_types
+    def if_drunk(self, user: str, data: Game_Data) -> None:
+        self.ability(user, data)

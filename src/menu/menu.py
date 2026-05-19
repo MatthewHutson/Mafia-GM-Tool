@@ -471,7 +471,7 @@ def selection_menu_create(data: Game_Data, entries: Menu_Entry, user: str, targe
         if role.secondary_ability is not None:
             if role.secondary_ability.__name__.lower() != "none":
                 tk.Label(secondary_frame, text = f"Secondary Ability:\n{role.secondary_ability.__name__} ({role.secondary_ability.targets})", bg = bg_2).pack(side = tk.TOP, fill = "x", padx = 2, pady = 2, ipady = 10, expand = False, anchor = "w")
-                Role_Icon([data.get_role_by_ability(role.secondary_ability).name], main_font, entries, size, command = none, data = data).pack(secondary_frame, side = tk.TOP)
+                Role_Icon([data.get_role_by_ability(role.secondary_ability, user).name], main_font, entries, size, command = none, data = data).pack(secondary_frame, side = tk.TOP)
                 tk.Label(secondary_frame, text = f"Card:\n{data.get_card_by_role(data.get_role_by_ability(role.secondary_ability))}", bg = bg_2).pack(side = tk.BOTTOM, fill = "both", padx = 2, pady = 2, expand = True, anchor = "w")
             else:
                 tk.Label(secondary_frame, text = f"Secondary Ability:\nNone (0)", bg = bg_2).pack(side = tk.TOP, fill = "both", padx = 2, pady = 2, ipady = 10, expand = False, anchor = "w")

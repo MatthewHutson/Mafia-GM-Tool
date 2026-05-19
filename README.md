@@ -11,15 +11,16 @@ The Stand Counter Button Will Show The Current Count
 The Counter Will Remain Between Games As Long As the Program Runs
 
 # -- Changelog -- #
-Upgraded Type Checker Again - Now Handles Any Layer Of Nesting And Unioning And Literals
-Replaced Unwanted Instances Of Any With Their Correct Type (FunctionTypes And Tuples)
+Added Colour Enum For Statuses And Alignments (May Not Use Due To Messagebox Issues)
+Replaced Status Icons With Button 7 Popup System (Like Examiner)
+Added The Ability To Load A Secondary Ability From The Role JSON Files
+Made It Possible To Decide Outcome Before Normal Check
 
-Began The Process of Reworking The README.md file
-
-Lawyer Rework - Added The Witness Protection & Evidence Tampering
+Added The Saint Role
 
 # -- To Do -- #
 Test Lawyer Rework
+Rework Effect Display - Replace With Button And Colourful Popup
 Rework Bomber
 Rework Role Selection System - Dont Guarentee Specific Role
 

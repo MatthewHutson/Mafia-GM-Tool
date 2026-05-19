@@ -32,9 +32,13 @@ def main() -> None:
         with open(path + "/" + item, 'r') as file:
             data: dict = json.load(file)
 
-            ability_name = data["ability"]  
-            data["ability"] = role_functions[ability_name]
+            ability_name: str = data["ability"]  
+            data["ability"] = deepcopy(role_functions[ability_name])
             data["_alignment"] = data["alignment"]
+
+            if "secondary_ability" in data.keys():
+                secondary_name: str = data["secondary_ability"]
+                data["secondary_ability"] = deepcopy(role_functions[secondary_name])
 
             del data["alignment"]
 

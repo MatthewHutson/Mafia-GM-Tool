@@ -496,7 +496,7 @@ class Player_Role_Frame(Player_Frame):
     
     @property
     def status_num(self) -> int:
-        return self.role.statuses.count_statuses()
+        return self.role.statuses.count_statuses(additions = {"winning": self.role.solo_win, "doomed": self.role.remaining_life_counter is not None})
 
     # -- Methods -- #
     @enforce_types
@@ -570,7 +570,7 @@ class Player_Role_Frame(Player_Frame):
         statuses: Status_Manager = self.role.statuses
         output: str = f"The player {self.name} ({self.role.name})\n\n"
 
-        for item in statuses.get_data(additions = {"winning": self.role.solo_win}):
+        for item in statuses.get_data(additions = {"winning": self.role.solo_win, "doomed": self.role.remaining_life_counter is not None}):
             output += item + "\n"
 
         messagebox.showinfo(f"{self.name}'s Statuses", output, icon = "info")

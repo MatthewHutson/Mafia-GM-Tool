@@ -928,7 +928,7 @@ class vulnerable(Ability):
 
         if player.was_voted_out:
             while not player.currently_alive or player.true_alignment == None:
-                player = choice(data.good_aligned.values())
+                player = choice(list(data.good_aligned.values()))
 
             player.remaining_life_counter = 1
 

@@ -11,9 +11,11 @@ The Stand Counter Button Will Show The Current Count
 The Counter Will Remain Between Games As Long As the Program Runs
 
 # -- Changelog -- #
-Saint No Longer Ends Game - Instead Killing A Random Good Role At Night
-Gambler No Longer Manually Re-Rolls
-Jackpot - The Gambler Has A Small Chance Of Winning Big
+Bug Fix - "Doom" Crashed The Game
+Bug Fix - Status Count Discluded Winning
+Made "Doom" Visible To Dev Status Tracker - If A Role Has A Limited Number Of Turns To Survive
+
+Unraised e in main
 
 # -- To Do -- #
 Test Lawyer Rework

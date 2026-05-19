@@ -35,7 +35,8 @@ def use_abilities(data: Game_Data, can_recurse: bool = True) -> None:
             role.remaining_life_counter -= 1
 
             if role.remaining_life_counter == 0:
-                role.die()
+                role.statuses.protected = False
+                role.die(data.players)
 
     for name, role in priority.items():
         if "late" in role.ability.ability_type:

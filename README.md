@@ -11,16 +11,11 @@ The Stand Counter Button Will Show The Current Count
 The Counter Will Remain Between Games As Long As the Program Runs
 
 # -- Changelog -- #
-Bug Fix - "Doom" Crashed The Game
-Bug Fix - Status Count Discluded Winning
-Made "Doom" Visible To Dev Status Tracker - If A Role Has A Limited Number Of Turns To Survive
-
-Unraised e in main
+Replaced Bomber With Vigilantee - One Time Super Kill That Works Only On Evil & Neutral Players
 
 # -- To Do -- #
 Test Lawyer Rework
 Rework Effect Display - Replace With Button And Colourful Popup
-Rework Bomber
 Rework Role Selection System - Dont Guarentee Specific Role
 
 Find And Fix Crash Caused By Putting A Role As A String Parameter Somewhere (Idk yet)

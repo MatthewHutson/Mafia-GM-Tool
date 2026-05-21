@@ -1,6 +1,6 @@
 {
-    "name": "Bomber",
-    "ability": "vengance",
+    "name": "Vigilante",
+    "ability": "execute",
     "alignment": true,
     "mafia_alternative": false,
     "max_count": 1

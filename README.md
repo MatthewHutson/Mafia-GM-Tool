@@ -11,16 +11,8 @@ The Stand Counter Button Will Show The Current Count
 The Counter Will Remain Between Games As Long As the Program Runs
 
 # -- Changelog -- #
-New Evil Role: Silencer - "Shut up Or Die"
-With This, New Status Effect - Silence (Resisted By Blessing)
-
-Bug Fix - Sheriff Confusing Evils and Neutrals by Accident
-Bug Fix - Players Were Perpetually Doomed
-
-Removed Evil Roles From Gambler Pool
-Altered Gambler Probabilities
-
-Removed Completed To Dos From README Cus I Forgot To
+Bug Fix - Accidentally Made The Gambler's Probabilities Wrong
+Bug Fix - Forgot To Give Creep Non-Default Priority, Making It Outspeed Blackmailer
 
 # -- To Do -- #
 Get One More Good Role In

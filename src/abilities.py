@@ -11,7 +11,7 @@ import colorist
 class none(Ability):
     @enforce_types
     def __init__(self) -> None:
-        super().__init__(targets = 0, p = 35, ability_type = ["passive"])
+        super().__init__(targets = 0, p = 25, ability_type = ["passive"])
     
     # -- Ability -- #
     @enforce_types
@@ -47,7 +47,7 @@ class vote(Ability):
 class reveal(Ability):
     @enforce_types
     def __init__(self) -> None:
-        super().__init__(targets = 1, p = 7.5, ability_type = ["repeat", "investigative"], priority = 7, can_pick_same_target = True)
+        super().__init__(targets = 1, p = 5, ability_type = ["repeat", "investigative"], priority = 7, can_pick_same_target = True)
         self.override: Literal[None, True, False] = None # -- Useful For Roles That Force A Specific Result -- #
 
     # -- Methods -- #
@@ -93,7 +93,7 @@ class reveal(Ability):
 class endure(Ability):
     @enforce_types
     def __init__(self) -> None:
-        super().__init__(targets = 0, p = 15, ability_type = ["passive", "defensive"], priority = 2)
+        super().__init__(targets = 0, p = 12.5, ability_type = ["passive", "defensive"], priority = 2)
     
     # -- Ability -- #
     @enforce_types
@@ -312,7 +312,7 @@ class telepathy(Ability):
 class stalk(Ability):
     @enforce_types
     def __init__(self) -> None:
-        super().__init__(targets = 1, p = 10, ability_type = ["repeat", "investigative"], can_pick_same_target = True)
+        super().__init__(targets = 1, p = 7.5, ability_type = ["repeat", "investigative"], can_pick_same_target = True, priority = 11)
         self.invisible_players: set[str] = {}
 
     # -- Methods -- #
@@ -719,7 +719,7 @@ class index(Ability):
 class examine(Ability):
     @enforce_types
     def __init__(self) -> None:
-        super().__init__(targets = 1, p = 15, ability_type = ["repeat", "investigative"], priority = 10, can_pick_same_target = True)
+        super().__init__(targets = 1, p = 12.5, ability_type = ["repeat", "investigative"], priority = 10, can_pick_same_target = True)
 
     # -- Ability -- #
     @enforce_types
@@ -954,7 +954,7 @@ class execute(Ability):
 class silence(Ability):
     @enforce_types
     def __init__(self) -> None:
-        super().__init__(targets = 1, p = 0, ability_type = ["repeat"], priority = 11)
+        super().__init__(targets = 1, p = 0, ability_type = ["repeat", "on_demand"], priority = 12)
     
     # -- Ability -- #
     @enforce_types

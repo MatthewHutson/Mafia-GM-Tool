@@ -35,8 +35,11 @@ def use_abilities(data: Game_Data, can_recurse: bool = True) -> None:
             role.remaining_life_counter -= 1
 
             if role.remaining_life_counter == 0:
+                protected: bool = role.statuses.protected
                 role.statuses.protected = False
                 role.die(data.players)
+                role.statuses.protected = protected
+                role.remaining_life_counter = None
 
     for name, role in priority.items():
         if "late" in role.ability.ability_type:
@@ -66,8 +69,8 @@ def life_death_sort(data: Game_Data) -> None:
                     data.evil_aligned[name] = role
 
 @enforce_types
-def remove_round_data(data: Game_Data, used_Death_ability: bool = False) -> None:
-    for role in data.players.values():
+def remove_round_data(data: Game_Data, used_Death_ability: bool = False, post_vote: bool = False) -> None:
+    for name, role in data.players.items():
         if ("keep_targets" not in role.ability.ability_type) and (used_Death_ability or not ("on_death" in role.ability_type or "on_vote" in role.ability_type)): 
             targets = role.targets
             
@@ -75,10 +78,25 @@ def remove_round_data(data: Game_Data, used_Death_ability: bool = False) -> None
                 targets.pop(0)
 
         role.recursion_fuck_up = False
-        role.statuses.poisoned = False
-        role.statuses.protected = False
         role.information = []
         role.visited_by = []
+
+        # -- Silence Check -- #
+        if post_vote: 
+            if role.statuses.silenced:
+                survived: bool = None
+                while survived is None:
+                    survived = messagebox.askyesnocancel("Ability", f"Did {name} Stay Silent?", default = "cancel", icon = "question")
+
+                if not survived:
+                    role.remaining_life_counter = 1
+
+        # -- Status Conditions -- #
+        if post_vote: 
+            role.statuses.silenced = False
+        else:
+            role.statuses.protected = False
+            role.statuses.poisoned = False
 
 @enforce_types
 def update_all_targets(data: Game_Data) -> None:

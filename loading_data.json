@@ -9,7 +9,7 @@
     },
     "evil": {
         "lead": ["Mafia"],
-        "support": ["Poisoner", "Psychic", "Magnet", "Ambusher", "Chancellor"]
+        "support": ["Poisoner", "Psychic", "Magnet", "Ambusher", "Chancellor", "Blackmailer"]
     },
     "boundaries": {
         "guarenteed": ["lead", "information", "defensive"],

@@ -153,7 +153,7 @@ def game(data: Game_Data, entries: Menu_Entry, normal_start: bool = True) -> Non
             # -- Player And GM Info -- #
             information(data)
             life_death_sort(data)
-            information(data, False)
+            information(data, tell_nothing = False, first_wave = False)
 
             # -- Resetting The Player Data -- #
             update_all_targets(data)
@@ -162,7 +162,7 @@ def game(data: Game_Data, entries: Menu_Entry, normal_start: bool = True) -> Non
             pack_alive_and_dead(data, data.vote_role, 0)
             use_death_abilities(data)
             life_death_sort(data)
-            remove_round_data(data, True)
+            remove_round_data(data, used_Death_ability = True)
 
             check_for_victory(data)
 
@@ -176,6 +176,7 @@ def game(data: Game_Data, entries: Menu_Entry, normal_start: bool = True) -> Non
                 use_vote_abiltities(data)
                 use_death_abilities(data)
                 life_death_sort(data)
+                remove_round_data(data, post_vote = True)
 
                 if data.playing:
                     pack_alive_and_dead(data, data.vote_role, 0)

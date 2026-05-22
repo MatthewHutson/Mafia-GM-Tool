@@ -34,7 +34,7 @@ class Status_Manager():
     protected: bool = False
     linked: bool = False
     blessed: bool = False
-    # silenced: bool = False
+    silenced: bool = False
 
     # -- Properties -- #
     @property
@@ -87,7 +87,7 @@ class Status_Manager():
         super().__setattr__(name, value)
 
         if self.blessed:
-            cleared_effects: list[str] = ["poisoned", "drunk"] #add Silenced
+            cleared_effects: list[str] = ["poisoned", "drunk", "silenced"]
             for effect in cleared_effects:
                 super().__setattr__(effect, False)
 

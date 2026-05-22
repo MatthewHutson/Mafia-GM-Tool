@@ -11,17 +11,21 @@ The Stand Counter Button Will Show The Current Count
 The Counter Will Remain Between Games As Long As the Program Runs
 
 # -- Changelog -- #
-Replaced Bomber With Vigilantee - One Time Super Kill That Works Only On Evil & Neutral Players
+New Evil Role: Silencer - "Shut up Or Die"
+With This, New Status Effect - Silence (Resisted By Blessing)
+
+Bug Fix - Sheriff Confusing Evils and Neutrals by Accident
+Bug Fix - Players Were Perpetually Doomed
+
+Removed Evil Roles From Gambler Pool
+Altered Gambler Probabilities
+
+Removed Completed To Dos From README Cus I Forgot To
 
 # -- To Do -- #
-Test Lawyer Rework
-Rework Effect Display - Replace With Button And Colourful Popup
-Rework Role Selection System - Dont Guarentee Specific Role
+Get One More Good Role In
 
 Find And Fix Crash Caused By Putting A Role As A String Parameter Somewhere (Idk yet)
-Find More Backup related bugs
-
-Think More About Lawyer - Possible Tampering To Help
 
 Make A Setting To Allow For Toggling Removing Guarenteed Roles
 Discord Bot Variant

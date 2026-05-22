@@ -530,10 +530,13 @@ def voting_menu(data: Game_Data, entries: Menu_Entry) -> str:
         return "none"
 
 @enforce_types
-def information(data: Game_Data, tell_nothing: bool = True) -> None:
+def information(data: Game_Data, tell_nothing: bool = True, first_wave: bool = True) -> None:
     for player, role in data.alive_players.items():
         info: str = "\n"
         count: int = 0
+
+        if role.statuses.silenced & first_wave:
+            role.information.append("You have been Silenced!")
 
         for item in role.information:
             info += f"\n #{count + 1}: " + item

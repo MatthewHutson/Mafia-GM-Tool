@@ -11,11 +11,13 @@ The Stand Counter Button Will Show The Current Count
 The Counter Will Remain Between Games As Long As the Program Runs
 
 # -- Changelog -- #
-Bug Fix - Accidentally Made The Gambler's Probabilities Wrong
-Bug Fix - Forgot To Give Creep Non-Default Priority, Making It Outspeed Blackmailer
+Made It So Remaining Life Counter Cannot Be Increased Through Property
+Put THe Changes In The Correct Place
 
 # -- To Do -- #
-Made It So Remaining Life Counter Cannot Be Increased Through Property
+Test Reworks
+Laminate Cards
+Make All Agreed Upon Roles
 
 # -- Ideas -- #
 Possible Third Evil Player?

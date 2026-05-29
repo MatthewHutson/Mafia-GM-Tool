@@ -9,7 +9,6 @@
     "Soldier": "Black Ace (A)",
     "Doctor": "Black 2",
     "Sheriff": "Black 3",
-    "Cupid": "Black 4",
     "Mayor": "Black 5",
     "Creep": "Black 6",
     "Gambler": "Black 7",
@@ -21,5 +20,6 @@
     "Villager": "Any Other Card",
     "Jester": "Red Jack",
     "Lawyer": "Red Queen",
+    "Cupid": "Red King",
     "Testing": "Testing Role"
 }

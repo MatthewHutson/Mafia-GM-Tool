@@ -15,17 +15,7 @@ Bug Fix - Accidentally Made The Gambler's Probabilities Wrong
 Bug Fix - Forgot To Give Creep Non-Default Priority, Making It Outspeed Blackmailer
 
 # -- To Do -- #
-Doom Status - The Remaining Life Counter Can Now Be Seen By Examiner As The "Doom" Status
-
-Cupid Rework - Cupid Is Now Neutral - Trying To Get Successive Lover Deaths
-Cupid Gains "Heartbreak" Ability - Gives Doom 1 To A Lover
-Lover Condition Change - Death Now Causes Partner To Become Drunk
-
-Sheriff Change - Poisoned Neutral Gives Random Result (50% Good, 25% Evil, 25% Neutral)
-
-Added (Or Re-Added (idk)) Post Game Ability Useage
-
-Unraised e in main
+Made Cupid Now Red King Card (Subject To Change When Custom Cards Are Laminated)
 
 # -- Ideas -- #
 Possible Third Evil Player?

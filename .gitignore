@@ -2,5 +2,5 @@
 token.txt
 defaults.txt
 backup.csv
-backup.json
+*backup.json
 src/discord_bot/*

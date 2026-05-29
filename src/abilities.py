@@ -80,7 +80,7 @@ class reveal(Ability):
         if data.players[target].true_alignment is not None:
             alignment: bool = not data.players[target].alignment
         else:
-            alignment = None
+            alignment = choice([True, True, False, None])
 
         self.information(data, user, alignment, target)
 
@@ -137,7 +137,7 @@ class protect(Ability):
 class link(Ability):
     @enforce_types
     def __init__(self) -> None:
-        super().__init__(targets = 2, p = 0, ability_type = ["on_demand", "keep_targets"], priority = 2, uses = 1)
+        super().__init__(targets = 2, p = 0, ability_type = ["on_demand"], priority = 2, uses = 1)
 
     # -- Extra Methods -- #
     @enforce_types
@@ -145,11 +145,10 @@ class link(Ability):
         data.players[link_1].statuses.linked = True
         data.players[link_2].statuses.linked = True
 
-        data.players[link_1].linker = user
-        data.players[link_2].linker = user
-
         data.players[link_1].linked_to = link_2
         data.players[link_2].linked_to = link_1
+
+        data.players[user].ability = heart_break()
         
     # -- Ability -- #
     @enforce_types
@@ -166,6 +165,62 @@ class link(Ability):
     def if_drunk(self, user: str, data: Game_Data) -> None:
         link_1: str = choice([name for name, role in data.players.items() if role.name != "Cupid"])
         self.link(data, user, user, link_1)
+
+@enforce_types
+class cupid_victory(Ability):
+    @enforce_types
+    def __init__(self) -> None:
+        super().__init__(targets = 0, p = 0, ability_type = ["passive", "on_vote", "game_end"], priority = 2)
+
+    # -- Ability -- #
+    @enforce_types
+    def ability(self, user: str, data: Game_Data) -> None:
+        user_role: Role = data.players[user]
+        lovers: list[str] = data.get_lovers()
+        link_1: str = lovers[0]
+        link_2: str = lovers[1]
+
+        print(data.previous_deaths)
+        print(data.second_previous_deaths)
+
+        if link_1 in data.previous_deaths:
+            if link_2 in data.previous_deaths or link_2 in data.second_previous_deaths:
+                user_role.solo_win = True
+        
+        if link_2 in data.previous_deaths:
+            if link_1 in data.previous_deaths or link_1 in data.second_previous_deaths:
+                user_role.solo_win = True
+
+    @enforce_types
+    def if_poisoned(self, user: str, data: Game_Data) -> None:
+        self.ability(user, data)
+
+    @enforce_types
+    def if_drunk(self, user: str, data: Game_Data) -> None:
+        self.ability(user, data)
+
+class heart_break(Ability):
+    @enforce_types
+    def __init__(self) -> None:
+        super().__init__(targets = 1, p = 0, ability_type = ["on_demand"], priority = 2, uses = 1, can_pick_same_target = True)
+
+    # -- Ability -- #
+    @enforce_types
+    def ability(self, user: str, data: Game_Data) -> None:
+        target: str = data.players[user].targets[0]
+
+        if target in data.get_lovers():
+            data.players[target].remaining_life_counter = 1
+        else:
+            self.number_of_uses += 1
+
+    @enforce_types
+    def if_poisoned(self, user: str, data: Game_Data) -> None:
+        self.ability(user, data)
+
+    @enforce_types
+    def if_drunk(self, user: str, data: Game_Data) -> None:
+        self.ability(user, data)
 
 class jester(Ability):
     @enforce_types
@@ -569,12 +624,12 @@ class gamble(Ability):
 class instant_death(Ability):
     @enforce_types
     def __init__(self) -> None:
-        super().__init__(targets = 1, p = 2.5, ability_type = ["late"])
+        super().__init__(targets = 1, p = 2.5, ability_type = ["instant"])
         
     # -- Ability -- #
     @enforce_types
     def ability(self, user: str, data: Game_Data) -> None:
-        data.players[user].die(data.players)
+        data.players[user].remaining_life_counter = 0
 
     @enforce_types
     def if_poisoned(self, user: str, data: Game_Data) -> None:
@@ -844,7 +899,7 @@ class evidence_tampering(Ability):
 class stop_vote(Ability):
     @enforce_types
     def __init__(self) -> None:
-        super().__init__(targets = 1, p = 0, ability_type = ["on_vote", "first_night", "keep_targets"])
+        super().__init__(targets = 1, p = 0, ability_type = ["on_vote", "first_night", "keep_targets"], priority = 10)
         
     # -- Ability -- #
     @enforce_types

@@ -35,6 +35,7 @@ class Status_Manager():
     linked: bool = False
     blessed: bool = False
     silenced: bool = False
+    doomed: bool = False
 
     # -- Properties -- #
     @property
@@ -176,7 +177,6 @@ class Role:
     secondary_ability: Ability = None
     new_mafia = False # For Mafia Alternative Handling
     currently_alive: bool = True
-    linker: str = None
     linked_to: str = None
     selected_target = False
     solo_win: bool = False
@@ -190,7 +190,7 @@ class Role:
     alternative_end_count: int = 0
     made_choice: bool = False
     previous_targets: list = None
-    remaining_life_counter: int = None
+    doom_count: int = None
     
     # -- Properties -- #
     @property
@@ -238,16 +238,30 @@ class Role:
     def targets(self, value: list[str]) -> None:
         self.current_targets = value
 
+    @property
+    @enforce_types
+    def remaining_life_counter(self) -> None:
+        return self.doom_count
+
+    @remaining_life_counter.setter
+    @enforce_types
+    def remaining_life_counter(self, value: int | Literal[None]) -> None:
+
+        if value == None: self.statuses.doomed = False
+        else: self.statuses.doomed = True
+
+        self.doom_count = value
+
     # -- Methods -- #
     @enforce_types
-    def die(self, players: Players, recurse: bool = True) -> bool:
-        if not self.protected: 
+    def die(self, players: Players) -> bool:
+        if not self.statuses.protected: 
             self.currently_alive = False
             self.just_died = True
 
-            if self.statuses.linked and recurse and (not players[self.linker].poisoned): # Recursion Base Case and Cupid Poison Check #
-                players[self.linked_to].protected = False
-                players[self.linked_to].die(players, recurse = False)
+            # -- Cupid Effect -- #
+            if self.statuses.linked:
+                players[self.linked_to].statuses.drunk = True
 
             return True
                 
@@ -300,11 +314,9 @@ class Role:
         self.just_died = False
 
     @enforce_types
-    def voted_out(self, players: Players, recurse: bool = True) -> None:
+    def voted_out(self, players: Players) -> None:
         self.was_voted_out = True
-        self.die(players, False)
-        if self.statuses.linked and recurse:
-            players[self.linked_to].voted_out(players, False)
+        self.die(players)
     
     @enforce_types
     def __eq__(self, value) -> bool:
@@ -441,6 +453,9 @@ class Game_Data():
     evil_win: bool = False
     evil_count: int = 0
     turn_count: int = 0
+    previous_deaths: list[str] = None
+    second_previous_deaths: list[str] = None
+    wanted_data: list[str] = None
 
     # -- Properties -- #
     @property
@@ -484,6 +499,8 @@ class Game_Data():
         self.dead_players = Players({name: role for name, role in self.players.items() if not role.currently_alive})
 
         self.settings = {name: data["value"] for name, data in self.menu_entries.settings.items()}
+        self.previous_deaths = []
+        self.second_previous_deaths = []
 
         # -- X Count Considerations -- #
         total_evil_count: int = len(self.evil_aligned)
@@ -503,6 +520,9 @@ class Game_Data():
         # -- statuses.drunk Consideration -- #
         if alter_drunk:
             self.set_drunk()
+
+        # -- For Backup Purposes -- #
+        self.wanted_data = ["turn_count", "deaths", "previous_deaths"]
 
     @enforce_types
     def set_drunk(self) -> None:
@@ -535,85 +555,6 @@ class Game_Data():
         return [str(sample[0]), self.abilities[sample[0]]]
     
     @enforce_types
-    def backup_to_csv(self) -> None:
-        # -- Saves Game State To The Backup csv When Crash Occurs -- #
-        file_name: str = "backup.csv"
-        data: list[list[str]] = [["Name", "Role", "Alignment", "Has Selected Target", "Used Primary", "Used Secondary", "Alive", "Solo Win", "Drunk", "Lover", "Targets"]]
-        data: list[list[str]] = data + [[name, role.name, role._alignment, role.selected_target, role.currently_alive, role.solo_win, role.statuses.drunk, role.statuses.linked, str(role.targets)] for name, role in self.players.items()]
-
-        with open(file_name, "w") as file:
-            writer = csv.writer(file, delimiter = ",", lineterminator = "\n")
-            writer.writerows(data)
-
-    @enforce_types
-    def load_from_backup(self) -> None:
-        # -- Loads Game State To The Backup csv From The State When Crash Occurs -- #
-        file_name: str = "backup.csv"
-        data: list[list[str]] = []
-        lovers: list[str] = []
-        final_data: dict[str, Role] = {}
-
-        with open(file_name, "r") as file:
-            reader = csv.reader(file, delimiter = ",")
-            is_data: bool = False
-            data: list[list[str]] = []
-
-            for row in reader:
-                if is_data: data.append(row)
-                else: is_data = True
-
-        for row in data:
-            # -- Data Management -- #
-            if row[2] == "":
-                row[2] = None
-            else:
-                row[2] = eval(row[2])
-
-            row[3] = eval(row[3])
-            row[4] = eval(row[4])
-            row[5] = eval(row[5])
-            row[6] = eval(row[6])
-            row[7] = eval(row[7])
-            row[8] = eval(row[8])
-            row[9] = eval(row[9])
-
-            if len(row[-1]) > 2:
-                row[-1] = row[-1][1:-1].split(", ")
-
-                for item in row[-1]:
-                    item = item[1: -1]
-            else:
-                row[-1] = []
-
-            # -- Loading Data -- #
-            role: Role = self.roles[row[1]]
-            role._alignment = row[2]
-            role.selected_target = row[3]
-            role.currently_alive = row[6]
-            role.solo_win = row[7]
-            role.statuses.drunk = row[8]
-            role.statuses.linked = row[9]
-            role.targets = row[-1]
-
-            if row[6]: lovers.append(row[0])
-            final_data[row[0]] = role
-
-        if len(lovers) == 2:
-            cupid: str = None
-            for name, role in final_data:
-                if role.name == "Cupid":
-                    cupid = name
-                    break
-
-            final_data[lovers[0]].linked_to = lovers[1]
-            final_data[lovers[1]].linked_to = lovers[0]
-            final_data[lovers[0]].linker = cupid
-            final_data[lovers[1]].linker = cupid
-
-        self.players = Players(final_data)
-        self.init(alter_drunk = False)
-
-    @enforce_types
     def backup_to_json(self) -> None:
         input_data: dict[str, dict] = {}
 
@@ -639,6 +580,10 @@ class Game_Data():
         with open("backup.json", "w") as file:
             json.dump(input_data, file, indent = 4, ensure_ascii = False)
 
+        with open("game_data_backup.json", "w") as file:
+            game_data: dict = {name: value for name, value in self.__dict__.items() if name in self.wanted_data}
+            json.dump(game_data, file, indent = 4, ensure_ascii = False)
+
     @enforce_types
     def load_from_json_backup(self) -> None:
         final_data: dict = {}
@@ -646,6 +591,9 @@ class Game_Data():
         with open("backup.json", "r") as file:
             out_data: dict = json.load(file)
 
+        with open("game_data_backup.json", "r") as file:
+            game_data: dict = json.load(file)
+    
         for player, data in out_data.items():
             # -- Dealing With Dictionaries of Nested Objects -- #
             status_data: dict = data["statuses"]
@@ -684,3 +632,38 @@ class Game_Data():
     
         self.players = Players(final_data)
         self.init(alter_drunk = False)
+
+        for name, value in game_data.items():
+            setattr(self, name, value)
+
+    @enforce_types
+    def update_life(self) -> None:
+        deaths: list[str] =[]
+
+        for name, role in self.players.items():
+            if name in self.alive_players.keys():
+                if not role.currently_alive:
+                    del self.alive_players[name]
+                    self.dead_players[name] = role
+                    deaths.append(name)
+                    if role.alignment:
+                        del self.good_aligned[name]
+                    else:
+                        del self.evil_aligned[name]
+
+            if name in self.dead_players.keys():
+                if role.currently_alive:
+                    del self.dead_players[name]
+                    self.alive_players[name] = role
+                    if role.alignment:
+                        self.good_aligned[name] = role
+                    else:
+                        self.evil_aligned[name] = role
+
+        if len(deaths) > 0:
+            self.second_previous_deaths = deepcopy(self.previous_deaths)
+            self.previous_deaths = deepcopy(deaths)
+
+    def get_lovers(self) -> list[str]:
+        out: list[str] = [name for name, role in self.players.items() if role.statuses.linked]
+        return out

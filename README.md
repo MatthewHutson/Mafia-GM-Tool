@@ -15,12 +15,17 @@ Bug Fix - Accidentally Made The Gambler's Probabilities Wrong
 Bug Fix - Forgot To Give Creep Non-Default Priority, Making It Outspeed Blackmailer
 
 # -- To Do -- #
-Get One More Good Role In
+Doom Status - The Remaining Life Counter Can Now Be Seen By Examiner As The "Doom" Status
 
-Find And Fix Crash Caused By Putting A Role As A String Parameter Somewhere (Idk yet)
+Cupid Rework - Cupid Is Now Neutral - Trying To Get Successive Lover Deaths
+Cupid Gains "Heartbreak" Ability - Gives Doom 1 To A Lover
+Lover Condition Change - Death Now Causes Partner To Become Drunk
 
-Make A Setting To Allow For Toggling Removing Guarenteed Roles
-Discord Bot Variant
+Sheriff Change - Poisoned Neutral Gives Random Result (50% Good, 25% Evil, 25% Neutral)
+
+Added (Or Re-Added (idk)) Post Game Ability Useage
+
+Unraised e in main
 
 # -- Ideas -- #
 Possible Third Evil Player?

@@ -24,6 +24,10 @@ def ability_conditions(role: Role, has_recursed: bool, data: Game_Data) -> bool:
 def use_abilities(data: Game_Data, can_recurse: bool = True) -> None:
     priority: Players = data.priority
 
+    for role in priority.values():
+        if role.remaining_life_counter is not None:
+            role.remaining_life_counter -= 1
+
     for name, role in priority.items():
         if ability_conditions(role, not can_recurse, data):
             role.ability(name, data)
@@ -31,42 +35,18 @@ def use_abilities(data: Game_Data, can_recurse: bool = True) -> None:
         elif "first_night" in role.ability.ability_type and data.turn_count == 1:
             role.ability(name, data, first_night = True)
 
+    for role in priority.values():
         if role.remaining_life_counter is not None:
-            role.remaining_life_counter -= 1
-
-            if role.remaining_life_counter == 0:
+            if role.remaining_life_counter <= 0:
                 protected: bool = role.statuses.protected
                 role.statuses.protected = False
                 role.die(data.players)
                 role.statuses.protected = protected
                 role.remaining_life_counter = None
 
-    for name, role in priority.items():
-        if "late" in role.ability.ability_type:
-            role.ability(name, data)
-        if "late" in role.secondary_ability.ability_type:
-            role.secondary_ability(name, data)
-
 @enforce_types
 def life_death_sort(data: Game_Data) -> None:
-    for name, role in data.players.items():
-        if name in data.alive_players.keys():
-                if not role.currently_alive:
-                    del data.alive_players[name]
-                    data.dead_players[name] = role
-                    if role.alignment:
-                        del data.good_aligned[name]
-                    else:
-                        del data.evil_aligned[name]
-
-        if name in data.dead_players.keys():
-            if role.currently_alive:
-                del data.dead_players[name]
-                data.alive_players[name] = role
-                if role.alignment:
-                    data.good_aligned[name] = role
-                else:
-                    data.evil_aligned[name] = role
+    data.update_life()
 
 @enforce_types
 def remove_round_data(data: Game_Data, used_Death_ability: bool = False, post_vote: bool = False) -> None:
@@ -141,7 +121,6 @@ def check_for_victory(data: Game_Data) -> None:
             data.evil_win = True
     else:
         data.playing = False
-            
 
 @enforce_types
 def revert_to_mafia(data: Game_Data) -> None:
@@ -173,7 +152,6 @@ def role_switch(data: Game_Data, player: str, new_role: Role) -> None:
     data.priority[player] = players[player]
     players[player].statuses.linked = role.linked
     players[player].linked_to = role.linked_to
-    players[player].linker = role.linker
     players[player].information = information
 
 @enforce_types
@@ -206,3 +184,11 @@ def init_evil_alternative(data: Game_Data) -> None:
     for role in data.evil_aligned.values():
         if role.secondary_ability == data.none_role.ability:
             role.secondary_ability = deepcopy(data.mafia_role.ability)
+
+@enforce_types
+def game_over_abilities(data: Game_Data) -> None:
+    for name, role in data.players.items():
+        if "game_end" in role.ability.ability_type:
+            role.ability.ability(name, data)
+        if "game_end" in role.secondary_ability.ability_type:
+            role.secondary_ability.ability(name, data)

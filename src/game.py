@@ -181,4 +181,5 @@ def game(data: Game_Data, entries: Menu_Entry, normal_start: bool = True) -> Non
                 if data.playing:
                     pack_alive_and_dead(data, data.vote_role, 0)
 
+        game_over_abilities(data)
         check_for_victory(data)

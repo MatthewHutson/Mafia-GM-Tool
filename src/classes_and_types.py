@@ -250,7 +250,14 @@ class Role:
         if value == None: self.statuses.doomed = False
         else: self.statuses.doomed = True
 
-        self.doom_count = value
+        if self.doom_count is not None:
+            if value is None:
+                self.doom_count = value
+            else:
+                if value < self.doom_count:
+                    self.doom_count = value
+        else:
+            self.doom_count = value
 
     # -- Methods -- #
     @enforce_types

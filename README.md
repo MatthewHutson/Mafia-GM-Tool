@@ -15,7 +15,7 @@ Bug Fix - Accidentally Made The Gambler's Probabilities Wrong
 Bug Fix - Forgot To Give Creep Non-Default Priority, Making It Outspeed Blackmailer
 
 # -- To Do -- #
-Made Cupid Now Red King Card (Subject To Change When Custom Cards Are Laminated)
+Made It So Remaining Life Counter Cannot Be Increased Through Property
 
 # -- Ideas -- #
 Possible Third Evil Player?

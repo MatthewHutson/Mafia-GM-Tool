@@ -122,6 +122,17 @@ def game(data: Game_Data, entries: Menu_Entry, normal_start: bool = True) -> Non
         data.turn_count += 1
 
         for name, role in data.alive_players.items():
+            # -- Equation Type Handler -- #
+            try:
+                if is_instance(role.ability.number_of_uses, equation):
+                    role.ability.number_of_uses = role.ability.number_of_uses.get_value(data.total_evil_count)
+            except: pass
+            
+            try:
+                if is_instance(role.secondaary_ability.number_of_uses, equation):
+                    role.secondaary_ability.number_of_uses = role.secondary_ability.number_of_uses.get_value(data.total_evil_count)
+            except: pass
+
             if data.playing:
                 action_frame, action_label, ability = selection_menu_create(data, entries, name, functional = False)
 

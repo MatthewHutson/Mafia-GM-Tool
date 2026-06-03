@@ -92,9 +92,31 @@ class Status_Manager():
             for effect in cleared_effects:
                 super().__setattr__(effect, False)
 
+# -- Equation Type -- #
+class equation():
+    # -- A Simple Equation -- #
+    @enforce_types
+    def __init__(self, equation: str):
+        temp: str = deepcopy(equation)
+        temp = temp.replace("x", "0")
+
+        try: eval(temp)
+        except: raise TypeError
+
+        self.equation = equation
+
+    @enforce_types
+    def get_value(self, x: int) -> int:
+        equation: str = deepcopy(self.equation).replace("x", str(x))
+        return eval(equation)
+    
+    @enforce_types
+    def __str__(self) -> str:
+        return self.equation + " (Equation)"
+
 class Ability():
     @enforce_types
-    def __init__(self, targets: int, p: int | float, ability_type: list[str], target_living: bool = True, priority: int = 255, can_pick_same_target: bool = False, uses: Literal["x"] | int = None) -> None:
+    def __init__(self, targets: int, p: int | float, ability_type: list[str], target_living: bool = True, priority: int = 255, can_pick_same_target: bool = False, uses: int | equation | str | None = None) -> None:
         # -- Attributes -- #
         self.targets: int = targets
         self.p: int | float = p
@@ -102,8 +124,10 @@ class Ability():
         self.target_living: bool = target_living
         self.priority: float = priority
         self.can_pick_same_target: bool = can_pick_same_target
-        self.number_of_uses = uses
-    
+
+        if not is_instance(uses, str): self.number_of_uses: int | equation = uses
+        else: self.number_of_uses = equation(uses)
+
     @property
     @enforce_types
     def __name__(self) -> str:
@@ -125,7 +149,11 @@ class Ability():
         ...
 
     def __call__(self, user: str, data: Game_Data, **kwargs) -> None:
-        if self.number_of_uses is not None:
+        if is_instance(self.number_of_uses, int):
+            self.number_of_uses -= 1
+
+        elif is_instance(self.number_of_uses, equation):
+            self.number_of_uses: int = self.number_of_uses.get_value(data.total_evil_count)
             self.number_of_uses -= 1
 
         match data.players[user].statuses.ability_conditions():
@@ -459,6 +487,7 @@ class Game_Data():
     good_win: bool = False
     evil_win: bool = False
     evil_count: int = 0
+    total_evil_count: int = 0 # -- Holds Both Alive And Dead Evils -- #
     turn_count: int = 0
     previous_deaths: list[str] = None
     second_previous_deaths: list[str] = None
@@ -509,12 +538,9 @@ class Game_Data():
         self.previous_deaths = []
         self.second_previous_deaths = []
 
-        # -- X Count Considerations -- #
-        total_evil_count: int = len(self.evil_aligned)
-
-        for ability in self.abilities.values():
-            if ability.number_of_uses == "x":
-                ability.number_of_uses = total_evil_count
+        # -- Variable Count Considerations -- #
+        if self.total_evil_count == 0:
+            self.total_evil_count: int = len(self.evil_aligned)
 
         # -- Using A Role For Menu Purposes -- #
         self.vote_role: Role = Role.new("Voting", self.abilities["vote"], True, False, 999)
@@ -536,7 +562,7 @@ class Game_Data():
         if self.settings["Drunk"] == 1:
             valid_players: list = [name for name, role in self.players.items() if role.true_alignment == True]
             player = choice(valid_players)
-            self.players[player].drunk = True
+            self.players[player].statuses.drunk = True
 
     @enforce_types
     def get_role_by_ability(self, ability: Ability, user: str = None) -> Role:
@@ -569,6 +595,16 @@ class Game_Data():
             # -- Handling Nested Objects -- #
             data: dict = role.__dict__
             statuses: dict = role.statuses.__dict__
+
+            # -- Equation Type Handler -- #
+            try:
+                if is_instance(role.ability.number_of_uses, equation):
+                    role.ability.number_of_uses = role.ability.number_of_uses.get_value(self.total_evil_count)
+
+                if is_instance(role.secondaary_ability.number_of_uses, equation):
+                    role.secondaary_ability.number_of_uses = role.secondary_ability.number_of_uses.get_value(self.total_evil_count)
+            except: pass
+
             primary_ability: dict = role.ability.to_dict()
             secondary_ability: dict = role.secondary_ability.to_dict()
 
@@ -584,12 +620,15 @@ class Game_Data():
 
             input_data[name] = data
 
-        with open("backup.json", "w") as file:
-            json.dump(input_data, file, indent = 4, ensure_ascii = False)
+        try:
+            with open("backup.json", "w") as file:
+                json.dump(input_data, file, indent = 4, ensure_ascii = False)
 
-        with open("game_data_backup.json", "w") as file:
-            game_data: dict = {name: value for name, value in self.__dict__.items() if name in self.wanted_data}
-            json.dump(game_data, file, indent = 4, ensure_ascii = False)
+            with open("game_data_backup.json", "w") as file:
+                game_data: dict = {name: value for name, value in self.__dict__.items() if name in self.wanted_data}
+                json.dump(game_data, file, indent = 4, ensure_ascii = False)
+        except:
+            pass
 
     @enforce_types
     def load_from_json_backup(self) -> None:

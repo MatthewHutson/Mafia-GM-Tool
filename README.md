@@ -11,8 +11,11 @@ The Stand Counter Button Will Show The Current Count
 The Counter Will Remain Between Games As Long As the Program Runs
 
 # -- Changelog -- #
-Made It So Remaining Life Counter Cannot Be Increased Through Property
-Put THe Changes In The Correct Place
+Expanded "X" use functionality with new equation type
+Changed The Ability Display To Show Number Of Uses Rather Than Targets (Since Targets Show At Top)
+Adjusted Specific Implementations To Account For This
+
+Bug Fix - Newly Aquired Abilities Not Updating The Variable (Equation) Values Properly
 
 # -- To Do -- #
 Test Reworks

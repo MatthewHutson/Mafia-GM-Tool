@@ -460,7 +460,7 @@ def selection_menu_create(data: Game_Data, entries: Menu_Entry, user: str, targe
         primary_frame.pack_propagate(False)
         secondary_frame.pack_propagate(False)
 
-        primary_name = tk.Label(primary_frame, text = f"Primary Ability:\n{ability.__name__} ({ability.targets})", bg = bg_2)
+        primary_name = tk.Label(primary_frame, text = f"Primary Ability:\n{ability.__name__} {"(x" + str(ability.number_of_uses) + ")" if ability.number_of_uses is not None else ""}", bg = bg_2)
         primary_name.pack(side = tk.TOP, fill = "x", padx = 2, pady = 2, ipady = 10, expand = False)
         primary_name.update()
         size: tuple = (primary_name.winfo_width(), 3)
@@ -470,13 +470,13 @@ def selection_menu_create(data: Game_Data, entries: Menu_Entry, user: str, targe
 
         if role.secondary_ability is not None:
             if role.secondary_ability.__name__.lower() != "none":
-                tk.Label(secondary_frame, text = f"Secondary Ability:\n{role.secondary_ability.__name__} ({role.secondary_ability.targets})", bg = bg_2).pack(side = tk.TOP, fill = "x", padx = 2, pady = 2, ipady = 10, expand = False, anchor = "w")
+                tk.Label(secondary_frame, text = f"Secondary Ability:\n{role.secondary_ability.__name__} {"(x" + str(role.secondary_ability.number_of_uses) + ")" if role.secondary_ability.number_of_uses is not None else ""}", bg = bg_2).pack(side = tk.TOP, fill = "x", padx = 2, pady = 2, ipady = 10, expand = False, anchor = "w")
                 Role_Icon([data.get_role_by_ability(role.secondary_ability, user).name], main_font, entries, size, command = none, data = data).pack(secondary_frame, side = tk.TOP)
                 tk.Label(secondary_frame, text = f"Card:\n{data.get_card_by_role(data.get_role_by_ability(role.secondary_ability))}", bg = bg_2).pack(side = tk.BOTTOM, fill = "both", padx = 2, pady = 2, expand = True, anchor = "w")
             else:
-                tk.Label(secondary_frame, text = f"Secondary Ability:\nNone (0)", bg = bg_2).pack(side = tk.TOP, fill = "both", padx = 2, pady = 2, ipady = 10, expand = False, anchor = "w")
+                tk.Label(secondary_frame, text = f"Secondary Ability:\nNone", bg = bg_2).pack(side = tk.TOP, fill = "both", padx = 2, pady = 2, ipady = 10, expand = False, anchor = "w")
         else:
-            tk.Label(secondary_frame, text = f"Secondary Ability:\nNone (0)", bg = bg_2).pack(side = tk.TOP, fill = "both", padx = 2, pady = 2, ipady = 10, expand = False, anchor = "w")
+            tk.Label(secondary_frame, text = f"Secondary Ability:\nNone", bg = bg_2).pack(side = tk.TOP, fill = "both", padx = 2, pady = 2, ipady = 10, expand = False, anchor = "w")
 
     # -- Vote Skip Button -- #
     if user == "none":

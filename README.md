@@ -11,11 +11,9 @@ The Stand Counter Button Will Show The Current Count
 The Counter Will Remain Between Games As Long As the Program Runs
 
 # -- Changelog -- #
-Expanded "X" use functionality with new equation type
-Changed The Ability Display To Show Number Of Uses Rather Than Targets (Since Targets Show At Top)
-Adjusted Specific Implementations To Account For This
-
-Bug Fix - Newly Aquired Abilities Not Updating The Variable (Equation) Values Properly
+Altered Poisoned Necromancer To Doom You Instead of Make A New Evil Player
+Bug Fix - "Death Spiral" - Infinite Loop Caused By Saint Trying To Doom Somebody When No Town Remain
+Removed Test Print Statements From Cupid Link Ability
 
 # -- To Do -- #
 Test Reworks

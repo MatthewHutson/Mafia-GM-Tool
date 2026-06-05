@@ -180,9 +180,6 @@ class cupid_victory(Ability):
         link_1: str = lovers[0]
         link_2: str = lovers[1]
 
-        print(data.previous_deaths)
-        print(data.second_previous_deaths)
-
         if link_1 in data.previous_deaths:
             if link_2 in data.previous_deaths or link_2 in data.second_previous_deaths:
                 user_role.solo_win = True
@@ -446,7 +443,7 @@ class resurrect(Ability):
     
     # -- Ability -- #
     @enforce_types
-    def ability(self, user: str, data: Game_Data, evil: bool = False) -> None:
+    def ability(self, user: str, data: Game_Data) -> None:
         user_role: Role = data.players[user]
         evil = evil or not user_role.alignment
 
@@ -461,18 +458,11 @@ class resurrect(Ability):
 
             target.information.append("You have Been Ressurected")
 
-            if evil and target.true_alignment == True:
-                target._alignment = False
-                target.mafia_alternative = True
-                target.information.append("You Are Now Evil!")
-
-                for role in data.evil_aligned.values():
-                    role.information.append(f"{user_role.targets[0]} has been resurrected! They are now evil!")
-
 
     @enforce_types
     def if_poisoned(self, user: str, data: Game_Data) -> None:
-        self.ability(user, data, True)
+        self.ability(user, data)
+        data.players[user].remaining_life_counter = 1
 
     @enforce_types
     def if_drunk(self, user: str, data: Game_Data) -> None:
@@ -966,11 +956,11 @@ class vulnerable(Ability):
         player: Role = data.players[user]
 
         if player.was_voted_out:
-            while not player.currently_alive or player.true_alignment == None:
-                player = choice(list(data.good_aligned.values()))
+            remaining_good_dict = {name: role for name, role in data.good_aligned.items() if role.true_alignment == True}
 
-            player.remaining_life_counter = 1
-
+            if len(remaining_good_dict) > 0:
+                player = choice(list(remaining_good_dict.values()))
+                player.remaining_life_counter = 1
 
     @enforce_types
     def if_poisoned(self, user: str, data: Game_Data) -> None:

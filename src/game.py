@@ -76,11 +76,12 @@ def nap_time(data: Game_Data) -> None:
     evil_roles: set[str] = set(name for name, role in data.roles.items() if not role.alignment)
     bluff_roles: list[str] = list(all_roles - playing_roles - evil_roles)
     shuffle(bluff_roles)
+
     try:
         bluff_roles = bluff_roles[:len(data.evil_aligned)]
     except:
         bluff_roles = bluff_roles
-    evil_cards: list[str] = [role for role in list(data.evil_aligned.values()) if role.name != "Mafia"]
+    evil_cards: list[str] = [role.name for role in list(data.evil_aligned.values()) if role.name != "Mafia"]
     bluff_cards: list[str] = [role for role in bluff_roles]
 
     info: str = f"Wake up The Evil Team: {list(data.evil_aligned.keys())}. Show Them \n\n #1: Their Teammate(s): {evil_cards}. \n #2: Their Bluff Roles: {bluff_cards}. \n\nIs Everyone Ready To Procede?"
@@ -117,6 +118,7 @@ def game(data: Game_Data, entries: Menu_Entry, normal_start: bool = True) -> Non
     if normal_start: start_abilities(data)
     init_game_menu(entries, data)
     nap_time(data)
+    init_evil_alternative(data)
 
      # -- Game Loop -- #
     while data.playing:
@@ -160,7 +162,6 @@ def game(data: Game_Data, entries: Menu_Entry, normal_start: bool = True) -> Non
             use_abilities(data)
 
              # -- Ensures Mafia Evil Roles Will Have Kill Switch -- #
-            init_evil_alternative(data)
             revert_to_mafia(data)
 
             # -- Player And GM Info -- #

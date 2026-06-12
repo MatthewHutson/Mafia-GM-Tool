@@ -74,6 +74,7 @@ def remove_round_data(data: Game_Data, used_Death_ability: bool = False, post_vo
         role.information = []
         role.visited_by = []
         role.protector = None
+        role.ability_cancel = False
 
         # -- Silence Check -- #
         if post_vote: 
@@ -196,7 +197,7 @@ def use_death_abilities(data: Game_Data) -> None:
 @enforce_types
 def init_evil_alternative(data: Game_Data) -> None:
     for role in data.evil_aligned.values():
-        if role.secondary_ability == data.none_role.ability:
+        if role.secondary_ability == data.none_role.ability or role.secondary_ability is None:
             role.secondary_ability = deepcopy(data.mafia_role.ability)
 
 @enforce_types

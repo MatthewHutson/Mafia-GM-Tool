@@ -536,7 +536,7 @@ def information(data: Game_Data, tell_nothing: bool = True, first_wave: bool = T
         count: int = 0
 
         if role.statuses.silenced & first_wave:
-            role.information.append("You have been Silenced!")
+            role.information = ["You have been Silenced!"]
 
         for item in role.information:
             info += f"\n #{count + 1}: " + item

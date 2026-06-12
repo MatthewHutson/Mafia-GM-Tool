@@ -111,7 +111,7 @@ class endure(Ability):
 class protect(Ability):
     @enforce_types
     def __init__(self) -> None:
-        super().__init__(targets = 1, p = 7.5, ability_type = ["repeat", "defensive", "refresh"], priority = 2, refresh_max = 2)
+        super().__init__(targets = 1, p = 7.5, ability_type = ["repeat", "defensive"], priority = 2)
 
     # -- Extra Methods -- #
     @enforce_types
@@ -304,16 +304,25 @@ class kill(Ability):
     # -- Ability -- #
     @enforce_types
     def ability(self, user: str, data: Game_Data) -> None:
-        target: str = data.players[user].targets[0]
-        data.players[target].die(data.players)
+        user_role: Role = data.players[user]
 
-        if data.players[user].secondary_ability == mayor:
-            data.players[user].secondary_ability(user, data)
+        if "evil_priority" in user_role.secondary_ability.ability_type and user_role.secondary_ability.number_of_uses != 0:
+            user_role.secondary_ability(user, data)
+        else:
+            target: str = data.players[user].targets[0]
+            data.players[target].die(data.players)
+
+            if user_role.secondary_ability == mayor:
+                user_role.secondary_ability(user, data)
 
     @enforce_types
     def if_poisoned(self, user: str, data: Game_Data) -> None:
-        if data.players[user].secondary_ability == mayor:
-            data.players[user].secondary_ability(user, data)
+        user_role: Role = data.players[user]
+        if "evil_priority" in user_role.secondary_ability.ability_type and user_role.secondary_ability.number_of_uses != 0:
+            user_role.secondary_ability(user, data)
+
+        elif user_role.secondary_ability == mayor:
+            user_role.secondary_ability(user, data)
 
     @enforce_types
     def if_drunk(self, user: str, data: Game_Data) -> None:
@@ -805,18 +814,22 @@ class examine(Ability):
 class super_kill(Ability):
     @enforce_types
     def __init__(self) -> None:
-        super().__init__(targets = 1, p = 0, ability_type = ["on_demand"], priority = -1, can_pick_same_target = True, uses = 1)
+        super().__init__(targets = 1, p = 0, ability_type = ["on_demand", "evil_priority"], priority = -1, can_pick_same_target = True, uses = 1)
         
     # -- Ability -- #
     @enforce_types
     def ability(self, user: str, data: Game_Data) -> None:
         target: str = data.players[user].targets[0]
-        data.players[target].die(data.players)
+        target_role: Role = data.players[target]
+        protected: bool = target_role.statuses.protected
+
+        target_role.statuses.protected = False
+        target_role.die(data.players)
+        target_role.statuses.protected = True
 
     @enforce_types
     def if_poisoned(self, user: str, data: Game_Data) -> None:
-        if data.players[user].secondary_ability == mayor:
-            data.players[user].secondary_ability(user, data)
+        pass
 
     @enforce_types
     def if_drunk(self, user: str, data: Game_Data) -> None:
@@ -997,7 +1010,7 @@ class execute(Ability):
 class silence(Ability):
     @enforce_types
     def __init__(self) -> None:
-        super().__init__(targets = 1, p = 0, ability_type = ["repeat", "on_demand"], priority = 12)
+        super().__init__(targets = 1, p = 0, ability_type = ["repeat", "on_demand"], priority = 1)
     
     # -- Ability -- #
     @enforce_types
@@ -1010,7 +1023,6 @@ class silence(Ability):
             info: list[str] = deepcopy(target_role.information)
 
             if len(info) > 0:
-                target_role.information = ["Your Information Appears To Be Missing."]
                 data.players[user].information += [f"You Stole The Following From {target}"] + info
             else:
                 data.players[user].information += [f"{target} Learned Nothing Tonight"] + info

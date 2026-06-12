@@ -11,7 +11,10 @@ The Stand Counter Button Will Show The Current Count
 The Counter Will Remain Between Games As Long As the Program Runs
 
 # -- Changelog -- #
-Removed All Instances of Card Indexing From Program
+Unraised e in main
+Added The Assasin - One Time Minion Super Kill Role
+Fixed Silencer & Examiner Clash
+Added evil_priority tag to allow roles not to be override mafia kill until used up.
 
 # -- To Do -- #
 Test Reworks

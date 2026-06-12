@@ -588,7 +588,7 @@ class Game_Data():
     
     @enforce_types
     def get_card_by_role(self, role: Role) -> str:
-        return self.card_dict[role.name]
+        return role.name
     
     @enforce_types
     def random_ability(self, used_abilities: set[str] = set([])) -> list[str, Ability]:

@@ -7,7 +7,7 @@ from time import sleep
 import threading
 from classes_and_types import *
 from menu.menu import *
-from menu.card_index import card_init
+#from menu.card_index import card_init
 from game_loop_functions import *
 import abilities as a
 

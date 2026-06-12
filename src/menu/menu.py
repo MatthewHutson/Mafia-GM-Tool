@@ -2,7 +2,7 @@
 from utils import *
 from menu.menu_classes import *
 from menu.mimi_stand_counter import counter_init
-from menu.card_index import card_index, destroy_card_index
+#from menu.card_index import card_index, destroy_card_index
 from menu.settings import display_settings, remove_instances, update_settings
 from menu.timer import create_timer, delete_timer
 from menu.loading_system import *
@@ -140,7 +140,7 @@ def add_role_tile(player_count: int, roles: list[list[str]], entries: Menu_Entry
 @enforce_types
 def clear() -> None:
     delete_timer()
-    destroy_card_index()
+    #destroy_card_index()
 
     clear_widgets(root)
 
@@ -329,8 +329,8 @@ def setup_menu(entries: Menu_Entry, default_names: list[str]) -> bool:
     random_button.pack(side = tk.RIGHT, ipady = 3, ipadx = 8, padx = 4)
 
     # -- Card Index -- #
-    index_access_button = tk.Button(settings_frame, text = "Card Index", command = lambda: card_index(root, bg_2, main_font, text_colour, entries), bg = "#C65DF0", activebackground = "#C049C4", fg = "#ffffff", activeforeground = "#ffffff")
-    index_access_button.pack(side = tk.RIGHT, ipadx = 8, ipady = 3, padx = 4)
+    #index_access_button = tk.Button(settings_frame, text = "Card Index", command = lambda: card_index(root, bg_2, main_font, text_colour, entries), bg = "#C65DF0", activebackground = "#C049C4", fg = "#ffffff", activeforeground = "#ffffff")
+    #index_access_button.pack(side = tk.RIGHT, ipadx = 8, ipady = 3, padx = 4)
 
     # -- Role Selection -- #
     tk.Label(role_frame, text = "Roles", font = main_font, bg = bg_1, fg = text_colour).pack(side = tk.TOP, padx = 4, pady = 4, fill = "x")
@@ -382,7 +382,7 @@ def init_game_menu(entries: Menu_Entry, data: Game_Data) -> None:
     dead_canvas.pack(side = tk.TOP, padx = 4, pady = 4, fill = "both", expand = True)
 
     pack_alive_and_dead(data, data.vote_role, 0) # -- Prevents Popup before the first night -- #
-    card_index(root, bg_2, main_font, text_colour, entries, data) # -- Gives Role Card Before Popups Appear -- #
+    #card_index(root, bg_2, main_font, text_colour, entries, data) # -- Gives Role Card Before Popups Appear -- #
 
 @enforce_types
 def selection_menu_create(data: Game_Data, entries: Menu_Entry, user: str, target: str = "", is_primary_ability: bool = True, functional: bool = True) -> tuple[tk.Frame, tk.Label, Ability]:
@@ -431,12 +431,12 @@ def selection_menu_create(data: Game_Data, entries: Menu_Entry, user: str, targe
 
     action_label.pack(side = tk.TOP, fill = "x", padx = 4, pady = 4, ipady = 4)
 
-    if functional: tk.Button(confirm_frame, text = "Confirm Choices", command = lambda: confirm_selection(data, role, is_primary_ability), bg = "#5D9FF0", activebackground = "#4980C4", fg = "#ffffff", activeforeground = "#ffffff").pack(side = tk.LEFT, ipadx = 16, ipady = 8, padx = 4)
+    if functional: tk.Button(info_frame, text = "Confirm Choices", command = lambda: confirm_selection(data, role, is_primary_ability), bg = "#5D9FF0", activebackground = "#4980C4", fg = "#ffffff", activeforeground = "#ffffff").pack(side = tk.LEFT, ipadx = 16, ipady = 8, padx = 4)
     tk.Button(confirm_frame, text = "End Game", command = lambda: menu_quit(data), bg = "#E03636", activebackground = "#8B2B2B", fg = "#ffffff", activeforeground = "#ffffff").pack(side = tk.RIGHT, ipadx = 16, ipady = 8, pady = 4, padx = 4)
 
     # -- Card Index -- #
-    index_access_button = tk.Button(info_frame, text = "Card Index", command = lambda: card_index(root, bg_2, main_font, text_colour, entries, data), bg = "#C65DF0", activebackground = "#C049C4", fg = "#ffffff", activeforeground = "#ffffff", width = 18)
-    index_access_button.pack(side = tk.LEFT, ipady = 8, padx = 4)
+    #index_access_button = tk.Button(info_frame, text = "Card Index", command = lambda: card_index(root, bg_2, main_font, text_colour, entries, data), bg = "#C65DF0", activebackground = "#C049C4", fg = "#ffffff", activeforeground = "#ffffff", width = 18)
+    #index_access_button.pack(side = tk.LEFT, ipady = 8, padx = 4)
 
     # -- Mimi Stand Counter -- #
     counter_init(root, info_frame, (16, 8), (4, 4), tk.RIGHT)

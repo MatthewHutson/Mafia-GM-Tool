@@ -7,7 +7,7 @@ from tkinter import messagebox
 from time import sleep
 from classes_and_types import *
 from menu.menu import *
-from menu.card_index import card_init
+#from menu.card_index import card_init
 from menu.settings import load_settings
 from game_loop_functions import *
 from game import game
@@ -64,7 +64,7 @@ def main() -> None:
     normal_load = setup_menu(entries, name_data)
 
     # -- Player Organisation -- #
-    game_data = Game_Data(Players(entries.assign_roles()), roles, role_functions, ability_distribution, card_init(), entries)
+    game_data = Game_Data(Players(entries.assign_roles()), roles, role_functions, ability_distribution, [], entries)
 
     if normal_load:
         game_data.init()
@@ -117,4 +117,4 @@ if __name__ == "__main__":
             playing = messagebox.askyesno("Game Over", "Do you want to play another round?", icon = "question")
         except Exception as e:
             playing = False
-            #raise e
+            raise e

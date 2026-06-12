@@ -111,20 +111,21 @@ class endure(Ability):
 class protect(Ability):
     @enforce_types
     def __init__(self) -> None:
-        super().__init__(targets = 1, p = 7.5, ability_type = ["repeat", "defensive"], priority = 2)
+        super().__init__(targets = 1, p = 7.5, ability_type = ["repeat", "defensive", "refresh"], priority = 2, refresh_max = 2)
 
     # -- Extra Methods -- #
     @enforce_types
     def check_for_mayor_case(self, target: str, data: Game_Data) -> bool:
         target_role: Role = data.players[target]
         return not (target_role.name == "Mayor" and target_role.solo_win)
-    
+
     # -- Ability -- #
     @enforce_types
     def ability(self, user: str, data: Game_Data) -> None:
         target: str = data.players[user].targets[0]
 
         if self.check_for_mayor_case(target, data): 
+            data.players[target].protector = user
             data.players[target].statuses.protected = True
 
     def if_poisoned(self, user: str, data: Game_Data) -> None:
@@ -177,16 +178,18 @@ class cupid_victory(Ability):
     def ability(self, user: str, data: Game_Data) -> None:
         user_role: Role = data.players[user]
         lovers: list[str] = data.get_lovers()
-        link_1: str = lovers[0]
-        link_2: str = lovers[1]
 
-        if link_1 in data.previous_deaths:
-            if link_2 in data.previous_deaths or link_2 in data.second_previous_deaths:
-                user_role.solo_win = True
-        
-        if link_2 in data.previous_deaths:
-            if link_1 in data.previous_deaths or link_1 in data.second_previous_deaths:
-                user_role.solo_win = True
+        if len(lovers) > 0:
+            link_1: str = lovers[0]
+            link_2: str = lovers[1]
+
+            if link_1 in data.previous_deaths:
+                if link_2 in data.previous_deaths or link_2 in data.second_previous_deaths:
+                    user_role.solo_win = True
+            
+            if link_2 in data.previous_deaths:
+                if link_1 in data.previous_deaths or link_1 in data.second_previous_deaths:
+                    user_role.solo_win = True
 
     @enforce_types
     def if_poisoned(self, user: str, data: Game_Data) -> None:
@@ -323,7 +326,7 @@ class telepathy(Ability):
 
     # -- Methods -- #
     def show_info(self, user: str, data: Game_Data, user_role: Role, target: str, role: Role) -> None:
-        user_role.information.append(f"Your psychic uncovered {role.name}, which is {data.get_card_by_role(role)}!")
+        user_role.information.append(f"Your psychic uncovered {role.name}!")
         temp_examine = examine()
         temp_examine(user, data)
 
@@ -331,7 +334,7 @@ class telepathy(Ability):
             mafia_roles: dict[str, Role] = {name: role for name, role in data.evil_aligned.items() if role.name != "Psychic"}
 
             for name, evil_role in mafia_roles.items():
-                evil_role.information.append(f"{target} is {role.name}, which is {data.get_card_by_role(role)}!")
+                evil_role.information.append(f"{target} is {role.name}!")
     
     # -- Ability -- #
     @enforce_types
@@ -458,11 +461,11 @@ class resurrect(Ability):
 
             target.information.append("You have Been Ressurected")
 
-
     @enforce_types
     def if_poisoned(self, user: str, data: Game_Data) -> None:
         self.ability(user, data)
         data.players[user].remaining_life_counter = 1
+        data.players[self.targets].remaining_life_counter = data.total_evil_count
 
     @enforce_types
     def if_drunk(self, user: str, data: Game_Data) -> None:
@@ -588,7 +591,7 @@ class gamble(Ability):
                 role.information.append(f"They rolled {role.secondary_ability.__name__}!")
             else:
                 new_role: Role = data.get_role_by_ability(role.secondary_ability)
-                new_card: str = data.get_card_by_role(new_role)
+                new_card: str = new_role.name
 
                 role.information.append(f"They rolled {new_role.name}, which has the card {new_card}!")
 
@@ -600,8 +603,6 @@ class gamble(Ability):
             # -- Removed The Ability From Being Drawn Again -- #
             if not (role.secondary_ability == none or role.secondary_ability is None):
                 self.used_abilities.add(role_data[0])
-
-            print(self.used_abilities)
 
     @enforce_types
     def if_poisoned(self, user: str, data: Game_Data) -> None:
@@ -724,9 +725,7 @@ class index(Ability):
             selected_role: str = choice(list(selected_set))
 
             self.seen_roles.add(selected_role)
-        
-            card = data.get_card_by_role(data.roles[selected_role])
-            user_role.information.append(f"{selected_role} is in the game with card {card}!")
+            user_role.information.append(f"{selected_role}!")
 
     # -- Ability -- #
     @enforce_types
@@ -827,7 +826,7 @@ class witness_protection(Ability):
     @enforce_types
     def __init__(self):
         # -- A Variant of Protection For Lawyer -- #
-        super().__init__(targets = 0, p = 0, ability_type = ["on_demand", "keep_targets", "defensive"], priority = 2, uses = "x")
+        super().__init__(targets = 0, p = 0, ability_type = ["on_demand", "keep_targets", "defensive"], priority = 2, uses = "x-1")
 
     # -- Extra Methods -- #
     @enforce_types
@@ -851,7 +850,7 @@ class evidence_tampering(Ability):
     @enforce_types
     def __init__(self):
         # -- A Variant of Protection For Lawyer -- #
-        super().__init__(targets = 0, p = 0, ability_type = ["on_demand", "keep_targets"], priority = -2, uses = "x")
+        super().__init__(targets = 0, p = 0, ability_type = ["on_demand", "keep_targets"], priority = -2, uses = "x-1")
 
     # -- Ability -- #
     @enforce_types
@@ -889,7 +888,7 @@ class evidence_tampering(Ability):
 class stop_vote(Ability):
     @enforce_types
     def __init__(self) -> None:
-        super().__init__(targets = 1, p = 0, ability_type = ["on_vote", "first_night", "keep_targets"], priority = 10)
+        super().__init__(targets = 1, p = 0, ability_type = ["on_vote", "first_night", "keep_targets"], priority = 10, uses = 1)
         
     # -- Ability -- #
     @enforce_types
@@ -913,7 +912,6 @@ class stop_vote(Ability):
             
             if user_role.ability != stop_vote:
                 user_role.ability, user_role.secondary_ability = user_role.secondary_ability, user_role.ability
-
 
     @enforce_types
     def if_poisoned(self, user: str, data: Game_Data, first_night: bool = False) -> None:

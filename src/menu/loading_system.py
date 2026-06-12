@@ -26,7 +26,7 @@ def load_role_data() -> int:
     evil_data = data["evil"]
     boundary_data = data["boundaries"]
 
-    max_players = len(good_data["information"]) + len(good_data["defensive"]) + len(good_data["other"]) + len(neutral_data["roles"])
+    max_players = len(good_data["information"]) + len(good_data["defensive"]) + len(good_data["other"]) + len(neutral_data["roles"]) + 3
     return max_players
 
 @enforce_types
@@ -63,7 +63,6 @@ def new_get_roles(player_count: int, settings: dict, offset: int = 1) -> list[li
 
     all_unselected_roles = all_unselected_roles[:-1 * (len(boundary_data["evil_support"]) + 1)]
 
-
     for i in range(player_count - len(roles)):
         if i < len(all_unselected_roles):
             roles.append(deepcopy(all_unselected_roles[i]))
@@ -81,6 +80,7 @@ def new_get_roles(player_count: int, settings: dict, offset: int = 1) -> list[li
             roles.append(deepcopy(boundary_data["overflow"]))
 
     return roles
+
 
 @enforce_types
 def get_all_role_lists() -> list[list[str]]:

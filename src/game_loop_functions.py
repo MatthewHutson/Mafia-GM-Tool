@@ -57,9 +57,23 @@ def remove_round_data(data: Game_Data, used_Death_ability: bool = False, post_vo
             for i in range(len(targets)):
                 targets.pop(0)
 
+        if not (post_vote or used_Death_ability):
+            if "refresh" in role.ability.ability_type:
+                role.ability.refresh_count += 1
+
+                if role.ability.refresh_count >= role.ability.refresh_max:
+                    role.ability.can_pick_same_target = False
+
+            if "refresh" in role.secondary_ability.ability_type:
+                role.secondary_ability.refresh_count += 1
+
+                if role.secondary_ability.refresh_count >= role.secondary_ability.refresh_max:
+                    role.secondary_ability.can_pick_same_target = False
+
         role.recursion_fuck_up = False
         role.information = []
         role.visited_by = []
+        role.protector = None
 
         # -- Silence Check -- #
         if post_vote: 

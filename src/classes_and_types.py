@@ -116,7 +116,7 @@ class equation():
 
 class Ability():
     @enforce_types
-    def __init__(self, targets: int, p: int | float, ability_type: list[str], target_living: bool = True, priority: int = 255, can_pick_same_target: bool = False, uses: int | equation | str | None = None) -> None:
+    def __init__(self, targets: int, p: int | float, ability_type: list[str], target_living: bool = True, priority: int = 255, can_pick_same_target: bool = False, uses: int | equation | str | None = None, refresh_max: int = 0) -> None:
         # -- Attributes -- #
         self.targets: int = targets
         self.p: int | float = p
@@ -124,6 +124,8 @@ class Ability():
         self.target_living: bool = target_living
         self.priority: float = priority
         self.can_pick_same_target: bool = can_pick_same_target
+        self.refresh_max = refresh_max
+        self.refresh_count = 0
 
         if not is_instance(uses, str): self.number_of_uses: int | equation = uses
         else: self.number_of_uses = equation(uses)
@@ -219,6 +221,7 @@ class Role:
     made_choice: bool = False
     previous_targets: list = None
     doom_count: int = None
+    protector: str = None
     
     # -- Properties -- #
     @property
@@ -290,6 +293,14 @@ class Role:
     # -- Methods -- #
     @enforce_types
     def die(self, players: Players) -> bool:
+        # -- Doctor Case -- #
+        if self.protector is not None:
+            doctor: Role = players[self.protector]
+            
+            if not doctor.statuses.poisoned:
+                doctor.ability.can_pick_same_target = True
+                doctor.ability.refresh_count = 0
+
         if not self.statuses.protected: 
             self.currently_alive = False
             self.just_died = True
@@ -678,6 +689,8 @@ class Game_Data():
     
         self.players = Players(final_data)
         self.init(alter_drunk = False)
+
+        game_data["turn_count"] -= 1
 
         for name, value in game_data.items():
             setattr(self, name, value)

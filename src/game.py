@@ -76,10 +76,12 @@ def nap_time(data: Game_Data) -> None:
     evil_roles: set[str] = set(name for name, role in data.roles.items() if not role.alignment)
     bluff_roles: list[str] = list(all_roles - playing_roles - evil_roles)
     shuffle(bluff_roles)
-    bluff_roles = bluff_roles[:len(data.evil_aligned)]
-    evil_cards: list[str] = [data.get_card_by_role(role) for role in list(data.evil_aligned.values()) if role.name != "Mafia"]
-    bluff_cards: list[str] = [data.get_card_by_role(data.roles[role]) for role in bluff_roles]
-
+    try:
+        bluff_roles = bluff_roles[:len(data.evil_aligned)]
+    except:
+        bluff_roles = bluff_roles
+    evil_cards: list[str] = [role for role in list(data.evil_aligned.values()) if role.name != "Mafia"]
+    bluff_cards: list[str] = [role for role in bluff_roles]
 
     info: str = f"Wake up The Evil Team: {list(data.evil_aligned.keys())}. Show Them \n\n #1: Their Teammate(s): {evil_cards}. \n #2: Their Bluff Roles: {bluff_cards}. \n\nIs Everyone Ready To Procede?"
     timer = threading.Timer(0.1, lambda: nap_time_info(info))

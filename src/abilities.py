@@ -6,6 +6,7 @@ from random import choice
 from time import sleep
 from re import fullmatch
 import colorist
+import json
 
 # -- Roles -- #
 class none(Ability):
@@ -825,7 +826,7 @@ class super_kill(Ability):
 
         target_role.statuses.protected = False
         target_role.die(data.players)
-        target_role.statuses.protected = True
+        target_role.statuses.protected = protected
 
     @enforce_types
     def if_poisoned(self, user: str, data: Game_Data) -> None:
@@ -1034,3 +1035,55 @@ class silence(Ability):
     @enforce_types
     def if_drunk(self, user: str, data: Game_Data) -> None:
         pass
+
+class sidequest(Ability):
+    @enforce_types
+    def __init__(self) -> None:
+        super().__init__(targets = 0, p = 0, ability_type = ["repeat", "on_vote", "first_night"], priority = 12)
+        self.tasks : list[str] = []
+        self.completed_tasks = 0
+        self.total_tasks = 0
+        self.required_tasks = 0
+    
+    # -- Ability -- #
+    @enforce_types
+    def ability(self, user: str, data: Game_Data, first_night: bool = False) -> None:
+        user_role: Role = data.players[user]
+
+        if first_night:
+            self.total_tasks = data.total_evil_count + 3
+            self.required_tasks = self.total_tasks - 1
+            solo_count = self.total_tasks // 2
+            social_count = self.total_tasks - solo_count
+            
+            with open("crewmate_tasks.json", "r") as file:
+                data: dict = json.load(file)
+                solo_tasks: list[str] = data["solo_tasks"]
+                social_tasks: list[str] = data["social_tasks"]
+                shuffle(solo_tasks)
+                shuffle(social_tasks)
+
+                self.tasks = solo_tasks[:solo_count] + social_tasks[:social_count]
+                self.tasks[-1] += "\n"
+
+            user_role.information.append(f"Your Tasks Are:" + "".join(["\n  " + chr(i + 97) + ") " + self.tasks[i] for i in range(len(self.tasks))]))
+
+        else:
+            check = None
+            while check is None:
+                check = messagebox.askyesnocancel("Ability", f"Has {user}, the {user_role.name} completed a task?", default = "cancel", icon = "question")
+                sleep(0.5)
+
+            if check:
+                self.completed_tasks += 1
+                if self.completed_tasks >= self.required_tasks:
+                    user_role.solo_win = True
+                    data.playing = False
+
+    @enforce_types
+    def if_poisoned(self, user: str, data: Game_Data, first_night: bool = False) -> None:
+        self.ability(user, data, first_night)
+
+    @enforce_types
+    def if_drunk(self, user: str, data: Game_Data, first_night: bool = False) -> None:
+        self.ability(user, data, first_night)

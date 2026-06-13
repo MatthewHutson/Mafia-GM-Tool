@@ -1,0 +1,7 @@
+{
+    "name": "Crewmate",
+    "ability": "sidequest",
+    "alignment": null,
+    "mafia_alternative": false,
+    "max_count": 1
+}

@@ -2,10 +2,10 @@
     "good": {
         "information": [["Sheriff"], ["Creep"], ["Librarian"], ["Examiner"]],
         "defensive": [["Soldier"], ["Doctor"], ["Necromancer"]],
-        "other": [["Cupid"], ["Mayor"], ["Gambler"], ["Vigilante"], ["Saint"]]
+        "other": [["Mayor"], ["Gambler"], ["Vigilante"], ["Saint"]]
     },
     "neutral": {
-        "roles": [["Jester"], ["Lawyer"]]
+        "roles": [["Jester"], ["Lawyer"], ["Cupid"], ["Crewmate"]]
     },
     "evil": {
         "lead": ["Mafia"],

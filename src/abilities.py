@@ -986,14 +986,15 @@ class execute(Ability):
     @enforce_types
     def __init__(self) -> None:
         super().__init__(targets = 1, p = 5, ability_type = ["on_demand"], priority = -1, can_pick_same_target = True, uses = 1)
-        
+        self.immune_players: set = {}
+
     # -- Ability -- #
     @enforce_types
     def ability(self, user: str, data: Game_Data) -> None:
         target: str = data.players[user].targets[0]
         target_role: Role = data.players[target]
 
-        if target_role.true_alignment != True:
+        if target_role.true_alignment != True and target not in self.immune_players:
             target_role.die(data.players)
 
     @enforce_types
@@ -1001,7 +1002,7 @@ class execute(Ability):
         target: str = data.players[user].targets[0]
         target_role: Role = data.players[target]
 
-        if target_role.alignment:
+        if target_role.alignment and target not in self.immune_players:
             target_role.die(data.players)
 
     @enforce_types
@@ -1021,12 +1022,7 @@ class silence(Ability):
         target_role.statuses.silenced = True
 
         if target_role.statuses.silenced:
-            info: list[str] = deepcopy(target_role.information)
-
-            if len(info) > 0:
-                data.players[user].information += [f"You Stole The Following From {target}"] + info
-            else:
-                data.players[user].information += [f"{target} Learned Nothing Tonight"] + info
+            target_role.silencer = user
 
     @enforce_types
     def if_poisoned(self, user: str, data: Game_Data) -> None:
@@ -1087,3 +1083,86 @@ class sidequest(Ability):
     @enforce_types
     def if_drunk(self, user: str, data: Game_Data, first_night: bool = False) -> None:
         self.ability(user, data, first_night)
+
+class calculated_risk(Ability):
+    @enforce_types
+    def __init__(self) -> None:
+        super().__init__(targets = [0, 1, 1, 1, 0, 1], p = 0, ability_type = ["repeat", "selection"], priority = 3)
+
+    # -- Backfires -- #
+    @enforce_types
+    def backfire(self, user: str, data: Game_Data) -> None:
+        user_role: Role = data.players[user]
+        target: str = user_role.targets[0] if len(user_role.targets) > 0 else None
+        target_role: Role = data.players[target] if target is not None else None
+
+        match self.selection_index:
+            case 0: pass
+            case 1: 
+                target_role.statuses.protected = True
+                target_role.statuses.silenced = True
+
+            case 2: 
+                target_role.information.append("The Thrillseeker Visited You!")
+
+            case 3: 
+                if not user_role.statuses.protected: user_role.remaining_life_counter = 2
+                ability: Ability = poison()
+                ability.ability(user, data)
+            case 4: 
+                valid_players: list[Role] = [role for role in data.dead_players.values() if role.true_alignment == True]
+                
+                ability: Ability = resurrect()
+                ability.ability(user, data)
+
+            case 5: user_role.remaining_life_counter = 1
+
+    # -- Ability -- #
+    @enforce_types
+    def ability(self, user: str, data: Game_Data) -> None:
+        backfired: bool = False
+        
+        if not backfired:
+            match self.selection_index:
+                case 0: 
+                    for role in data.players.values():
+                        if user in role.targets:
+                            match role.name:
+                                case "Sheriff":
+                                    if user in role.targets: 
+                                        role.ability.override = True
+                                case "Creep": role.ability.invisible_players.add(user)
+                                case "Vigilantee": role.ability.immune_players.add(user)
+
+                case 1:
+                    ability: Ability = silence()
+                    ability.ability(user, data)
+
+                case 2: pass
+                case 3: 
+                    ability: Ability = poison()
+                    ability.ability(user, data)
+
+                case 4:
+                    valid_players: list[Role] = [role for role in data.dead_players.values() if role.true_alignment == True]
+                    
+                    if len(valid_players) > 0:
+                        target_role: Role = choice(valid_players)
+                        target_role.revive()
+                        target_role.true_alignment = False
+                        target_role.information.append("You Have Been Revived & Are Now Evil!")
+
+                case 5:
+                    ability: Ability = super_kill()
+                    ability.ability(user, data)
+
+        else:
+            self.backfire(user, data) 
+
+    @enforce_types
+    def if_poisoned(self, user: str, data: Game_Data) -> None:
+        self.backfire(user, data)
+
+    @enforce_types
+    def if_drunk(self, user: str, data: Game_Data) -> None:
+        self.backfire(user, data)

@@ -11,8 +11,8 @@ The Stand Counter Button Will Show The Current Count
 The Counter Will Remain Between Games As Long As the Program Runs
 
 # -- Changelog -- #
-Added The Crewmate - Sidequest Until You Win
-Bugfixes aAlong The Way
+Added Thrillseeker Framework - Pick Your Risks For Increasing Rewards
+Added New System To Select From A Range Of Abilities
 
 # -- To Do -- #
 Test Reworks

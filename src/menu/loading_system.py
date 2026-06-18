@@ -26,7 +26,7 @@ def load_role_data() -> int:
     evil_data = data["evil"]
     boundary_data = data["boundaries"]
 
-    max_players = len(good_data["information"]) + len(good_data["defensive"]) + len(good_data["other"]) + len(neutral_data["roles"]) + 3
+    max_players = len(good_data["information"]) + len(good_data["defensive"]) + len(good_data["other"]) + len(neutral_data["roles"])
     return max_players
 
 @enforce_types

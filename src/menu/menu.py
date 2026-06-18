@@ -532,11 +532,18 @@ def voting_menu(data: Game_Data, entries: Menu_Entry) -> str:
 @enforce_types
 def information(data: Game_Data, tell_nothing: bool = True, first_wave: bool = True) -> None:
     for player, role in data.alive_players.items():
+        if role.statuses.silenced & first_wave:
+            if role.silencer != player:
+                if len(role.information) > 0:
+                    data.players[role.silencer].information .append("Your Target Has Uncoverd:" + "".join([f"\n   {i}) {role.information[i]}" for i in range(role.information)]))
+                else:
+                    data.players[role.silencer].information .append("Your Target Has Uncoverd Nothing")
+
+            role.information = ["You have been Silenced!"]
+
+    for player, role in data.alive_players.items():
         info: str = "\n"
         count: int = 0
-
-        if role.statuses.silenced & first_wave:
-            role.information = ["You have been Silenced!"]
 
         for item in role.information:
             info += f"\n #{count + 1}: " + item

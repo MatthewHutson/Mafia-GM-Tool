@@ -2,7 +2,7 @@
 import json
 import os
 from utils import *
-from tkinter import messagebox
+from tkinter import messagebox, simpledialog
 from time import sleep
 import threading
 from classes_and_types import *
@@ -13,7 +13,7 @@ import abilities as a
 
 # -- Functions -- #
 @enforce_types
-def on_demand(data: Game_Data, role: Role, ability: Ability, is_primary_ability: bool, name: str) -> None:
+def on_demand(role: Role, ability: Ability, is_primary_ability: bool, name: str) -> None:
     if "on_demand" in ability.ability_type and ability.number_of_uses != 0:
         sleep(0.5)
         
@@ -30,7 +30,7 @@ def on_demand(data: Game_Data, role: Role, ability: Ability, is_primary_ability:
         role.made_choice = True
 
 @enforce_types
-def alternate(data: Game_Data, role: Role, ability: Ability, name: str) -> None:
+def alternate(role: Role, ability: Ability, name: str) -> None:
     if "alternate" in ability.ability_type and ability.number_of_uses != 0:
         sleep(0.5)
 
@@ -42,6 +42,11 @@ def alternate(data: Game_Data, role: Role, ability: Ability, name: str) -> None:
         role.ability_cancel = not use_ability
         role.secondary_ability_cancel = use_ability
         role.made_choice = True
+
+@enforce_types
+def ability_selection_input(role: Role, ability: Ability) -> None:
+    if "selection" in ability.ability_type:
+        ability.selection_index = simpledialog.askinteger(F"Index for {role.name}", f"Input A Value Between {0} and {ability.max_selection_index}.", minvalue = 0, maxvalue = ability.max_selection_index)
 
 @enforce_types
 def selection_coindition(data: Game_Data, role: Role, name: str, is_primary_ability: bool) -> bool:
@@ -56,8 +61,8 @@ def selection_coindition(data: Game_Data, role: Role, name: str, is_primary_abil
     dead_targets = (ability.target_living or len(data.dead_players) > 0)
 
     if can_use and data.playing and dead_targets:
-        alternate(data, role, ability, name)
-        on_demand(data, role, ability, is_primary_ability, name)
+        alternate(role, ability, name)
+        on_demand(role, ability, is_primary_ability, name)
     
     if is_primary_ability:
         use_ability = not role.ability_cancel
@@ -127,14 +132,17 @@ def game(data: Game_Data, entries: Menu_Entry, normal_start: bool = True) -> Non
 
         for name, role in data.alive_players.items():
             # -- Equation Type Handler -- #
+            ability_selection_input(role.ability)
+            ability_selection_input(role.secondary_ability)  
+
             try:
                 if is_instance(role.ability.number_of_uses, equation):
                     role.ability.number_of_uses = role.ability.number_of_uses.get_value(data.total_evil_count)
             except: pass
             
             try:
-                if is_instance(role.secondaary_ability.number_of_uses, equation):
-                    role.secondaary_ability.number_of_uses = role.secondary_ability.number_of_uses.get_value(data.total_evil_count)
+                if is_instance(role.secondary_ability.number_of_uses, equation):
+                    role.secondary_ability.number_of_uses = role.secondary_ability.number_of_uses.get_value(data.total_evil_count)
             except: pass
 
             if data.playing:
@@ -145,8 +153,9 @@ def game(data: Game_Data, entries: Menu_Entry, normal_start: bool = True) -> Non
 
             if data.playing:
                 selection_menu_destroy(data, entries, name, action_frame, action_label, ability, functional = False)
-
-            if can_pick_primary_target: selection_menu(data, entries, name)
+        
+            if can_pick_primary_target:
+                selection_menu(data, entries, name)
 
             if "secondary_ability" in role.ability_type and not ("alternate" in role.ability_type and not role.ability_cancel):
                 can_pick_secondary_target: bool = selection_coindition(data, role, name, False)

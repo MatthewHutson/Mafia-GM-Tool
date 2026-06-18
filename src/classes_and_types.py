@@ -116,9 +116,8 @@ class equation():
 
 class Ability():
     @enforce_types
-    def __init__(self, targets: int, p: int | float, ability_type: list[str], target_living: bool = True, priority: int = 255, can_pick_same_target: bool = False, uses: int | equation | str | None = None, refresh_max: int = 0) -> None:
+    def __init__(self, targets: int | list[int], p: int | float, ability_type: list[str], target_living: bool = True, priority: int = 255, can_pick_same_target: bool = False, uses: int | equation | str | None = None, refresh_max: int = 0) -> None:
         # -- Attributes -- #
-        self.targets: int = targets
         self.p: int | float = p
         self.ability_type: list[str] = ability_type
         self.target_living: bool = target_living
@@ -126,9 +125,13 @@ class Ability():
         self.can_pick_same_target: bool = can_pick_same_target
         self.refresh_max = refresh_max
         self.refresh_count = 0
+        self.selection_index = 0
 
         if not is_instance(uses, str): self.number_of_uses: int | equation = uses
         else: self.number_of_uses = equation(uses)
+
+        self.target_list: list[int] = [targets] if isinstance(targets, int) else targets
+        self.max_selection_index = len(self.target_list) - 1
 
     @property
     @enforce_types
@@ -139,6 +142,16 @@ class Ability():
     @enforce_types
     def true_name(self) -> str:
         return type(self).__name__
+    
+    @property
+    @enforce_types
+    def targets(self) -> int:
+        return self.target_list[self.selection_index]
+    
+    @targets.setter
+    @enforce_types
+    def targets(self, value: int) -> None:
+        self.target_list[self.selection_index] = value
 
     # -- Methods -- #
     def ability(self, user: str, data: Game_Data, **kwargs) -> None:
@@ -222,6 +235,7 @@ class Role:
     previous_targets: list = None
     doom_count: int = None
     protector: str = None
+    silencer: str = None
     
     # -- Properties -- #
     @property

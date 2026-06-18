@@ -1,6 +1,6 @@
 {
     "name": "Testing",
-    "ability": "vote",
+    "ability": "calculated_risk",
     "alignment": null,
     "mafia_alternative": false,
     "max_count": 1

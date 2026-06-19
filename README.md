@@ -11,8 +11,10 @@ The Stand Counter Button Will Show The Current Count
 The Counter Will Remain Between Games As Long As the Program Runs
 
 # -- Changelog -- #
-Added Thrillseeker Framework - Pick Your Risks For Increasing Rewards
-Added New System To Select From A Range Of Abilities
+Balance Change - Instant Death Doesn't Trigger When Protected
+Added Saboteur - Single Use Group Poisons
+Technical Changes
+Unraised e in main
 
 # -- To Do -- #
 Test Reworks

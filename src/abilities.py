@@ -630,7 +630,8 @@ class instant_death(Ability):
     # -- Ability -- #
     @enforce_types
     def ability(self, user: str, data: Game_Data) -> None:
-        data.players[user].remaining_life_counter = 0
+        if not data.players[user].statuses.protected:
+            data.players[user].remaining_life_counter = 0
 
     @enforce_types
     def if_poisoned(self, user: str, data: Game_Data) -> None:
@@ -932,8 +933,8 @@ class stop_vote(Ability):
         self.ability(user, data, first_night)
 
     @enforce_types
-    def if_drunk(self, user: str, data: Game_Data) -> None:
-        pass
+    def if_drunk(self, user: str, data: Game_Data, first_night: bool = False) -> None:
+        self.ability(user, data, first_night)
 
 class bless(Ability):
     @enforce_types
@@ -1166,3 +1167,36 @@ class calculated_risk(Ability):
     @enforce_types
     def if_drunk(self, user: str, data: Game_Data) -> None:
         self.backfire(user, data)
+
+class sabotage(Ability):
+    @enforce_types
+    def __init__(self) -> None:
+        super().__init__(targets = [0, 0], p = 0, ability_type = ["repeat", "selection", "on_demand"], priority = -2)
+    
+    # -- Ability -- #
+    @enforce_types
+    def ability(self, user: str, data: Game_Data) -> None:
+        match self.selection_index:
+            case 0:
+                for role in data.good_aligned.values():
+                    if "investigative" in role.ability.ability_type or "investigative" in role.secondary_ability.ability_type:
+                        role.statuses.poisoned = True
+            case 1:
+                for role in data.good_aligned.values():
+                    if "defensive" in role.ability.ability_type or "defensive" in role.secondary_ability.ability_type:
+                        role.statuses.poisoned = True
+
+        if "selection" in self.ability_type:
+            self.ability_type.remove("selection")
+        else:
+            self.number_of_uses = 0
+
+    @enforce_types
+    def if_poisoned(self, user: str, data: Game_Data) -> None:
+        for role in data.evil_aligned.values():
+            role.statuses.poisoned = True
+
+    @enforce_types
+    def if_drunk(self, user: str, data: Game_Data) -> None:
+        for role in data.evil_aligned.values():
+            role.statuses.poisoned = True

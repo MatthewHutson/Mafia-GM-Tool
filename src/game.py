@@ -132,9 +132,6 @@ def game(data: Game_Data, entries: Menu_Entry, normal_start: bool = True) -> Non
 
         for name, role in data.alive_players.items():
             # -- Equation Type Handler -- #
-            ability_selection_input(role.ability)
-            ability_selection_input(role.secondary_ability)  
-
             try:
                 if is_instance(role.ability.number_of_uses, equation):
                     role.ability.number_of_uses = role.ability.number_of_uses.get_value(data.total_evil_count)
@@ -152,6 +149,8 @@ def game(data: Game_Data, entries: Menu_Entry, normal_start: bool = True) -> Non
             can_pick_primary_target: bool = selection_coindition(data, role, name, True)
 
             if data.playing:
+                ability_selection_input(role, role.ability)
+                ability_selection_input(role, role.secondary_ability)  
                 selection_menu_destroy(data, entries, name, action_frame, action_label, ability, functional = False)
         
             if can_pick_primary_target:

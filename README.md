@@ -11,8 +11,7 @@ The Stand Counter Button Will Show The Current Count
 The Counter Will Remain Between Games As Long As the Program Runs
 
 # -- Changelog -- #
-Started Adding Global Announcements Upon Wake Up
-Small Tweeks
+Completed Global Announcements - Deaths & Revives Are Announcements Now
 
 # -- To Do -- #
 Test Reworks

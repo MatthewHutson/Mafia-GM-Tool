@@ -183,7 +183,7 @@ def game(data: Game_Data, entries: Menu_Entry, normal_start: bool = True) -> Non
 
             pack_alive_and_dead(data, data.vote_role, 0)
             use_death_abilities(data)
-            life_death_sort(data, update_data = False)
+            life_death_sort(data, update_data = True)
             remove_round_data(data, used_Death_ability = True, keep_announcements = True)
 
             check_for_victory(data)

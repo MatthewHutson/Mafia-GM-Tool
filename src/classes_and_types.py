@@ -518,6 +518,8 @@ class Game_Data():
     previous_deaths: list[str] = None
     second_previous_deaths: list[str] = None
     wanted_data: list[str] = None
+    temp_deaths: list[str] = None
+    temp_ressurections: list[str] = None
 
     # -- Properties -- #
     @property
@@ -564,6 +566,8 @@ class Game_Data():
         self.previous_deaths = []
         self.second_previous_deaths = []
         self.announcements = []
+        self.temp_deaths = []
+        self.temp_ressurections = []
 
         # -- Variable Count Considerations -- #
         if self.total_evil_count == 0:
@@ -731,25 +735,42 @@ class Game_Data():
                 if role.currently_alive:
                     del self.dead_players[name]
                     self.alive_players[name] = role
+                    resurrections.append(name)
                     if role.alignment:
                         self.good_aligned[name] = role
                     else:
                         self.evil_aligned[name] = role
-    
-        if len(deaths) > 0 and update_data:
-            self.second_previous_deaths = deepcopy(self.previous_deaths)
-            self.previous_deaths = deepcopy(deaths)
+
+        print(len(deaths), update_data, len(self.temp_deaths))
 
         if update_data:
-            deaths_info: list[str] = [f"\n  {chr(i + 97)}) {deaths[i]}" for i in range(len(deaths))]
-            resurrections_info: list[str] = [f"\n   {chr(i + 97)}) {resurrections[i]}" for i in range(len(resurrections))]
+            full_deaths = deaths + [name for name in self.temp_deaths if name not in deaths]
+            full_resurrections = resurrections + [name for name in self.temp_ressurections if name not in resurrections]
 
-            if len(deaths) == 0: deaths_info = ["Nobody"]
-            if len(resurrections) == 0: resurrections_info = ["Nobody"]
+            full_deaths.sort(), full_resurrections.sort()
 
-            self.announcements.append(f"The following players died tonight:" + "".join(deaths_info))
-            self.announcements.append(f"The following players have been revived tonight:" + "".join(resurrections_info))
+            deaths_info: list[str] = [f"\n       {chr(i + 97)}) {full_deaths[i]}" for i in range(len(full_deaths))]
+            resurrections_info: list[str] = [f"\n       {chr(i + 97)}) {full_resurrections[i]}" for i in range(len(full_resurrections))]
+
+            if len(full_deaths) == 0: self.announcements.append("Nobody Died Tonight!")
+            else: self.announcements.append(f"The following players died tonight:" + "".join(deaths_info))
+                
+            if len(full_resurrections) > 0: self.announcements.append(f"The following players have been revived tonight:" + "".join(resurrections_info))
+
+            if len(deaths) > 0:
+                self.second_previous_deaths = deepcopy(self.previous_deaths)
+                self.previous_deaths = deepcopy(deaths)
+
+            self.temp_deaths = []
+            self.temp_ressurections = []
+            
+        else:
+            self.temp_deaths = deepcopy(deaths)
+            self.temp_ressurections = deepcopy(resurrections)
 
     def get_lovers(self) -> list[str]:
         out: list[str] = [name for name, role in self.players.items() if role.statuses.linked]
         return out
+    
+    def death_announcements(self) -> None:
+        pass

@@ -501,6 +501,7 @@ class Game_Data():
     ablity_distribution: dict[str, float]
     card_dict: dict[str, str]
     menu_entries: Menu_Entry
+    announcements: list[str] = None
     settings: dict[str, Any] = None
     mafia_role: Role = None
     none_role: Role = None
@@ -562,6 +563,7 @@ class Game_Data():
         self.settings = {name: data["value"] for name, data in self.menu_entries.settings.items()}
         self.previous_deaths = []
         self.second_previous_deaths = []
+        self.announcements = []
 
         # -- Variable Count Considerations -- #
         if self.total_evil_count == 0:
@@ -710,8 +712,9 @@ class Game_Data():
             setattr(self, name, value)
 
     @enforce_types
-    def update_life(self) -> None:
-        deaths: list[str] =[]
+    def update_life(self, update_data: bool = False) -> None:
+        deaths: list[str] = []
+        resurrections: list[str] = []
 
         for name, role in self.players.items():
             if name in self.alive_players.keys():
@@ -732,10 +735,20 @@ class Game_Data():
                         self.good_aligned[name] = role
                     else:
                         self.evil_aligned[name] = role
-
-        if len(deaths) > 0:
+    
+        if len(deaths) > 0 and update_data:
             self.second_previous_deaths = deepcopy(self.previous_deaths)
             self.previous_deaths = deepcopy(deaths)
+
+        if update_data:
+            deaths_info: list[str] = [f"\n  {chr(i + 97)}) {deaths[i]}" for i in range(len(deaths))]
+            resurrections_info: list[str] = [f"\n   {chr(i + 97)}) {resurrections[i]}" for i in range(len(resurrections))]
+
+            if len(deaths) == 0: deaths_info = ["Nobody"]
+            if len(resurrections) == 0: resurrections_info = ["Nobody"]
+
+            self.announcements.append(f"The following players died tonight:" + "".join(deaths_info))
+            self.announcements.append(f"The following players have been revived tonight:" + "".join(resurrections_info))
 
     def get_lovers(self) -> list[str]:
         out: list[str] = [name for name, role in self.players.items() if role.statuses.linked]

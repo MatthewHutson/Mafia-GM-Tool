@@ -458,7 +458,6 @@ class resurrect(Ability):
     @enforce_types
     def ability(self, user: str, data: Game_Data) -> None:
         user_role: Role = data.players[user]
-        evil = evil or not user_role.alignment
 
         if user_role.ability == self: # -- Gambler Check -- #
             ability_cancel = user_role.ability_cancel
@@ -1190,6 +1189,8 @@ class sabotage(Ability):
             self.ability_type.remove("selection")
         else:
             self.number_of_uses = 0
+
+        data.announcements.append("The Saboteur Used Their Ability Last Night!")
 
     @enforce_types
     def if_poisoned(self, user: str, data: Game_Data) -> None:

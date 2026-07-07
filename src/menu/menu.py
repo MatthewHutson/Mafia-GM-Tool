@@ -12,6 +12,7 @@ from random import shuffle
 from pathlib import Path
 import tkinter as tk
 import sys
+import threading
 import json
 
 # -- Setup Global Variables -- #
@@ -517,6 +518,7 @@ def selection_menu_destroy(data: Game_Data, entries: Menu_Entry, user: str, acti
 def selection_menu(data: Game_Data, entries: Menu_Entry, user: str, target: str = "", is_primary_ability: bool = True, can_recurse: bool = True) -> None:
     global selected_players
     action_frame, action_label, ability = selection_menu_create(data, entries, user, target, is_primary_ability)
+    announcements(data)
     root.mainloop()
     selection_menu_destroy(data, entries, user, action_frame, action_label, ability, is_primary_ability, can_recurse)
 
@@ -528,6 +530,19 @@ def voting_menu(data: Game_Data, entries: Menu_Entry) -> str:
         return selected_players[0]
     else: 
         return "none"
+
+@enforce_types
+def announcements(data: Game_Data) -> None:
+    info = "\n"
+    count = 0
+
+    for item in data.announcements:
+            info += f"\n #{count + 1}: " + item
+            count += 1
+
+    if len(data.announcements) > 0:
+        messagebox.showinfo("Announcements", f"Everyone is told: {info}", icon = "info")
+        
 
 @enforce_types
 def information(data: Game_Data, tell_nothing: bool = True, first_wave: bool = True) -> None:

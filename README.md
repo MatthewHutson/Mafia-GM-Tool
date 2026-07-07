@@ -11,10 +11,8 @@ The Stand Counter Button Will Show The Current Count
 The Counter Will Remain Between Games As Long As the Program Runs
 
 # -- Changelog -- #
-Balance Change - Instant Death Doesn't Trigger When Protected
-Added Saboteur - Single Use Group Poisons
-Technical Changes
-Unraised e in main
+Started Adding Global Announcements Upon Wake Up
+Small Tweeks
 
 # -- To Do -- #
 Test Reworks

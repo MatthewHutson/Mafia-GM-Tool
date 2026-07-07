@@ -179,12 +179,12 @@ def game(data: Game_Data, entries: Menu_Entry, normal_start: bool = True) -> Non
 
             # -- Resetting The Player Data -- #
             update_all_targets(data)
-            remove_round_data(data)
+            remove_round_data(data, keep_announcements = True)
 
             pack_alive_and_dead(data, data.vote_role, 0)
             use_death_abilities(data)
-            life_death_sort(data)
-            remove_round_data(data, used_Death_ability = True)
+            life_death_sort(data, update_data = False)
+            remove_round_data(data, used_Death_ability = True, keep_announcements = True)
 
             check_for_victory(data)
 

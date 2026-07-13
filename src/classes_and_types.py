@@ -36,6 +36,7 @@ class Status_Manager():
     blessed: bool = False
     silenced: bool = False
     doomed: bool = False
+    doused: bool = False
 
     # -- Properties -- #
     @property
@@ -512,6 +513,7 @@ class Game_Data():
     playing: bool = True
     good_win: bool = False
     evil_win: bool = False
+    win_steal: bool = False
     evil_count: int = 0
     total_evil_count: int = 0 # -- Holds Both Alive And Dead Evils -- #
     turn_count: int = 0

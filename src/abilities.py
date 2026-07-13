@@ -1251,6 +1251,65 @@ class role_replicate(Ability):
     @enforce_types
     def if_poisoned(self, user: str, data: Game_Data) -> None:
         self.ability(user, data)
+        data.players[user].statuses.drunk = True
+
+    @enforce_types
+    def if_drunk(self, user: str, data: Game_Data) -> None:
+        pass
+
+class douse(Ability):
+    def __init__(self) -> None:
+        super().__init__(targets = 1, p = 0, ability_type = ["repeat", "alternate"])
+        
+    # -- Ability -- #
+    @enforce_types
+    def ability(self, user: str, data: Game_Data) -> None:
+        user_role: Role = data.players[user]
+        if not user_role.ability_cancel:
+            target_role: Role = data.players[user_role.targets[0]]
+            target_role.statuses.doused = True
+        else:
+            user_role.secondary_ability(user, data)
+
+    @enforce_types
+    def if_poisoned(self, user: str, data: Game_Data) -> None:
+        self.ability(user, data)
+
+    @enforce_types
+    def if_drunk(self, user: str, data: Game_Data) -> None:
+        self.ability(user, data)
+
+class incinerate(Ability):
+    def __init__(self) -> None:
+        super().__init__(targets = 0, p = 0, ability_type = [], uses = 1)
+        
+    # -- Ability -- #
+    @enforce_types
+    def ability(self, user: str, data: Game_Data) -> None:
+        user_role: Role = data.players[user]
+
+        for role in data.players.values():
+            if role.statuses.doused:
+                protected: bool = role.statuses.protected
+                role.statuses.protected = False
+                role.die(data.players)
+                role.statuses.protected = protected
+            
+        alive_count: int = 0
+
+        for name, role in data.players.items():
+            if name != user:
+                if role.currently_alive:
+                    alive_count += 1
+
+        user_role.solo_win = alive_count == 0
+        data.win_steal = user_role.solo_win or data.win_steal
+        user_role.ability = none()
+        user_role.secondary_ability = none()
+
+    @enforce_types
+    def if_poisoned(self, user: str, data: Game_Data) -> None:
+        self.ability(user, data)
 
     @enforce_types
     def if_drunk(self, user: str, data: Game_Data) -> None:

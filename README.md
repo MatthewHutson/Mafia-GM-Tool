@@ -11,7 +11,9 @@ The Stand Counter Button Will Show The Current Count
 The Counter Will Remain Between Games As Long As the Program Runs
 
 # -- Changelog -- #
-Added The Underdog - For The Times Your Good Role Gets Sniped Too Early
+Added The Arsonist - Exactly As You Would Expect
+Added The Underdog's Poisoned Effect
+Added A Win Steal Tracker For Neutral Roles
 
 # -- To Do -- #
 Test Reworks

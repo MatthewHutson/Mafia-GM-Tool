@@ -81,12 +81,14 @@ def main() -> None:
                 role.secondary_ability(name, game_data) 
 
         winners = []
+        win_steal: bool = False
 
         for name, role in game_data.players.items():
             if role.solo_win:
                 if not role.team_win_condition:
                     if role.channeled_role == None:
                         winners.append(f"\n{name} as the {role.name}")
+                        win_steal = win_steal or game_data.win_steal
                     else:
                         winners.append(f"\n{name} as the {role.name} chanelling the {role.channeled_role}")
                 else:
@@ -98,9 +100,10 @@ def main() -> None:
                         elif not game_data.good_win:
                             game_data.good_win = False
                             game_data.evil_win = True
-
-        if game_data.good_win: winners.append("\nThe Good Team!")
-        if game_data.evil_win: winners.append("\nThe Evil Team!")
+                            
+        if not win_steal:
+            if game_data.good_win: winners.append("\nThe Good Team!")
+            if game_data.evil_win: winners.append("\nThe Evil Team!")
 
         show_victory(winners, game_data.turn_count)
 

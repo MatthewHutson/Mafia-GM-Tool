@@ -5,7 +5,7 @@
         "other": [["Mayor"], ["Gambler"], ["Vigilante"], ["Saint"], ["Underdog"]]
     },
     "neutral": {
-        "roles": [["Jester"], ["Lawyer"], ["Cupid"], ["Crewmate"]]
+        "roles": [["Jester"], ["Lawyer"], ["Cupid"], ["Crewmate"], ["Arsonist"]]
     },
     "evil": {
         "lead": ["Mafia"],

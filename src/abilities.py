@@ -1217,12 +1217,40 @@ class sacrificial_protection(Ability):
         if not target_role.currently_alive:
             target_role.currently_alive = True
             user_role.statuses.protected = False
-            user_role.die()
+            user_role.die(data.players)
             user_role.statuses.protected = protected
 
     @enforce_types
     def if_poisoned(self, user: str, data: Game_Data) -> None:
         pass
+
+    @enforce_types
+    def if_drunk(self, user: str, data: Game_Data) -> None:
+        pass
+
+class role_replicate(Ability):
+    def __init__(self) -> None:
+        super().__init__(targets = 0, p = 0, ability_type = ["on_vote", "no_action_round"])
+        
+    # -- Ability -- #
+    @enforce_types
+    def ability(self, user: str, data: Game_Data) -> None:
+        user_role: Role = data.players[user]
+        target_role: Role = user_role
+        target: str = user
+  
+        for name, role in data.players.items():
+            if role.was_voted_out and role.true_alignment == True:
+                target_role = role
+                target = name
+        
+        if target != user:
+            user_role.ability = deepcopy(target_role.ability)
+            user_role.secondary_ability = deepcopy(target_role.secondary_ability)
+
+    @enforce_types
+    def if_poisoned(self, user: str, data: Game_Data) -> None:
+        self.ability(user, data)
 
     @enforce_types
     def if_drunk(self, user: str, data: Game_Data) -> None:

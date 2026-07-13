@@ -11,7 +11,7 @@ The Stand Counter Button Will Show The Current Count
 The Counter Will Remain Between Games As Long As the Program Runs
 
 # -- Changelog -- #
-Added The Bodyguard - Sacrificial Protection
+Added The Underdog - For The Times Your Good Role Gets Sniped Too Early
 
 # -- To Do -- #
 Test Reworks

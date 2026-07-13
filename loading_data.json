@@ -2,7 +2,7 @@
     "good": {
         "information": [["Sheriff"], ["Creep"], ["Librarian"], ["Examiner"]],
         "defensive": [["Soldier"], ["Doctor"], ["Necromancer"], ["Bodyguard"]],
-        "other": [["Mayor"], ["Gambler"], ["Vigilante"], ["Saint"]]
+        "other": [["Mayor"], ["Gambler"], ["Vigilante"], ["Saint"], ["Underdog"]]
     },
     "neutral": {
         "roles": [["Jester"], ["Lawyer"], ["Cupid"], ["Crewmate"]]

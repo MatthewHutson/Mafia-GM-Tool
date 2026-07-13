@@ -741,8 +741,6 @@ class Game_Data():
                     else:
                         self.evil_aligned[name] = role
 
-        print(len(deaths), update_data, len(self.temp_deaths))
-
         if update_data:
             full_deaths = deaths + [name for name in self.temp_deaths if name not in deaths]
             full_resurrections = resurrections + [name for name in self.temp_ressurections if name not in resurrections]

@@ -1,0 +1,7 @@
+{
+    "name": "Bodyguard",
+    "ability": "sacrificial_protection",
+    "alignment": true,
+    "mafia_alternative": false,
+    "max_count": 1
+}

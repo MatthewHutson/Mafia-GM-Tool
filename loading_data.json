@@ -1,7 +1,7 @@
 {
     "good": {
         "information": [["Sheriff"], ["Creep"], ["Librarian"], ["Examiner"]],
-        "defensive": [["Soldier"], ["Doctor"], ["Necromancer"]],
+        "defensive": [["Soldier"], ["Doctor"], ["Necromancer"], ["Bodyguard"]],
         "other": [["Mayor"], ["Gambler"], ["Vigilante"], ["Saint"]]
     },
     "neutral": {

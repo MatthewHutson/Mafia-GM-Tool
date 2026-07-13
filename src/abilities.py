@@ -1201,3 +1201,29 @@ class sabotage(Ability):
     def if_drunk(self, user: str, data: Game_Data) -> None:
         for role in data.evil_aligned.values():
             role.statuses.poisoned = True
+
+class sacrificial_protection(Ability):
+    @enforce_types
+    def __init__(self) -> None:
+        super().__init__(targets = 1, p = 0, ability_type = ["repeat"], priority = 256)
+
+    # -- Ability -- #
+    @enforce_types
+    def ability(self, user: str, data: Game_Data) -> None:
+        user_role: Role = data.players[user]
+        target_role: Role = data.players[user_role.targets[0]]
+        protected: bool = user_role.statuses.protected
+
+        if not target_role.currently_alive:
+            target_role.currently_alive = True
+            user_role.statuses.protected = False
+            user_role.die()
+            user_role.statuses.protected = protected
+
+    @enforce_types
+    def if_poisoned(self, user: str, data: Game_Data) -> None:
+        pass
+
+    @enforce_types
+    def if_drunk(self, user: str, data: Game_Data) -> None:
+        pass

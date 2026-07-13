@@ -11,7 +11,7 @@ The Stand Counter Button Will Show The Current Count
 The Counter Will Remain Between Games As Long As the Program Runs
 
 # -- Changelog -- #
-Completed Global Announcements - Deaths & Revives Are Announcements Now
+Added The Bodyguard - Sacrificial Protection
 
 # -- To Do -- #
 Test Reworks

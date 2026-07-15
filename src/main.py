@@ -23,28 +23,15 @@ def main() -> None:
     ability_distribution: dict[str, float] = {}
 
     # -- File Handling -- #
-    path: str = "Roles"
-
     for key, value in role_functions.items():
         ability_distribution[key] = float(value.p)
 
-    for item in os.listdir(path):
-        with open(path + "/" + item, 'r') as file:
-            data: dict = json.load(file)
+    with open("roles.json", "r") as file:
+        loaded_role_data: dict = json.load(file)
 
-            ability_name: str = data["ability"]  
-            data["ability"] = deepcopy(role_functions[ability_name])
-            data["_alignment"] = data["alignment"]
-
-            if "secondary_ability" in data.keys():
-                secondary_name: str = data["secondary_ability"]
-                data["secondary_ability"] = deepcopy(role_functions[secondary_name])
-
-            del data["alignment"]
-
-            data["abilities"] = {} #{0, data["ability"]}
-            
-            roles[data["name"]] = Role.new(**data)
+    unpack_role_types(roles, loaded_role_data["good_roles"], role_functions, True)
+    unpack_role_types(roles, loaded_role_data["evil_roles"], role_functions, False)
+    unpack_role_types(roles, loaded_role_data["neutral_roles"], role_functions, None)
 
     if not Path("defaults.txt").is_file():
         with open("defaults.txt", "w") as file:
@@ -120,4 +107,4 @@ if __name__ == "__main__":
             playing = messagebox.askyesno("Game Over", "Do you want to play another round?", icon = "question")
         except Exception as e:
             playing = False
-            #raise e
+            raise e

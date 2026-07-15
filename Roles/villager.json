@@ -1,7 +1,0 @@
-{
-    "name": "Villager",
-    "ability": "none",
-    "alignment": true,
-    "mafia_alternative": false,
-    "max_count": 999
-}

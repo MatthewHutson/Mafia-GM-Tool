@@ -1,7 +1,0 @@
-{
-    "name": "Lawyer",
-    "ability": "stop_vote",
-    "alignment": null,
-    "mafia_alternative": false,
-    "max_count": 1
-}

@@ -1,8 +1,0 @@
-{
-    "name": "Gambler",
-    "ability": "gamble",
-    "alignment": true,
-    "mafia_alternative": false,
-    "max_count": 1,
-    "secondary_ability_cancel": false
-}

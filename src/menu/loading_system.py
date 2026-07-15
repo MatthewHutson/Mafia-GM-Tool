@@ -81,7 +81,6 @@ def new_get_roles(player_count: int, settings: dict, offset: int = 1) -> list[li
 
     return roles
 
-
 @enforce_types
 def get_all_role_lists() -> list[list[str]]:
     # -- Start By Getting Each Category -- #
@@ -98,3 +97,17 @@ def get_all_role_lists() -> list[list[str]]:
     all_roles: list[list[str]] = deepcopy(info_roles) + deepcopy(defensive_roles) + deepcopy(other_good_roles) + deepcopy(neutral_roles) + deepcopy(evil_lead) + deepcopy(evil_support)
 
     return all_roles
+
+@enforce_types
+def unpack_role_types(roles: dict, loaded_role_data: dict, role_functions: dict, alignment: bool | Literal[None]) -> None:
+    for name, data in loaded_role_data.items():
+        ability_name: str = data["ability"]  
+        data["ability"] = deepcopy(role_functions[ability_name])
+
+        if "secondary_ability" in data.keys():
+            secondary_name: str = data["secondary_ability"]
+            data["secondary_ability"] = deepcopy(role_functions[secondary_name])
+
+        data["abilities"] = {}
+            
+        roles[name] = Role(name = name, _alignment = alignment, **data)

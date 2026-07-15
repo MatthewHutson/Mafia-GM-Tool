@@ -1,7 +1,0 @@
-{
-    "name": "Blackmailer",
-    "ability": "silence",
-    "alignment": false,
-    "mafia_alternative": true,
-    "max_count": 1
-}

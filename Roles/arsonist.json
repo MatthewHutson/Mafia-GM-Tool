@@ -1,8 +1,0 @@
-{
-    "name": "Arsonist",
-    "ability": "douse",
-    "secondary_ability": "incinerate",
-    "alignment": null,
-    "mafia_alternative": false,
-    "max_count": 1
-}

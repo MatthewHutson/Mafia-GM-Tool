@@ -1,0 +1,100 @@
+{
+    "good_roles": {
+        "Bodyguard": {
+            "ability": "sacrificial_protection"
+        },
+        "Creep": {
+            "ability": "stalk"
+        },
+        "Doctor": {
+            "ability": "protect"
+        },
+        "Examiner": {
+            "ability": "examine"
+        },
+        "Gambler": {
+            "ability": "gamble"
+        },
+        "Librarian": {
+            "ability": "index"
+        },
+        "Mayor": {
+            "ability": "mayor"
+        },
+        "Necromancer": {
+            "ability": "resurrect"
+        },
+        "Saint": {
+            "ability": "bless",
+            "secondary_ability": "vulnerable"
+        },
+        "Sheriff": {
+            "ability": "reveal"
+        },
+        "Soldier": {
+            "ability": "endure"
+        },
+        "Underdog": {
+            "ability": "role_replicate"
+        },
+        "Vigilante": {
+            "ability": "execute"
+        },
+        "Villager": {
+            "ability": "none"
+        }
+    },
+    "evil_roles": {
+        "Ambusher": {
+            "ability": "ambush"
+        },
+        "Assasin": {
+            "ability": "super_kill"
+        },
+        "Blackmailer": {
+            "ability": "silence"
+        },
+        "Chancellor": {
+            "ability": "mayor"
+        },
+        "Mafia": {
+            "ability": "kill"
+        },
+        "Magnet": {
+            "ability": "magnet"
+        },
+        "Poisoner": {
+            "ability": "poison"
+        },
+        "Psychic": {
+            "ability": "telepathy"
+        },
+        "Saboteur": {
+            "ability": "sabotage"
+        }
+    },
+    "neutral_roles": {
+        "Arsonist": {
+            "ability": "douse",
+            "secondary_ability": "incinerate"
+        },
+        "Crewmate": {
+            "ability": "sidequest"
+        },
+        "Cupid": {
+            "ability": "link",
+            "secondary_ability": "cupid_victory"
+        },
+        "Jester": {
+             "ability": "jester"
+        },
+        "Lawyer": {
+            "ability": "stop_vote"
+        },
+
+        "Testing": {
+            "ability": "vote",
+            "secondary_ability": "vote"
+        }
+    }
+}

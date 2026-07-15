@@ -1,8 +1,0 @@
-{
-    "name": "Saint",
-    "ability": "bless",
-    "secondary_ability": "vulnerable",
-    "alignment": true,
-    "mafia_alternative": false,
-    "max_count": 1
-}

@@ -1,7 +1,0 @@
-{
-    "name": "Necromancer",
-    "ability": "resurrect",
-    "alignment": true,
-    "mafia_alternative": false,
-    "max_count": 1
-}

@@ -209,16 +209,14 @@ class Ability():
 class Role:
     # -- Attributes - #
     name: str
-    ability: Ability
     _alignment: bool # True Being Good, False Being Evil #
-    mafia_alternative: bool # Switches to Mafia Abiltity When All Normal Mafia Dies #
-    max_count: int
-    current_targets: list[str]
-    information: list[str]
-    visited_by: list[str]
-    statuses: Status_Manager
-    abilities: dict[int, Ability]
+    ability: Ability
     secondary_ability: Ability = None
+    abilities: dict[str, Ability] = None
+    current_targets: list[str] = None
+    information: list[str] = None
+    visited_by: list[str] = None
+    statuses: Status_Manager = None
     new_mafia = False # For Mafia Alternative Handling
     currently_alive: bool = True
     linked_to: str = None
@@ -305,6 +303,18 @@ class Role:
         else:
             self.doom_count = value
 
+    # -- Constructor -- #
+    @enforce_types
+    def __post_init__(self):
+        key_checks: list[str] = ["current_targets", "information", "visited_by", "abilities"]
+
+        for identifier in key_checks:
+            setattr(self, identifier, [])
+
+        self.abilities = {}
+
+        self.statuses = Status_Manager()
+    
     # -- Methods -- #
     @enforce_types
     def die(self, players: Players) -> bool:
@@ -346,8 +356,9 @@ class Role:
         if name != "statuses" and name != "__dict__":
             # -- Nesting To Avoid Recursion Errors -- #
             if "statuses" in self.__dict__.keys():
-                if name in self.statuses.__dict__.keys():
-                    return self.statuses.__getattribute__(name)
+                if isinstance(self.__dict__["statuses"], Status_Manager):
+                    if name in self.statuses.__dict__.keys():
+                        return self.statuses.__getattribute__(name)
             
         return super().__getattribute__(name)
     
@@ -357,8 +368,9 @@ class Role:
         if name != "statuses" and name != "__dict__":
             # -- Nesting To Avoid Recursion Errors -- #
             if "statuses" in self.__dict__.keys():
-                if name in self.statuses.__dict__.keys():
-                     self.statuses.__setattr__(name, value)
+                if isinstance(self.__dict__["statuses"], Status_Manager):
+                    if name in self.statuses.__dict__.keys():
+                        self.statuses.__setattr__(name, value)
             
         super().__setattr__(name, value)
 
@@ -386,12 +398,6 @@ class Role:
     @enforce_types
     def update_targets(self) -> None:
         self.previous_targets = deepcopy(self.targets)
-
-    def new(*args, **kwargs) -> Role:
-        try: # Fix This Later
-            return Role(*args, **kwargs, current_targets = [], information = [], visited_by = [], statuses = Status_Manager())
-        except:
-            return Role(*args, **kwargs, current_targets = [], information = [], visited_by = [], statuses = Status_Manager(), abilities = {})
     
 # -- Type Definitions -- #
 class Players(dict[str, Role]):
@@ -576,7 +582,7 @@ class Game_Data():
             self.total_evil_count: int = len(self.evil_aligned)
 
         # -- Using A Role For Menu Purposes -- #
-        self.vote_role: Role = Role.new("Voting", self.abilities["vote"], True, False, 999)
+        self.vote_role: Role = Role("Voting", self.abilities["vote"], True, False, 999)
         
         # -- Secondary Ability Handling -- #
         for role in self.players.values():

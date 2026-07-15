@@ -1,7 +1,0 @@
-{
-    "name": "Sheriff",
-    "ability": "reveal",
-    "alignment": true,
-    "mafia_alternative": false,
-    "max_count": 1
-}

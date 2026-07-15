@@ -1,7 +1,0 @@
-{
-    "name": "Saboteur",
-    "ability": "sabotage",
-    "alignment": false,
-    "mafia_alternative": true,
-    "max_count": 1
-}

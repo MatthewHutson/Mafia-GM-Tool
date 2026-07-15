@@ -1,9 +1,0 @@
-{
-    "name": "Chancellor",
-    "ability": "mayor",
-    "alignment": false,
-    "mafia_alternative": true,
-    "max_count": 10,
-    "alternative_end_count": 3,
-    "team_win_condition": true
-}

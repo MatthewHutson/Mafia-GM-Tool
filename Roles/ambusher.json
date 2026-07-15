@@ -1,7 +1,0 @@
-{
-    "name": "Ambusher",
-    "ability": "ambush",
-    "alignment": false,
-    "mafia_alternative": true,
-    "max_count": 1
-}

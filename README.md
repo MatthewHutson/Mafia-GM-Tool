@@ -11,9 +11,10 @@ The Stand Counter Button Will Show The Current Count
 The Counter Will Remain Between Games As Long As the Program Runs
 
 # -- Changelog -- #
-Added The Arsonist - Exactly As You Would Expect
-Added The Underdog's Poisoned Effect
-Added A Win Steal Tracker For Neutral Roles
+Moved All Of THe Individual Role JSON Files Into One Single File
+Removed The Old Role JSON Files
+Altered Loading Code To Account For This
+Redesigned Role Constructor To Simplify It
 
 # -- To Do -- #
 Test Reworks

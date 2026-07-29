@@ -235,6 +235,7 @@ class Role:
     doom_count: int = None
     protector: str = None
     silencer: str = None
+    ability_blocked: bool = False
     
     # -- Properties -- #
     @property
@@ -582,7 +583,7 @@ class Game_Data():
             self.total_evil_count: int = len(self.evil_aligned)
 
         # -- Using A Role For Menu Purposes -- #
-        self.vote_role: Role = Role("Voting", self.abilities["vote"], True, False, 999)
+        self.vote_role: Role = Role("Voting", None, self.abilities["vote"], True, False, 999)
         
         # -- Secondary Ability Handling -- #
         for role in self.players.values():
@@ -708,7 +709,7 @@ class Game_Data():
             data["secondary_ability"] = secondary_ability
 
             # -- Main Role Object -- #
-            role: Role = Role("temp", ability, True, False, 1, [], [], [], statuses, abilities = {})
+            role: Role = Role("temp", ability, True, False, 1, [], [], [], statuses)
 
             for name, value in data.items():
                 role.__setattr__(name, value)

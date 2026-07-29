@@ -34,6 +34,9 @@
         "Soldier": {
             "ability": "endure"
         },
+        "Warden": {
+            "ability": "jail"
+        },
         "Underdog": {
             "ability": "role_replicate"
         },

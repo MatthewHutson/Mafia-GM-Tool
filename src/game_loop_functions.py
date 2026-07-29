@@ -12,13 +12,14 @@ def ability_conditions(role: Role, has_recursed: bool, data: Game_Data) -> bool:
     can_use = role.ability.number_of_uses != 0
     normal_activation = not ("no_action_round" in role.ability_type)
     first_night_special: bool = not ("first_night" in role.ability.ability_type and data.turn_count == 1)
+    not_blocked = not role.ability_blocked
 
     if has_recursed:
         recurse_case = "activate_again" in role.ability_type
     else:
         recurse_case = True
 
-    return life and can_use and recurse_case and normal_activation and not_cancel and first_night_special
+    return life and can_use and recurse_case and normal_activation and not_cancel and first_night_special and not_blocked
 
 @enforce_types
 def use_abilities(data: Game_Data, can_recurse: bool = True) -> None:
@@ -78,6 +79,7 @@ def remove_round_data(data: Game_Data, used_Death_ability: bool = False, post_vo
         role.visited_by = []
         role.protector = None
         role.ability_cancel = False
+        role.ability_blocked = False
 
         # -- Silence Check -- #
         if post_vote: 

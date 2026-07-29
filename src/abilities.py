@@ -1314,3 +1314,26 @@ class incinerate(Ability):
     @enforce_types
     def if_drunk(self, user: str, data: Game_Data) -> None:
         pass
+
+class jail(Ability):
+    def __init__(self) -> None:
+        super().__init__(targets = 1, p = 0, ability_type = [], priority = -3, can_pick_same_target = True)
+        
+    # -- Ability -- #
+    @enforce_types
+    def ability(self, user: str, data: Game_Data) -> None:
+        user_role: Role = data.players[user]
+        target_role: Role = data.players[user_role.targets[0]]
+
+        target_role.statuses.protected = True
+        target_role.ability_blocked = True
+
+        target_role.information.append("Your ability Failed Last Night.")
+
+    @enforce_types
+    def if_poisoned(self, user: str, data: Game_Data) -> None:
+        pass
+
+    @enforce_types
+    def if_drunk(self, user: str, data: Game_Data) -> None:
+        pass

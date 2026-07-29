@@ -11,10 +11,8 @@ The Stand Counter Button Will Show The Current Count
 The Counter Will Remain Between Games As Long As the Program Runs
 
 # -- Changelog -- #
-Moved All Of THe Individual Role JSON Files Into One Single File
-Removed The Old Role JSON Files
-Altered Loading Code To Account For This
-Redesigned Role Constructor To Simplify It
+Added the Warden - Block A Role For Protection
+Technical Changes To Make Role Cancel
 
 # -- To Do -- #
 Test Reworks

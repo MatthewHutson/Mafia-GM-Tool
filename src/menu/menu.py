@@ -407,6 +407,8 @@ def selection_menu_create(data: Game_Data, entries: Menu_Entry, user: str, targe
     else:
         ability = role.secondary_ability
 
+    print(role.name)
+
     # -- Sub Functions -- #
     @enforce_types
     def enter_pressed(event) -> None:

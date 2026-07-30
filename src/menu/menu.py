@@ -390,6 +390,7 @@ def selection_menu_create(data: Game_Data, entries: Menu_Entry, user: str, targe
     # -- Setup -- #
     global selected_players
     selected_players = []
+    role: Role = None
 
     try: 
         # -- To Check if Ability Selection Or Vote Selection -- #
@@ -406,8 +407,6 @@ def selection_menu_create(data: Game_Data, entries: Menu_Entry, user: str, targe
         ability = role.ability
     else:
         ability = role.secondary_ability
-
-    print(role.name)
 
     # -- Sub Functions -- #
     @enforce_types
@@ -462,6 +461,9 @@ def selection_menu_create(data: Game_Data, entries: Menu_Entry, user: str, targe
 
         primary_frame.pack_propagate(False)
         secondary_frame.pack_propagate(False)
+
+        if ability.targets > 0:
+            role.picked_targets_tonight = True
 
         primary_name = tk.Label(primary_frame, text = f"Primary Ability:\n{ability.__name__} {"(x" + str(ability.number_of_uses) + ")" if ability.number_of_uses is not None else ""}", bg = bg_2)
         primary_name.pack(side = tk.TOP, fill = "x", padx = 2, pady = 2, ipady = 10, expand = False)
@@ -545,7 +547,6 @@ def announcements(data: Game_Data) -> None:
     if len(data.announcements) > 0:
         messagebox.showinfo("Announcements", f"Everyone is told: {info}", icon = "info")
         
-
 @enforce_types
 def information(data: Game_Data, tell_nothing: bool = True, first_wave: bool = True) -> None:
     for player, role in data.alive_players.items():

@@ -1337,3 +1337,38 @@ class jail(Ability):
     @enforce_types
     def if_drunk(self, user: str, data: Game_Data) -> None:
         pass
+
+class rewind(Ability):
+    def __init__(self) -> None:
+        super().__init__(targets = 0, p = 0, ability_type = [], priority = 9, can_pick_same_target = True)
+
+    # -- Methods -- #
+    @enforce_types
+    def count_visits(self, data: Game_Data) -> int:
+        sum = 0
+        
+        for role in data.players.values():
+            sum += int(role.picked_targets_tonight)
+
+        return sum
+
+    @enforce_types
+    def information(self, role: Role, count: int) -> None:
+        role.information.append(f"{count} people attempted to visit anyone at night.")
+        
+    # -- Ability -- #
+    @enforce_types
+    def ability(self, user: str, data: Game_Data) -> None:
+        user_role: Role = data.players[user]
+        count = self.count_visits(data)
+        self.information(user_role, count)
+
+    @enforce_types
+    def if_poisoned(self, user: str, data: Game_Data) -> None:
+        user_role: Role = data.players[user]
+        count = len(data.alive_players) - self.count_visits(data)
+        self.information(user_role, count)
+
+    @enforce_types
+    def if_drunk(self, user: str, data: Game_Data) -> None:
+        pass

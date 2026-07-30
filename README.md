@@ -11,8 +11,7 @@ The Stand Counter Button Will Show The Current Count
 The Counter Will Remain Between Games As Long As the Program Runs
 
 # -- Changelog -- #
-Added the Warden - Block A Role For Protection
-Technical Changes To Make Role Cancel
+Added an idea for the Timelord - tracking who visits who
 
 # -- To Do -- #
 Test Reworks

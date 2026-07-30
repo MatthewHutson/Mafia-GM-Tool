@@ -236,6 +236,7 @@ class Role:
     protector: str = None
     silencer: str = None
     ability_blocked: bool = False
+    picked_targets_tonight: bool = False
     
     # -- Properties -- #
     @property

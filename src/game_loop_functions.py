@@ -80,6 +80,7 @@ def remove_round_data(data: Game_Data, used_Death_ability: bool = False, post_vo
         role.protector = None
         role.ability_cancel = False
         role.ability_blocked = False
+        role.picked_targets_tonight = False
 
         # -- Silence Check -- #
         if post_vote: 

@@ -219,7 +219,6 @@ class Role:
     statuses: Status_Manager = None
     new_mafia = False # For Mafia Alternative Handling
     currently_alive: bool = True
-    linked_to: str = None
     selected_target = False
     solo_win: bool = False
     was_voted_out: bool = False
@@ -333,7 +332,8 @@ class Role:
 
             # -- Cupid Effect -- #
             if self.statuses.linked:
-                players[self.linked_to].statuses.drunk = True
+                lover: Role = [role for role in players.values() if role.name != self.name and role.statuses.linked][0]
+                lover.currently_alive = False
 
             return True
                 

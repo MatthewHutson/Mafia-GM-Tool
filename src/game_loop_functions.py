@@ -95,6 +95,7 @@ def remove_round_data(data: Game_Data, used_Death_ability: bool = False, post_vo
         # -- Status Conditions -- #
         if post_vote: 
             role.statuses.silenced = False
+            role.statuses.linked = False
         else:
             role.statuses.protected = False
             role.statuses.poisoned = False
@@ -172,7 +173,6 @@ def role_switch(data: Game_Data, player: str, new_role: Role) -> None:
     players[player].ability = deepcopy(new_role.ability)
     data.priority[player] = players[player]
     players[player].statuses.linked = role.linked
-    players[player].linked_to = role.linked_to
     players[player].information = information
 
 @enforce_types

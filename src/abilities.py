@@ -139,7 +139,7 @@ class protect(Ability):
 class link(Ability):
     @enforce_types
     def __init__(self) -> None:
-        super().__init__(targets = 2, p = 0, ability_type = ["on_demand"], priority = 2, uses = 1)
+        super().__init__(targets = 2, p = 0, ability_type = ["on_demand"], priority = 2, uses = "x")
 
     # -- Extra Methods -- #
     @enforce_types
@@ -147,10 +147,7 @@ class link(Ability):
         data.players[link_1].statuses.linked = True
         data.players[link_2].statuses.linked = True
 
-        data.players[link_1].linked_to = link_2
-        data.players[link_2].linked_to = link_1
-
-        data.players[user].ability = heart_break()
+        #data.players[user].ability = heart_break()
         
     # -- Ability -- #
     @enforce_types
@@ -180,17 +177,20 @@ class cupid_victory(Ability):
         user_role: Role = data.players[user]
         lovers: list[str] = data.get_lovers()
 
-        if len(lovers) > 0:
-            link_1: str = lovers[0]
-            link_2: str = lovers[1]
+        living = any([data.players[lover].currently_alive for lover in lovers])
+        user_role.solo_win = (not living) or user_role.solo_win
 
-            if link_1 in data.previous_deaths:
-                if link_2 in data.previous_deaths or link_2 in data.second_previous_deaths:
-                    user_role.solo_win = True
+        # if len(lovers) > 0:
+        #     link_1: str = lovers[0]
+        #     link_2: str = lovers[1]
+
+        #     if link_1 in data.previous_deaths:
+        #         if link_2 in data.previous_deaths or link_2 in data.second_previous_deaths:
+        #             user_role.solo_win = True
             
-            if link_2 in data.previous_deaths:
-                if link_1 in data.previous_deaths or link_1 in data.second_previous_deaths:
-                    user_role.solo_win = True
+        #     if link_2 in data.previous_deaths:
+        #         if link_1 in data.previous_deaths or link_1 in data.second_previous_deaths:
+        #             user_role.solo_win = True
 
     @enforce_types
     def if_poisoned(self, user: str, data: Game_Data) -> None:

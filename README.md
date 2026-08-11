@@ -11,8 +11,8 @@ The Stand Counter Button Will Show The Current Count
 The Counter Will Remain Between Games As Long As the Program Runs
 
 # -- Changelog -- #
-Reworked Timelord
-Silently Removed Ambusher - Come back as leader later
+Simplified The Cupid By Making Lover A Temporary Status & Giving The Cupid X Tries To Eliminate Them
+Removed Heart Break From Cupid Ability
 
 # -- To Do -- #
 Test Reworks

@@ -11,7 +11,8 @@ The Stand Counter Button Will Show The Current Count
 The Counter Will Remain Between Games As Long As the Program Runs
 
 # -- Changelog -- #
-Added an idea for the Timelord - tracking who visits who
+Reworked Timelord
+Silently Removed Ambusher - Come back as leader later
 
 # -- To Do -- #
 Test Reworks

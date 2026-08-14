@@ -1340,7 +1340,7 @@ class jail(Ability):
 
 class rewind(Ability):
     def __init__(self) -> None:
-        super().__init__(targets = 0, p = 0, ability_type = [], priority = 9, can_pick_same_target = True)
+        super().__init__(targets = 0, p = 0, ability_type = [], priority = 9, can_pick_same_target = True, uses = 1)
 
     # -- Methods -- #
     @enforce_types
@@ -1353,21 +1353,44 @@ class rewind(Ability):
         return sum
 
     @enforce_types
-    def information(self, role: Role, count: int) -> None:
-        role.information.append(f"{count} people attempted to visit anyone at night.")
+    def information(self, role: Role, good: int, neutral: int, evil: int) -> None:
+        role.information.append(f"There are {good} good players, {neutral} neutral players and {evil} evil players alive.")
+
+    @enforce_types
+    def fake_numbers(self, data: Game_Data) -> tuple[int]:
+        good_count, evil_count, neutral_count = 0, 0, 0
+
+        actual_good_count: int = len([role for role in data.alive_players.values() if role.true_alignment == True])
+        actual_evil_count: int = len(data.evil_aligned)
+        actual_neutral_count: int = len(data.good_aligned) - good_count
+
+        total_evils: int = len([role for role in data.players.values() if role.true_alignment == False])
+        alive_players = len(data.alive_players)
+        possible_good: int = alive_players - 1
+
+        while (good_count + evil_count + neutral_count == alive_players) and (good_count + neutral_count >= evil_count) and (good_count >= neutral_count) and (good_count != actual_good_count and evil_count != actual_evil_count and neutral_count != actual_neutral_count):
+            good_count = randint(1, possible_good)
+            evil_count = randint(1, min(total_evils, alive_players - 1))
+            neutral_count = alive_players - good_count - evil_count
+
+        return good_count, neutral_count, evil_count
         
     # -- Ability -- #
     @enforce_types
     def ability(self, user: str, data: Game_Data) -> None:
         user_role: Role = data.players[user]
-        count = self.count_visits(data)
-        self.information(user_role, count)
+        good_count: int = len([role for role in data.alive_players.values() if role.true_alignment == True])
+        evil_count: int = len(data.evil_aligned)
+        neutral_count: int = len(data.good_aligned) - good_count
+
+        self.information(user_role, good_count, neutral_count, evil_count)
 
     @enforce_types
     def if_poisoned(self, user: str, data: Game_Data) -> None:
         user_role: Role = data.players[user]
-        count = len(data.alive_players) - self.count_visits(data)
-        self.information(user_role, count)
+
+        good_count, evil_count, neutral_count = self.fake_numbers(data)
+        self.information(user_role, good_count, neutral_count, evil_count)
 
     @enforce_types
     def if_drunk(self, user: str, data: Game_Data) -> None:

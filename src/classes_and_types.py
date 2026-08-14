@@ -318,7 +318,9 @@ class Role:
     
     # -- Methods -- #
     @enforce_types
-    def die(self, players: Players) -> bool:
+    def die(self, data: Game_Data) -> bool:
+        players = data.players
+
         # -- Doctor Case -- #
         if self.protector is not None:
             doctor: Role = players[self.protector]
@@ -337,6 +339,10 @@ class Role:
                 lover.currently_alive = False
 
             return True
+
+        elif self.ability.__name__ in ["mayor", "chancellor"]:
+            self.ability.protected = False
+            data.announcements.append("Someone Attempted To Kill The Mayor")
                 
         return False
         
@@ -389,9 +395,9 @@ class Role:
         self.just_died = False
 
     @enforce_types
-    def voted_out(self, players: Players) -> None:
+    def voted_out(self, data: Game_Data) -> None:
         self.was_voted_out = True
-        self.die(players)
+        self.die(data)
     
     @enforce_types
     def __eq__(self, value) -> bool:
@@ -563,7 +569,6 @@ class Game_Data():
     @enforce_types
     def init(self, alter_drunk: bool = True) -> None:
         # -- Player Info -- #
-        self.mafia_role = deepcopy(self.roles["Mafia"]) 
         self.none_role = deepcopy(self.roles["Villager"])
 
         self.good_aligned = Players({name: role for name, role in self.players.items() if role.alignment and role.currently_alive})

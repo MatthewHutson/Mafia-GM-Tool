@@ -2,7 +2,7 @@
     "solo_tasks": [
         "Vote a player that no one else is voting for",
         "Falsely claim to be silenced for one round",
-        "Falsley claim to be Mayor",
+        "Falsley claim to be [A Role]",
         "Vote yourself at least once",
         "Do an [arbitrary action] in plain sight "
     ],

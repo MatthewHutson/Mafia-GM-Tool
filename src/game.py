@@ -123,7 +123,6 @@ def game(data: Game_Data, entries: Menu_Entry, normal_start: bool = True) -> Non
     if normal_start: start_abilities(data)
     init_game_menu(entries, data)
     nap_time(data)
-    init_evil_alternative(data)
 
      # -- Game Loop -- #
     while data.playing:
@@ -169,9 +168,6 @@ def game(data: Game_Data, entries: Menu_Entry, normal_start: bool = True) -> Non
         if data.playing:
             use_abilities(data)
 
-             # -- Ensures Mafia Evil Roles Will Have Kill Switch -- #
-            revert_to_mafia(data)
-
             # -- Player And GM Info -- #
             information(data)
             life_death_sort(data)
@@ -192,7 +188,7 @@ def game(data: Game_Data, entries: Menu_Entry, normal_start: bool = True) -> Non
                 voted_out: str = voting_menu(data, entries)
 
                 if data.playing and voted_out != "none":
-                    data.players[voted_out].voted_out(data.players)
+                    data.players[voted_out].voted_out(players)
             
                 life_death_sort(data)
                 use_vote_abiltities(data)

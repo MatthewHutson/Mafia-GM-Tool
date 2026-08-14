@@ -11,8 +11,10 @@ The Stand Counter Button Will Show The Current Count
 The Counter Will Remain Between Games As Long As the Program Runs
 
 # -- Changelog -- #
-Simplified The Cupid By Making Lover A Temporary Status & Giving The Cupid X Tries To Eliminate Them
-Removed Heart Break From Cupid Ability
+Fixed Timelord - Made It On Demand
+Replaced Claim Mayor Crewmate Task With Claim A Role Decided By GM
+Made Promotion A Mafia Only Trait - Replaced How It Functions To Suit This
+Reworked Mayor & Chancellor
 
 # -- To Do -- #
 Test Reworks

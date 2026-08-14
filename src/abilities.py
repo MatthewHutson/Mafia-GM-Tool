@@ -114,20 +114,13 @@ class protect(Ability):
     def __init__(self) -> None:
         super().__init__(targets = 1, p = 7.5, ability_type = ["repeat", "defensive"], priority = 2)
 
-    # -- Extra Methods -- #
-    @enforce_types
-    def check_for_mayor_case(self, target: str, data: Game_Data) -> bool:
-        target_role: Role = data.players[target]
-        return not (target_role.name == "Mayor" and target_role.solo_win)
-
     # -- Ability -- #
     @enforce_types
     def ability(self, user: str, data: Game_Data) -> None:
         target: str = data.players[user].targets[0]
 
-        if self.check_for_mayor_case(target, data): 
-            data.players[target].protector = user
-            data.players[target].statuses.protected = True
+        data.players[target].protector = user
+        data.players[target].statuses.protected = True
 
     def if_poisoned(self, user: str, data: Game_Data) -> None:
         pass
@@ -300,21 +293,26 @@ class poison(Ability):
 class kill(Ability):
     @enforce_types
     def __init__(self) -> None:
-        super().__init__(targets = 1, p = 0, ability_type = ["repeat"], priority = 5, can_pick_same_target = True)
+        super().__init__(targets = 1, p = 0, ability_type = ["repeat", "on_death"], priority = 5, can_pick_same_target = True)
+        self.starpass: Ability = starpass()
         
     # -- Ability -- #
     @enforce_types
     def ability(self, user: str, data: Game_Data) -> None:
         user_role: Role = data.players[user]
 
-        if "evil_priority" in user_role.secondary_ability.ability_type and user_role.secondary_ability.number_of_uses != 0:
-            user_role.secondary_ability(user, data)
-        else:
-            target: str = data.players[user].targets[0]
-            data.players[target].die(data.players)
-
-            if user_role.secondary_ability == mayor:
+        if user in data.alive_players.keys():
+            if "evil_priority" in user_role.secondary_ability.ability_type and user_role.secondary_ability.number_of_uses != 0:
                 user_role.secondary_ability(user, data)
+            else:
+                target: str = data.players[user].targets[0]
+                data.players[target].die(data)
+
+                if user_role.secondary_ability == mayor:
+                    user_role.secondary_ability(user, data)
+
+        else: # -- Only When Mafia Dies -- #
+            self.starpass.ability(user, data)
 
     @enforce_types
     def if_poisoned(self, user: str, data: Game_Data) -> None:
@@ -491,8 +489,8 @@ class vengance(Ability):
         if not data.players[user].was_voted_out:
             target = data.players[user].targets[0]
             role = data.players[target]
-            role.protected = False
-            role.die(data.players)
+            role.statuses.protected = False
+            role.die(data)
 
     @enforce_types
     def if_poisoned(self, user: str, data: Game_Data) -> None:
@@ -543,16 +541,15 @@ class ambush(Ability):
 class mayor(Ability):
     @enforce_types
     def __init__(self) -> None:
-        super().__init__(targets = 0, p = 0, ability_type = ["passive", "game_end"], priority = 8)
+        super().__init__(targets = 0, p = 0, ability_type = ["passive", "game_end"], priority = 4)
+        self.protected = True
     
     # -- Ability -- #
     @enforce_types
     def ability(self, user: str, data: Game_Data) -> None:
         if data.playing:
-            if not data.players[user].solo_win:
-                sleep(0.5)
-                if messagebox.askyesno("Mayor", f"Has {user} claimed mayor?", icon = "question"):
-                    data.players[user].solo_win = True
+            if self.protected:
+                data.players[user].statuses.protected = True
         else:
             data.players[user].solo_win = len(data.players) == data.players[user].alternative_end_count
             
@@ -825,7 +822,7 @@ class super_kill(Ability):
         protected: bool = target_role.statuses.protected
 
         target_role.statuses.protected = False
-        target_role.die(data.players)
+        target_role.die(data)
         target_role.statuses.protected = protected
 
     @enforce_types
@@ -995,7 +992,7 @@ class execute(Ability):
         target_role: Role = data.players[target]
 
         if target_role.true_alignment != True and target not in self.immune_players:
-            target_role.die(data.players)
+            target_role.die(data)
 
     @enforce_types
     def if_poisoned(self, user: str, data: Game_Data) -> None:
@@ -1003,7 +1000,7 @@ class execute(Ability):
         target_role: Role = data.players[target]
 
         if target_role.alignment and target not in self.immune_players:
-            target_role.die(data.players)
+            target_role.die(data)
 
     @enforce_types
     def if_drunk(self, user: str, data: Game_Data) -> None:
@@ -1217,7 +1214,7 @@ class sacrificial_protection(Ability):
         if not target_role.currently_alive:
             target_role.currently_alive = True
             user_role.statuses.protected = False
-            user_role.die(data.players)
+            user_role.die(data)
             user_role.statuses.protected = protected
 
     @enforce_types
@@ -1292,7 +1289,7 @@ class incinerate(Ability):
             if role.statuses.doused:
                 protected: bool = role.statuses.protected
                 role.statuses.protected = False
-                role.die(data.players)
+                role.die(data)
                 role.statuses.protected = protected
             
         alive_count: int = 0
@@ -1340,7 +1337,7 @@ class jail(Ability):
 
 class rewind(Ability):
     def __init__(self) -> None:
-        super().__init__(targets = 0, p = 0, ability_type = [], priority = 9, can_pick_same_target = True, uses = 1)
+        super().__init__(targets = 0, p = 0, ability_type = ["on_demand"], priority = 9, can_pick_same_target = True, uses = 1)
 
     # -- Methods -- #
     @enforce_types
@@ -1395,3 +1392,53 @@ class rewind(Ability):
     @enforce_types
     def if_drunk(self, user: str, data: Game_Data) -> None:
         pass
+
+class starpass(Ability):
+    def __init__(self) -> None:
+        super().__init__(targets = 0, p = 0, ability_type = ["on_death"], can_pick_same_target = True)
+     
+    # -- Ability -- #
+    @enforce_types
+    def ability(self, user: str, data: Game_Data) -> None:
+        minion: str = data.next_evil_player
+
+        if minion is not None:
+            minion_role: Role = data.players[minion]
+            minion_copy: Role = deepcopy(minion_role)
+            user_role: Role = data.players[user]
+            user_copy: Role = deepcopy(user_role)
+
+            user_role = minion_copy.name
+            user_role.ability = minion_copy.ability
+            user_role.secondary_ability = minion_role.secondary_ability
+
+            user_role.information.append(f"You Are Now The {user_role.name}!")
+
+            minion_role.name = user_copy.name
+            minion_role.ability = user_copy.ability
+
+            minion_role.information.append(f"You have been promoted to the {minion_role.name}!")
+ 
+    @enforce_types
+    def if_poisoned(self, user: str, data: Game_Data) -> None:
+        self.ability(user, data)
+
+    @enforce_types
+    def if_drunk(self, user: str, data: Game_Data) -> None:
+        pass
+
+class chancellor(mayor):
+    def __init__(self) -> None:
+        super().__init__()
+
+    # -- Ability -- #
+    @enforce_types
+    def ability(self, user: str, data: Game_Data) -> None:
+        if self.protected:
+            fake_out: bool = messagebox.askyesno("Mayor Fake Out", f"Does {user} want to fake a mayor hit?", icon = "question", default = "no")
+
+            if fake_out:
+                self.protected = False
+                data.announcements.append("Someone Attempted To Kill The Mayor")
+
+        super().ability(user, data)

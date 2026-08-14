@@ -61,7 +61,7 @@
             "ability": "silence"
         },
         "Chancellor": {
-            "ability": "mayor"
+            "ability": "chancellor"
         },
         "Mafia": {
             "ability": "kill"

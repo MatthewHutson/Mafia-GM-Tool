@@ -188,7 +188,7 @@ def game(data: Game_Data, entries: Menu_Entry, normal_start: bool = True) -> Non
                 voted_out: str = voting_menu(data, entries)
 
                 if data.playing and voted_out != "none":
-                    data.players[voted_out].voted_out(players)
+                    data.players[voted_out].voted_out(data)
             
                 life_death_sort(data)
                 use_vote_abiltities(data)

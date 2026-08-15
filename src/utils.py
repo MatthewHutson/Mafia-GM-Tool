@@ -1,5 +1,5 @@
 # -- Imports -- #
-from typing import get_type_hints, get_origin, get_args, Callable, TypeAlias, Any, Protocol, Union, Literal
+from typing import get_type_hints, get_origin, get_args, Callable, TypeAlias, Any, Protocol, Union, Literal, Type, Set
 from types import UnionType, FunctionType
 
 # -- Decerators -- #
@@ -130,3 +130,13 @@ def printLine(input_string: str) -> None: print("\n" + input_string)
 
 @enforce_types
 def inputLine(input_string: str) -> str: return input("\n" + input_string + ": ")
+
+@enforce_types
+def all_subclasses(cls: Type) -> Set[Type]:
+    subclasses: Set[Type] = set(cls.__subclasses__())
+
+    for subclass in subclasses:
+        subsubclasses = all_subclasses(subclass)
+        subclasses = subclasses.union(subsubclasses)
+
+    return subclasses

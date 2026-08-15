@@ -161,9 +161,6 @@ class Ability():
     def if_poisoned(self, user: str, data: Game_Data, **kwargs) -> None:
         ...
 
-    def if_drunk(self, user: str, data: Game_Data, **kwargs) -> None:
-        ...
-
     def __call__(self, user: str, data: Game_Data, **kwargs) -> None:
         if is_instance(self.number_of_uses, int):
             self.number_of_uses -= 1
@@ -340,7 +337,7 @@ class Role:
 
             return True
 
-        elif self.ability.__name__ in ["mayor", "chancellor"]:
+        elif self.ability.__name__ in ["Mayor", "Chancellor"]:
             self.ability.protected = False
             data.announcements.append("Someone Attempted To Kill The Mayor")
                 
@@ -564,6 +561,12 @@ class Game_Data():
             out_data[ability.__name__] = ability
 
         return out_data
+
+    @property
+    @enforce_types
+    def current_life_count(self) -> int:
+        num = len([role.name for role in self.players.values() if role.currently_alive])
+        return num
 
     # -- Methods -- #
     @enforce_types

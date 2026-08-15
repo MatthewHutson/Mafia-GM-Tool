@@ -11,10 +11,11 @@ The Stand Counter Button Will Show The Current Count
 The Counter Will Remain Between Games As Long As the Program Runs
 
 # -- Changelog -- #
-Fixed Timelord - Made It On Demand
-Replaced Claim Mayor Crewmate Task With Claim A Role Decided By GM
-Made Promotion A Mafia Only Trait - Replaced How It Functions To Suit This
-Reworked Mayor & Chancellor
+Fixed Starpassing
+Fixed The Mayor/Chancellor
+Made Bodyguard work on Doom 0.
+Added Crewmate Tasks
+Reworked Psychic
 
 # -- To Do -- #
 Test Reworks

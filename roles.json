@@ -19,7 +19,9 @@
             "ability": "index"
         },
         "Mayor": {
-            "ability": "mayor"
+            "ability": "mayor",
+            "alternative_end_count": 3,
+            "team_win_condition": true
         },
         "Necromancer": {
             "ability": "resurrect"
@@ -61,7 +63,9 @@
             "ability": "silence"
         },
         "Chancellor": {
-            "ability": "chancellor"
+            "ability": "chancellor",
+            "alternative_end_count": 3,
+            "team_win_condition": true
         },
         "Mafia": {
             "ability": "kill"

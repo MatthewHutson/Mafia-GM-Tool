@@ -18,7 +18,7 @@ import abilities as a
 @enforce_types
 def main() -> None:
     # -- Game Data -- #
-    role_functions: dict[str, a.Ability] = {ability.__name__: ability() for ability in Ability.__subclasses__()}
+    role_functions: dict[str, a.Ability] = {ability.__name__: ability() for ability in all_subclasses(Ability)}
     roles: dict[str, Role] = {}
     ability_distribution: dict[str, float] = {}
 

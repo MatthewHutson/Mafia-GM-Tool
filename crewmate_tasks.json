@@ -1,15 +1,20 @@
 {
     "solo_tasks": [
-        "Vote a player that no one else is voting for",
         "Falsely claim to be silenced for one round",
         "Falsley claim to be [A Role]",
+        "Correctly claim to be the crewmate",
         "Vote yourself at least once",
-        "Do an [arbitrary action] in plain sight "
+        "Do an [arbitrary action] in plain sight",
+        "leave the game for a certain amount of time",
+        "Pick a player that nobody picks during the action round",
+        "Guess who is a specific role during the Action Round"
     ],
     "social_tasks": [
+        "Vote a player that no one else is voting for",
         "Get [Player A] to vote for [Player B] at least once",
         "Swap seats with somebody without them complaining.",
         "Get any player to do an [arbitrary action]",
-        "Guess who is a specific role during the Action Round"
+        "Watch some pick a target during the action round without being spotted by the player.",
+        "Watch a player recieve information during the information round without being spotted."
     ]
 }

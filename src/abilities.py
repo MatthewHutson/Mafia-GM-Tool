@@ -45,37 +45,38 @@ class reveal(Ability):
 
     # -- Methods -- #
     @enforce_types
-    def information(self, data: Game_Data, user: str, result: bool | None, target: str = "Your target") -> None:
-        match self.override:
-            case True: 
-                data.players[user].information.append(f"{target} is GOOD!")
-            case False: 
-                data.players[user].information.append(f"{target} is EVIL!")
-            case None:
-                if result == True: data.players[user].information.append(f"{target} is GOOD!")
-                elif result == False: data.players[user].information.append(f"{target} is EVIL!")
-                else: data.players[user].information.append(f"{target} is NEUTRAL!")
+    def information(self, data: Game_Data, user: str, result: bool, target: str = "Your target", droisoned: bool = False) -> None:
+        info: str = ""
+        user_role: Role = data.players[user]
+        poisoned: bool = False
 
+        match self.override:
+            case True:  result = True
+            case False: result = False
+            case _: poisoned = droisoned
+
+        if result: info += f"{target} is GOOD!"
+        else: info += f"{target} is EVIL!"
+
+        if poisoned: info += " (Drunk/Poisoned)"
+
+        user_role.information.append(info)
         self.override = None
     
     # -- Ability -- #
     @enforce_types
     def ability(self, user: str, data: Game_Data) -> None:
         target: str = data.players[user].targets[0]
-        alignment: bool = data.players[target].true_alignment
+        alignment: bool = data.players[target].alignment
 
         self.information(data, user, alignment, target)
 
     @enforce_types
     def if_poisoned(self, user: str, data: Game_Data) -> None:
         target: str = data.players[user].targets[0]
+        alignment: bool = not data.players[target].alignment
 
-        if data.players[target].true_alignment is not None:
-            alignment: bool = not data.players[target].alignment
-        else:
-            alignment = choice([True, True, False, None])
-
-        self.information(data, user, alignment, target)
+        self.information(data, user, alignment, target, True)
 
     @enforce_types
     def if_drunk(self, user: str, data: Game_Data) -> None:
@@ -322,12 +323,12 @@ class telepathy(Ability):
 class stalk(Ability):
     @enforce_types
     def __init__(self) -> None:
-        super().__init__(targets = 1, p = 7.5, ability_type = ["repeat", "investigative"], can_pick_same_target = True, priority = 11, uses = "x")
+        super().__init__(targets = 1, p = 7.5, ability_type = ["on_demand", "investigative"], can_pick_same_target = True, priority = 11, uses = "2*x")
         self.invisible_players: set[str] = {}
 
     # -- Methods -- #
     @enforce_types
-    def information(self, data: Game_Data, user: str, target: str, visitors: list[str]) -> None:
+    def information(self, data: Game_Data, user: str, target: str, visitors: list[str], droisoned: bool = False) -> None:
         target_str: str = f"{target} was visited by "
         count: int = 0
 
@@ -352,6 +353,8 @@ class stalk(Ability):
             target_str = target_str[:-2]
         else:
             target_str += "nobody"
+
+        if droisoned: target_str += " (Poisoned/Drunk)"
 
         data.players[user].information.append(target_str)
         
@@ -387,7 +390,7 @@ class stalk(Ability):
         for i in range(random_num): selected_players.add(choice(can_see_too))
         visitors = list(selected_players)
 
-        self.information(data, user, target, visitors)
+        self.information(data, user, target, visitors, True)
 
     @enforce_types
     def if_drunk(self, user: str, data: Game_Data) -> None:
@@ -412,6 +415,7 @@ class resurrect(Ability):
         if len(user_role.targets) > 0 and not ability_cancel:
             target = data.players[user_role.targets[0]]
             target.revive()
+            target.statuses.blessed = True
 
             target.information.append("You have Been Ressurected")
 
@@ -657,12 +661,12 @@ class index(Ability):
 
     # -- Methods -- #
     @enforce_types
-    def information(self, data: Game_Data, user_role: Role, selected_set: set[str]) -> None:
+    def information(self, data: Game_Data, user_role: Role, selected_set: set[str], droisoned: bool = False) -> None:
         if len(selected_set) > 0 and self.count < len(data.players):
             selected_role: str = choice(list(selected_set))
 
             self.seen_roles.add(selected_role)
-            user_role.information.append(f"{selected_role}!")
+            user_role.information.append(f"{selected_role}! {"(Poisoned/Drunk)" if droisoned else ""}")
 
     # -- Ability -- #
     @enforce_types
@@ -685,7 +689,7 @@ class index(Ability):
         self.seen_roles.add(user_role.name)
         selected_set: set[str] = all_roles - normal_roles - self.seen_roles
 
-        self.information(data, user_role, selected_set)
+        self.information(data, user_role, selected_set, True)
 
     @enforce_types
     def if_drunk(self, user: str, data: Game_Data) -> None:
@@ -720,11 +724,13 @@ class examine(Ability):
         target: str = data.players[user].targets[0]
         role: Role = data.players[target]
 
+        data.players[user].information.append("(Drunk/Poisoned)")
+
         if info_reciever is None:
-            for item in role.statuses.get_data(target, inverse = True):
+            for item in role.statuses.get_data(target, altered = True):
                 data.players[user].information.append(item)
         else:
-            for item in role.statuses.get_data(target, inverse = True):
+            for item in role.statuses.get_data(target, altered = True):
                 data.players[info_reciever].information.append(item)
 
     @enforce_types
@@ -842,12 +848,9 @@ class stop_vote(Ability):
             else:
                 user_role.ability, user_role.secondary_ability = deepcopy(data.abilities["evidence_tampering"]), user_role.ability
         
-        user_role.solo_win = not data.players[target].was_voted_out
+        user_role.solo_win = not data.players[target].currently_alive
 
-        if not (target_role.currently_alive or target_role.was_voted_out):
-            user_role.solo_win = data.players[user].currently_alive
-            
-            if user_role.ability != stop_vote:
+        if not (target_role.currently_alive or target_role.was_voted_out) and user_role.ability != stop_vote:
                 user_role.ability, user_role.secondary_ability = user_role.secondary_ability, user_role.ability
 
     @enforce_types
@@ -1250,8 +1253,8 @@ class rewind(Ability):
         return sum
 
     @enforce_types
-    def information(self, role: Role, good: int, neutral: int, evil: int) -> None:
-        role.information.append(f"There are {good} good players, {neutral} neutral players and {evil} evil players alive.")
+    def information(self, role: Role, good: int, neutral: int, evil: int, droisoned: bool = False) -> None:
+        role.information.append(f"There are {good} good players, {neutral} neutral players and {evil} evil players alive. {"(Drunk/Poisoned)" if droisoned else ""}")
 
     @enforce_types
     def fake_numbers(self, data: Game_Data) -> tuple[int]:

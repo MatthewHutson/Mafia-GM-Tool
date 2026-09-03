@@ -11,13 +11,14 @@ The Stand Counter Button Will Show The Current Count
 The Counter Will Remain Between Games As Long As the Program Runs
 
 # -- Changelog -- #
-Fixed Starpassing
-Fixed The Mayor/Chancellor
-Made Bodyguard work on Doom 0.
-Added Crewmate Tasks
-Reworked Psychic
+Added GM Poison/Drunk Tags On Information
+Made Creep 2X uses
+Revereted Sheriff to Before Neutrals Registered Differently
+Made Lawyer Simpler
 
 # -- To Do -- #
+Create New Poison Examine Effect
+
 Test Reworks
 Make All Agreed Upon Roles
 

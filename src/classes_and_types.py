@@ -50,7 +50,7 @@ class Status_Manager():
         return [self.poisoned, self.drunk]
     
     @enforce_types
-    def get_data(self, user: str = "", inverse = False, add_colours: bool = False, additions: dict[str, bool] = {}) -> list[str]:
+    def get_data(self, user: str = "", inverse = False, altered: bool = False, add_colours: bool = False, additions: dict[str, bool] = {}) -> list[str]:
         output: list[str] = []
 
         for status, value in (self.__dict__ | additions).items():
@@ -60,10 +60,10 @@ class Status_Manager():
             else:
                 out_string: str = status
 
-            if value ^ inverse:
-                output.append(f"{user} is {out_string}.")
-            else:
-                output.append(f"{user} is NOT {out_string}.")
+            if altered:
+                pass
+
+            if value ^ inverse: output.append(f"{user} is {out_string}.")
 
         return output
     

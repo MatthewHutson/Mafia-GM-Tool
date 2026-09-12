@@ -447,7 +447,7 @@ class Player_Select_Frame(Player_Frame):
 class Player_Role_Frame(Player_Frame):
     # -- Constructor -- #
     @enforce_types
-    def __init__(self, name: str, data: Game_Data, main_frame: tk.Frame | Vertical_Scroll_Frame, main_font: tuple[str, int], selected_players: list[str], selected_role: Role, number_of_targets: int, pack_alive_and_dead: FunctionType, bg: str, fg: str) -> None:
+    def __init__(self, name: str, data: Game_Data, main_frame: tk.Frame | Vertical_Scroll_Frame, main_font: tuple[str, int], selected_players: list[str], selected_role: Role, number_of_targets: int, pack_alive_and_dead: FunctionType, select_roles: FunctionType, bg: str, fg: str) -> None:
         super().__init__(name, main_frame, main_font, bg, fg)
         self.data = data
         self.alignment = self.role.true_alignment
@@ -458,6 +458,7 @@ class Player_Role_Frame(Player_Frame):
         self.selected = False
         self.current_role_icon = None
         self.pack_alive_and_dead: Callable = pack_alive_and_dead
+        self.select_roles: Callable = select_roles
 
         # -- Role Colours -- #
         self.role_fg = "#000000"
@@ -474,7 +475,8 @@ class Player_Role_Frame(Player_Frame):
 
         # -- Extra Icons -- #
         self.select_icon = tk.Button(self.frame, text = "Select", bg = "#5D9FF0", activebackground = "#4980C4", fg = "#FFFFFF", activeforeground = "#FFFFFF", width = 6, height = 4, command = self.select)
-        self.stats_icon = tk.Button(self.frame, text = f"Statuses ({self.status_num})", bg = "#DBC1FC", fg = "#000000", activebackground = "#DBC1FC", activeforeground = "#000000", width = 10, height = 4, command = self.show_statuses)
+        self.stats_icon = tk.Button(self.frame, text = f"Data ({self.status_num})", bg = "#DBC1FC", fg = "#000000", activebackground = "#DBC1FC", activeforeground = "#000000", width = 6, height = 4, command = self.show_statuses)
+        self.role_change_button = tk.Button(self.frame, text = "Role", bg = "#A25DF0", activebackground = "#8249C4", fg = "#ffffff", activeforeground = "#ffffff", width = 6, height = 4,  command = self.change_role)
 
         if type(self.master) == Vertical_Scroll_Frame:
             self.master.add_player_frame(self)
@@ -517,6 +519,7 @@ class Player_Role_Frame(Player_Frame):
         self.role_icon.pack(side = tk.RIGHT, padx = 2, expand = False)
         self.select_icon.pack(side = tk.RIGHT, padx = 2, expand = False)
         self.kill_icon.pack(side = tk.RIGHT, padx = 2, expand = False)
+        #self.role_change_button.pack(side = tk.RIGHT, padx = 2, expand = False)
         self.stats_icon.pack(side = tk.RIGHT, padx = 2, expand = False)
         super().pack()
 
@@ -527,6 +530,7 @@ class Player_Role_Frame(Player_Frame):
         try: self._kill_icon.pack_forget()
         except: pass
 
+        #self.role_change_button.pack_forget()
         self.stats_icon.pack_forget
         super().forget()
 
@@ -587,6 +591,21 @@ class Player_Role_Frame(Player_Frame):
             output += item + "\n"
 
         messagebox.showinfo(f"{self.name}'s Statuses", output, icon = "info")
+
+    @enforce_types
+    def change_role(self) -> None:
+        if messagebox.askyesno("Confirm", f"Do you want to change {self.name}'s role?", default = "no", icon = "question"):
+            role: Role = deepcopy(self.data.roles[self.select_roles(self.data.menu_entries, title = f"Change {self.name}'s Role", roles = deepcopy(list(self.data.roles.values())))])
+            previous_role = self.data.players[self.name]
+
+            if role.name != previous_role.name:
+                role.statuses = previous_role.statuses
+                role.currently_alive = previous_role.currently_alive
+                role.doom_count = previous_role.doom_count
+
+                self.data.players[self.name] = role
+
+                self.pack_alive_and_dead(self.data, self.selected_role, self.number_of_targets)
 
 # -- Protocols -- #
 class Has_Widget_Children(Protocol):

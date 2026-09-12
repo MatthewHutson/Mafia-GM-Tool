@@ -448,19 +448,27 @@ class vengance(Ability):
 class ambush(Ability):
     @enforce_types
     def __init__(self) -> None:
-        super().__init__(targets = 1, p = 0, ability_type = ["repeat", "on_demand"], priority = 3, can_pick_same_target = True)
+        super().__init__(targets = 1, p = 0, ability_type = ["repeat"], priority = 3, can_pick_same_target = True)
         
     # -- Ability -- #
     @enforce_types
     def ability(self, user: str, data: Game_Data, active: bool = True) -> None:
-        target = data.players[user].targets[0]
-        visitors = deepcopy(data.players[target].visited_by)
+        user_role: Role = data.players[user]
+
+        target: str = user_role.targets[0]
+        target_role: Role = data.players[target]
+
+        visitors = deepcopy(target_role.visited_by)
         new_target: str = "nobody"
 
-        try:
-            visitors.remove(user)
-        except:
-            pass
+        kill().ability(user, data) # -- The "Primary" Kill Which Is Guarenteed -- #
+
+        # -- Filtering Out The Possibility Of "Double Tap" Or Self-Kill -- #
+        try: visitors.remove(user)
+        except: pass
+
+        try: visitors.remove(target)
+        except: pass
 
         if active:
             try:
@@ -468,7 +476,7 @@ class ambush(Ability):
                 visitors = visitors[1:]
 
                 data.players[user].targets = [new_target]
-                kill()(user, data)
+                kill()(user, data) # -- The Secondary Kill -- #
             except:
                 pass
 

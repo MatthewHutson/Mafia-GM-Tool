@@ -189,11 +189,11 @@ def pack_alive_and_dead(data: Game_Data, active_role: Role, number_of_targets: i
         frame.delete()
 
     for name in data.alive_players.keys():
-        player_frame = Player_Role_Frame(name, data, alive_canvas, main_font, selected_players, active_role, number_of_targets, pack_alive_and_dead, bg_2, text_colour)
+        player_frame = Player_Role_Frame(name, data, alive_canvas, main_font, selected_players, active_role, number_of_targets, pack_alive_and_dead, select_role, bg_2, text_colour)
         alive_frames.append(player_frame)
 
     for name in data.dead_players.keys():
-        player_frame = Player_Role_Frame(name, data, dead_canvas, main_font, selected_players, active_role, number_of_targets, pack_alive_and_dead, bg_2, text_colour)
+        player_frame = Player_Role_Frame(name, data, dead_canvas, main_font, selected_players, active_role, number_of_targets, pack_alive_and_dead, select_role, bg_2, text_colour)
         dead_frames.append(player_frame)
 
     alive_canvas.update()
@@ -566,7 +566,7 @@ def select_role(entries: Menu_Entry, num: int = 1, roles: list[Role] | None = No
     select_role_row.max_row_length += 1
 
     for role in roles:
-        role_icon = Role_Icon([role.name], main_font, global_entries)
+        role_icon = Role_Icon([role.name], main_font, entries)
         role_icon.command = role_icon.selection
         role_icons.append(role_icon)
         select_role_row.add_item(role_icon)

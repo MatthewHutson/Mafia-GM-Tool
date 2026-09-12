@@ -6,12 +6,12 @@ from menu.menu_classes import *
 
 # -- Functions -- #
 @enforce_types
-def ability_conditions(role: Role, has_recursed: bool, data: Game_Data) -> bool:
+def ability_conditions(role: Role, ability: Ability, has_recursed: bool, data: Game_Data) -> bool:
     life = role in data.alive_players.values()
-    not_cancel = (not role.ability_cancel or "passive" in role.ability_type or "alternate" in role.ability_type)
-    can_use = role.ability.number_of_uses != 0
-    normal_activation = not ("no_action_round" in role.ability_type)
-    first_night_special: bool = not ("first_night" in role.ability.ability_type and data.turn_count == 1)
+    not_cancel = (not role.ability_cancel or "passive" in ability.ability_type or "alternate" in ability.ability_type)
+    can_use = ability.number_of_uses != 0
+    normal_activation = not ("no_action_round" in ability.ability_type)
+    first_night_special: bool = not ("first_night" in ability.ability_type and data.turn_count == 1)
     not_blocked = not role.ability_blocked
 
     if has_recursed:
@@ -30,11 +30,17 @@ def use_abilities(data: Game_Data, can_recurse: bool = True) -> None:
             role.remaining_life_counter -= 1
 
     for name, role in priority.items():
-        if ability_conditions(role, not can_recurse, data):
+        if ability_conditions(role, role.ability, not can_recurse, data):
             role.ability(name, data)
 
         elif "first_night" in role.ability.ability_type and data.turn_count == 1:
             role.ability(name, data, first_night = True)
+
+        if ability_conditions(role, role.secondary_ability, not can_recurse, data):
+            role.secondary_ability(name, data)
+
+        elif "first_night" in role.secondary_ability.ability_type and data.turn_count == 1:
+            role.secondary_ability(name, data, first_night = True)
 
     for role in priority.values():
         if role.remaining_life_counter is not None:

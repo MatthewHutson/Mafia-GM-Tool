@@ -110,6 +110,7 @@ class Role_Icon:
         self.label = None
         self.frame = None
         self.frames = None
+        self.selected = False
 
         if command == None: self.command = self.change_role
         else: self.command = command
@@ -146,14 +147,21 @@ class Role_Icon:
     
     @property
     def bg_colour(self) -> str:
-        if self.name == "Testing":
-            return  "#36eeee"
-        elif self.alignment == None:
-            return  "#f5f5f5"
-        elif self.alignment:
-            return "#48f748"
-        else:
-            return "#c72e2e"
+        match self.alignment, self.selected:
+            case None, False:
+                if self.name == "Testing": return  "#36eeee"
+                else: return  "#f5f5f5"
+            case None, True:
+                if self.name == "Testing": return  "#2f9797"
+                else: return  "#A5A4A4"
+            case True, False:
+                return "#48f748"
+            case True, True:
+                return "#38c538"
+            case False, False:
+                return "#c72e2e"
+            case _:
+                return "#8f2222"
 
     @property
     def fg_colour(self) -> str:
@@ -250,6 +258,11 @@ class Role_Icon:
     def deepcopy(self) -> object:
         new_icon = Role_Icon(self.role_names, self.font, self.entries)
         return new_icon
+
+    @enforce_types
+    def selection(self) -> None:
+        self.selected = not self.selected
+        self.refresh()
 
 class Role_Row:
     # -- Constructor -- #

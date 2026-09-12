@@ -14,6 +14,6 @@
     "boundaries": {
         "guarenteed": ["lead", "information", "defensive"],
         "overflow": ["Villager"],
-        "evil_support": [6, 12]
+        "evil_support": [6, 10, 14, 18]
     }
 }

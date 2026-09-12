@@ -13,7 +13,8 @@
             "ability": "examine"
         },
         "Gambler": {
-            "ability": "gamble"
+            "ability": "none",
+            "secondary_ability": "gamble"
         },
         "Librarian": {
             "ability": "index"

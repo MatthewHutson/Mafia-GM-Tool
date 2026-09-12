@@ -18,8 +18,8 @@ import json
 # -- Setup Global Variables -- #
 root: tk.Tk = tk.Tk()
 
-MIN_PLAYERS: int = 4
-max_players: int = 4
+MIN_PLAYERS: int = 6
+max_players: int = 6
 
 # -- Colour Schemes -- #
 bg_1: str  = "#F0F0F0"
@@ -68,16 +68,17 @@ def get_roles(player_count: int, offset: int = 1) -> list[list[str]]:
     return new_get_roles(player_count, global_entries.settings, offset)
 
 @enforce_types
-def role_boundary_reset(roles: list[list[Role]]) -> None:
+def role_boundary_reset(roles: list[list[Role]], do_shuffle: bool = True) -> None:
     global global_entries
 
     if global_entries != None:
         global_entries.current_roles_lists = []
 
     i = 0
-    role_temp = roles
+    role_temp = deepcopy(roles)
 
-    shuffle(role_temp)
+    if do_shuffle: shuffle(role_temp)
+
     for role_icon in role_row_frames.icon_list:
         role_icon.re_init(role_temp[i])
         i += 1
@@ -168,7 +169,7 @@ def get_data(root: tk.Tk, entries: Menu_Entry) -> None:
 
 @enforce_types
 def start_confirm(entries: Menu_Entry) -> None:
-    if len(players) < 4:
+    if len(players) < MIN_PLAYERS:
         messagebox.showerror("Error", "You Need at Least 4 Players to Start!", icon = "error")
     else:
         if messagebox.askyesno("Confirm Choice", "Do you wish to start the game?", icon = "question"):
@@ -329,9 +330,9 @@ def setup_menu(entries: Menu_Entry, default_names: list[str]) -> bool:
     random_button = tk.Button(settings_frame, text = "Randomise", command = role_boundary_reset_for_icons, bg = "#48f748", activebackground = "#55E036", fg = "#000000", activeforeground = "#000000")
     random_button.pack(side = tk.RIGHT, ipady = 3, ipadx = 8, padx = 4)
 
-    # -- Card Index -- #
-    #index_access_button = tk.Button(settings_frame, text = "Card Index", command = lambda: card_index(root, bg_2, main_font, text_colour, entries), bg = "#C65DF0", activebackground = "#C049C4", fg = "#ffffff", activeforeground = "#ffffff")
-    #index_access_button.pack(side = tk.RIGHT, ipadx = 8, ipady = 3, padx = 4)
+    # -- Testing Button -- #
+    # index_access_button = tk.Button(settings_frame, text = "Testing", command = lambda: print(select_role(entries, num = 3)), bg = "#C65DF0", activebackground = "#C049C4", fg = "#ffffff", activeforeground = "#ffffff")
+    # index_access_button.pack(side = tk.RIGHT, ipadx = 8, ipady = 3, padx = 4)
 
     # -- Role Selection -- #
     tk.Label(role_frame, text = "Roles", font = main_font, bg = bg_1, fg = text_colour).pack(side = tk.TOP, padx = 4, pady = 4, fill = "x")
@@ -437,7 +438,7 @@ def selection_menu_create(data: Game_Data, entries: Menu_Entry, user: str, targe
     tk.Button(confirm_frame, text = "End Game", command = lambda: menu_quit(data), bg = "#E03636", activebackground = "#8B2B2B", fg = "#ffffff", activeforeground = "#ffffff").pack(side = tk.RIGHT, ipadx = 16, ipady = 8, pady = 4, padx = 4)
 
     # -- Card Index -- #
-    #index_access_button = tk.Button(info_frame, text = "Card Index", command = lambda: card_index(root, bg_2, main_font, text_colour, entries, data), bg = "#C65DF0", activebackground = "#C049C4", fg = "#ffffff", activeforeground = "#ffffff", width = 18)
+    #index_access_button = tk.Button(info_frame, text = "Testing", command = lambda: select_role(data))
     #index_access_button.pack(side = tk.LEFT, ipady = 8, padx = 4)
 
     # -- Mimi Stand Counter -- #
@@ -534,6 +535,58 @@ def voting_menu(data: Game_Data, entries: Menu_Entry) -> str:
         return selected_players[0]
     else: 
         return "none"
+
+@enforce_types
+def role_selections(role_icons: list[Role_Icon]) -> list[Role_Icon]:
+    return [role for role in role_icons if role.selected]
+
+@enforce_types
+def confirm_role_selection(role_root: tk.Toplevel, role_icons: list[Role_Icon], num: int) -> None:
+    if len(role_selections(role_icons)) == num:
+        if messagebox.askyesno("Confirm Selection", "Are you sure you want to proceed?", default = "no", icon = "question"):
+            role_root.quit()
+    else:
+        messagebox.showerror("Error", "You have made an incorrect number of selections!", icon = "error")
+
+@enforce_types
+def select_role(entries: Menu_Entry, num: int = 1, roles: list[Role] | None = None, title: str = "") -> list[str]:
+    role_root = tk.Toplevel()
+    role_root.geometry("1000x512")
+    role_root.resizable(False, True)
+    role_root.title(f"{title} Select {num} Role{"s" if num != 1 else ""}")
+    role_icons: list[Role_Icon] = []
+
+    main_frame = tk.Frame(role_root, bg = bg_2)
+
+    if roles is None: 
+        role_temp = deepcopy(entries.roles)
+        roles = [role for role in role_temp if role.name != "Testing"]
+
+    select_role_row = Role_Row(main_frame, bg_2)
+    select_role_row.max_row_length += 1
+
+    for role in roles:
+        role_icon = Role_Icon([role.name], main_font, global_entries)
+        role_icon.command = role_icon.selection
+        role_icons.append(role_icon)
+        select_role_row.add_item(role_icon)
+
+    confirm_row = tk.Frame(role_root, bg = bg_1)
+    confirm_button = tk.Button(confirm_row, bg = "#5D9FF0", command = lambda: confirm_role_selection(role_root, role_icons, num), text = "Confirm Selection", foreground = "#ffffff")
+
+    confirm_button.pack(side = tk.LEFT, fill = "y", ipadx = 64)
+
+    confirm_row.pack(side = tk.BOTTOM, fill = "x", ipady = 32, pady = 2)
+    main_frame.pack(side= tk.TOP, anchor = tk.NW, expand = True, fill = "both")
+
+    select_role_row.pack()
+    role_root.mainloop()
+
+    icon_selections: list[Role_Icon] = role_selections([role for role in role_icons])
+    roles = [role.name for role in icon_selections]
+    role_root.destroy()
+
+    return roles
 
 @enforce_types
 def announcements(data: Game_Data) -> None:

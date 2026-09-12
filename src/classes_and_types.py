@@ -488,13 +488,14 @@ class Menu_Entry:
     @enforce_types
     def assign_roles(self) -> Players:
         shuffle(self.players)
-        shuffle(self.roles)
+        roles_temp = deepcopy(self.roles)
+        shuffle(roles_temp)
 
         # -- Fixing Sleepy Time Bug With Bogosort -- #
-        while self.roles[0].ability.targets == 0 or "on_demand" in self.roles[0].ability.ability_type or "alternate" in self.roles[0].ability.ability_type:
-            shuffle(self.roles)
+        while roles_temp[0].ability.targets == 0 or "on_demand" in roles_temp[0].ability.ability_type or "alternate" in roles_temp[0].ability.ability_type:
+            shuffle(roles_temp)
 
-        return Players({self.players[i]: self.roles[i] for i in range(len(self.players))})
+        return Players({self.players[i]: roles_temp[i] for i in range(len(self.players))})
     
     @enforce_types
     def filter_roles(self, roles: list[str]) -> None:
@@ -645,13 +646,17 @@ class Game_Data():
             data: dict = role.__dict__
             statuses: dict = role.statuses.__dict__
 
+            if role.ability is None: role.ability = deepcopy(self.none_role.ability)
+            if role.secondary_ability is None: role.secondary_ability = deepcopy(self.none_role.ability)
+
             # -- Equation Type Handler -- #
             try:
                 if is_instance(role.ability.number_of_uses, equation):
                     role.ability.number_of_uses = role.ability.number_of_uses.get_value(self.total_evil_count)
 
-                if is_instance(role.secondaary_ability.number_of_uses, equation):
-                    role.secondaary_ability.number_of_uses = role.secondary_ability.number_of_uses.get_value(self.total_evil_count)
+                if is_instance(role.secondary_ability.number_of_uses, equation):
+                    role.secondary_ability.number_of_uses = role.secondary_ability.number_of_uses.get_value(self.total_evil_count)
+
             except: pass
 
             primary_ability: dict = role.ability.to_dict()

@@ -11,10 +11,12 @@ The Stand Counter Button Will Show The Current Count
 The Counter Will Remain Between Games As Long As the Program Runs
 
 # -- Changelog -- #
-Added GM Poison/Drunk Tags On Information
-Made Creep 2X uses
-Revereted Sheriff to Before Neutrals Registered Differently
-Made Lawyer Simpler
+Created A Menu To Select Any Number of Roles
+Completed Underdog Code
+Bug Fix - Poisoend Necro Crashes Game
+Set Minimum Players to 6
+Altered Numbers For Evil Scaling (2 - 4 Evil Players)
+Altered Creep Uses To Better Suit This
 
 # -- To Do -- #
 Create New Poison Examine Effect

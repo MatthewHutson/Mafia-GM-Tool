@@ -5,6 +5,7 @@ from game_loop_functions import *
 from random import choice
 from time import sleep
 from re import fullmatch
+from menu.menu import select_role
 import colorist
 import json
 
@@ -323,7 +324,7 @@ class telepathy(Ability):
 class stalk(Ability):
     @enforce_types
     def __init__(self) -> None:
-        super().__init__(targets = 1, p = 7.5, ability_type = ["on_demand", "investigative"], can_pick_same_target = True, priority = 11, uses = "2*x")
+        super().__init__(targets = 1, p = 7.5, ability_type = ["on_demand", "investigative"], can_pick_same_target = True, priority = 11, uses = "x")
         self.invisible_players: set[str] = {}
 
     # -- Methods -- #
@@ -422,8 +423,9 @@ class resurrect(Ability):
     @enforce_types
     def if_poisoned(self, user: str, data: Game_Data) -> None:
         self.ability(user, data)
-        data.players[user].remaining_life_counter = 1
-        data.players[self.targets].remaining_life_counter = data.total_evil_count
+        user_role: Role = data.players[user]
+        user_role.remaining_life_counter = 1
+        data.players[user_role.targets[0]].remaining_life_counter = data.total_evil_count
 
 class vengance(Ability):
     @enforce_types
@@ -510,7 +512,7 @@ class mayor(Ability):
 class gamble(Ability):
     @enforce_types
     def __init__(self) -> None:
-        super().__init__(targets = 0, p = 0, ability_type = ["secondary_ability", "passive", "game_start"], priority = 6)
+        super().__init__(targets = 0, p = 0, ability_type = ["passive", "game_start"], priority = 6)
         self.used_abilities: set[str] = set([])
         self.non_starting_abilities: set[str] = set([])
         
@@ -525,31 +527,33 @@ class gamble(Ability):
             role_data: list[str, Ability] = data.random_ability(self.non_starting_abilities)
             
             self.used_abilities.add(role_data[0])
-            role.secondary_ability = role_data[1]
+            role.ability = role_data[1]
 
             if data.settings["Instant Death"] == 0:
                 self.used_abilities.add("instant_death")
+                self.used_abilities.add("jackpot")
+
         else:
-            role.secondary_ability(user, data)
+            #role.ability(user, data)
 
             role_data: list[str, Ability] = data.random_ability(self.used_abilities)
-            role.secondary_ability = role_data[1]
+            role.ability = role_data[1]
 
-            if role.secondary_ability == instant_death or role.secondary_ability == none or role.secondary_ability == jackpot:
-                role.information.append(f"They rolled {role.secondary_ability.__name__}!")
+            if role.ability == instant_death or role.ability == none or role.ability == jackpot:
+                role.information.append(f"They rolled {role.ability.__name__}!")
             else:
-                new_role: Role = data.get_role_by_ability(role.secondary_ability)
+                new_role: Role = data.get_role_by_ability(role.ability)
                 new_card: str = new_role.name
 
                 role.information.append(f"They rolled {new_role.name}, which has the card {new_card}!")
 
-            role.ability.priority = role.secondary_ability.priority + 0.5
+            role.secondary_ability.priority = role.ability.priority + 0.5
 
-            if "instant" in role.secondary_ability.ability_type:
-                role.secondary_ability(user, data)
+            if "instant" in role.ability.ability_type:
+                role.ability(user, data)
 
             # -- Removed The Ability From Being Drawn Again -- #
-            if not (role.secondary_ability == none or role.secondary_ability is None):
+            if not (role.ability == none or role.ability is None):
                 self.used_abilities.add(role_data[0])
 
     @enforce_types
@@ -1146,24 +1150,37 @@ class role_replicate(Ability):
         
     # -- Ability -- #
     @enforce_types
-    def ability(self, user: str, data: Game_Data) -> None:
+    def ability(self, user: str, data: Game_Data, poisoned: bool = False) -> None:
         user_role: Role = data.players[user]
         target_role: Role = user_role
         target: str = user
   
         for name, role in data.players.items():
-            if role.was_voted_out and role.true_alignment == True:
+            if role.was_voted_out:
                 target_role = role
                 target = name
         
         if target != user:
+            if target_role.true_alignment != True:
+                # -- Giving Them A Bluff For Evil -- #
+                target_role = deepcopy(data.roles[select_role(data.menu_entries, title = "Evil/Neutral Underdog: Gamemaster")[0]])
+                user_role.statuses.drunk = True
+
+            else:
+                target_role = deepcopy(data.roles[target_role.name]) # -- Giving A Fresh Copy Of The Role -- #
+
             user_role.ability = deepcopy(target_role.ability)
             user_role.secondary_ability = deepcopy(target_role.secondary_ability)
 
+            if user_role.ability is None: user_role.ability = deepcopy(data.none_role.ability)
+            if user_role.secondary_ability is None: user_role.secondary_ability = deepcopy(data.none_role.ability)
+
+            if poisoned:
+                user_role.statuses.drunk = True
+
     @enforce_types
     def if_poisoned(self, user: str, data: Game_Data) -> None:
-        self.ability(user, data)
-        data.players[user].statuses.drunk = True
+        self.ability(user, data, poisoned = True)
 
 class douse(Ability):
     def __init__(self) -> None:

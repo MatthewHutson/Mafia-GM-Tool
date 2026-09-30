@@ -1,0 +1,21 @@
+{
+    "name": "Humble Beginnings",
+    "good": {
+        "information": [["Sheriff"], ["Creep"]],
+        "defensive": [["Soldier"], ["Doctor"]],
+        "other": [["Mayor"], ["Vigilante"]]
+    },
+    "neutral": {
+        "roles": [["Jester"]]
+    },
+    "evil": {
+        "lead": ["Mafia"],
+        "support": ["Poisoner"]
+    },
+    "boundaries": {
+        "guarenteed": ["lead", "information", "defensive"],
+        "overflow": ["Villager"],
+        "evil_support": [6],
+        "min_players": 4
+    }
+}

@@ -76,9 +76,9 @@ def selection_coindition(data: Game_Data, role: Role, name: str, is_primary_abil
 @enforce_types
 def nap_time(data: Game_Data) -> None:
     # -- A Menu To Inform Evil Players Of Their Allies And Bluffs -- #
-    all_roles: set[str] = set(data.roles.keys()) - set(["Villager", "Testing"])
+    all_roles: set[str] = set(data.in_play_roles.keys()) - set(["Villager", "Testing"])
     playing_roles: set[str] = set(role.name for role in data.players.values())
-    evil_roles: set[str] = set(name for name, role in data.roles.items() if not role.alignment)
+    evil_roles: set[str] = set(name for name, role in data.in_play_roles.items() if not role.alignment)
     bluff_roles: list[str] = list(all_roles - playing_roles - evil_roles)
     shuffle(bluff_roles)
 

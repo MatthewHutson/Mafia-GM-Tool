@@ -662,7 +662,7 @@ class index(Ability):
     @enforce_types
     def __init__(self) -> None:
         super().__init__(targets = 0, p = 10, ability_type = ["passive", "investigative"], priority = 9)
-        self.seen_roles: set[str] = {"Mafia"}
+        self.seen_roles: set[str] = {"Mafia", "Ambusher"}
         self.blind_roles: set[str] = {} # -- Roles That Cannot Be Seen On A Temporary Basis -- #
 
     # -- Properties -- #

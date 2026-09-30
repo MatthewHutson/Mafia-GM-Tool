@@ -49,9 +49,10 @@ def main() -> None:
 
     # -- Menu -- #
     normal_load = setup_menu(entries, name_data)
+    in_play_roles: dict[str, Role] = deepcopy({name: roles[name] for name in get_all_roles()})
 
     # -- Player Organisation -- #
-    game_data = Game_Data(Players(entries.assign_roles()), roles, role_functions, ability_distribution, [], entries)
+    game_data = Game_Data(Players(entries.assign_roles()), roles, role_functions, ability_distribution, [], entries, in_play_roles)
 
     if normal_load:
         game_data.init()

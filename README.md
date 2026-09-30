@@ -11,7 +11,9 @@ The Stand Counter Button Will Show The Current Count
 The Counter Will Remain Between Games As Long As the Program Runs
 
 # -- Changelog -- #
-Made The Ambusher A Evil "Leader" - An Alternative To The Mafia
+Made a BOTC style script system - load a subset of roles into the game (saved as JSON format)
+Made 2 Scripts, "Eveything" and "Humble Beginnings"
+Made Ambusher Unable To Be Seen By Librarian
 
 # -- To Do -- #
 Create New Poison Examine Effect

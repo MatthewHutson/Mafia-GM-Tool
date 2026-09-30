@@ -3,6 +3,7 @@ from utils import *
 from menu.menu_classes import *
 from menu.settings import update_settings
 from random import choice, shuffle
+from tkinter import filedialog
 import json
 
 # -- Global Variables -- #
@@ -14,11 +15,11 @@ boundary_data: dict = None
 
 # -- Methods -- #
 @enforce_types
-def load_role_data() -> int:
+def load_role_data(file_path: str = "Scripts/everything.json") -> tuple[int, int]:
     # -- Role Load System V4 -- #
     global data, good_data, neutral_data, evil_data, boundary_data, max_players
 
-    with open("loading_data.json", "r") as file:
+    with open(file_path, "r") as file:
         data = json.load(file)
     
     good_data = data["good"]
@@ -27,7 +28,9 @@ def load_role_data() -> int:
     boundary_data = data["boundaries"]
 
     max_players = len(good_data["information"]) + len(good_data["defensive"]) + len(good_data["other"]) + len(neutral_data["roles"])
-    return max_players
+    min_players = boundary_data["min_players"]
+    
+    return max_players, min_players
 
 @enforce_types
 def new_get_roles(player_count: int, settings: dict, offset: int = 1) -> list[list[Role]]:
@@ -61,7 +64,7 @@ def new_get_roles(player_count: int, settings: dict, offset: int = 1) -> list[li
     if settings["Testing Role"]["value"] == 1:
         all_unselected_roles.insert(0, ["Testing"])
 
-    all_unselected_roles = all_unselected_roles[:-1 * (len(boundary_data["evil_support"]) + 1)]
+    #all_unselected_roles = all_unselected_roles[:-1 * (len(boundary_data["evil_support"]) + 1)]
 
     for i in range(player_count - len(roles)):
         if i < len(all_unselected_roles):
@@ -99,6 +102,20 @@ def get_all_role_lists() -> list[list[str]]:
     return all_roles
 
 @enforce_types
+def get_all_roles() -> list[Role]:
+    role_lists: list[list[Role]] = get_all_role_lists()
+    output: list[Role] = []
+
+    for sublist in role_lists:
+        if type(sublist) == list:
+            for role in sublist:
+                output.append(role)
+        else:
+            output.append(sublist)
+
+    return output
+
+@enforce_types
 def unpack_role_types(roles: dict, loaded_role_data: dict, role_functions: dict, alignment: bool | Literal[None]) -> None:
     for name, data in loaded_role_data.items():
         ability_name: str = data["ability"]  
@@ -111,3 +128,19 @@ def unpack_role_types(roles: dict, loaded_role_data: dict, role_functions: dict,
         data["abilities"] = {}
             
         roles[name] = Role(name = name, _alignment = alignment, **data)
+
+@enforce_types
+def load_script() -> tuple[int, int]:
+    file_path = filedialog.askopenfilename(title = "Pick a Script", filetypes = [("JSON", "*.json")])
+
+    if file_path:
+        try: 
+            max_players, min_players = load_role_data(file_path)
+        except: 
+            messagebox.showerror(title = "Error", message = "Invalid Script Format!\n\nLoading Default Script", icon = "error")
+            max_players, min_players = load_role_data()
+
+        return max_players, min_players
+    else:
+        messagebox.showerror(title = "Error", message = "No Script Provided!\n\nLoading Default Script", icon = "error")
+        return load_role_data()

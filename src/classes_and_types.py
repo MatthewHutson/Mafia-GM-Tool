@@ -514,6 +514,7 @@ class Game_Data():
     ablity_distribution: dict[str, float]
     card_dict: dict[str, str]
     menu_entries: Menu_Entry
+    in_play_roles: dict[str, Role]
     announcements: list[str] = None
     settings: dict[str, Any] = None
     mafia_role: Role = None

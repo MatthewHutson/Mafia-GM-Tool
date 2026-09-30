@@ -18,8 +18,8 @@ import json
 # -- Setup Global Variables -- #
 root: tk.Tk = tk.Tk()
 
-MIN_PLAYERS: int = 6
-max_players: int = 6
+min_players: int = 0
+max_players: int = 0
 
 # -- Colour Schemes -- #
 bg_1: str  = "#F0F0F0"
@@ -111,6 +111,8 @@ def add_player(players: list[Player_Select_Frame], roles: list[list[Role]], entr
 
     except OverflowError as e:
         messagebox.showwarning("Warning", "You Have Reached The Maximum Number of Players!", icon = "warning")
+    except IndexError as e:
+        messagebox.showwarning("Warning", "You Have Reached The Maximum Number of Players!", icon = "warning")
     except NameError:
         messagebox.showwarning("Warning", "A Player With This Name Already Exists!", icon = "warning")
     except ValueError:
@@ -169,8 +171,8 @@ def get_data(root: tk.Tk, entries: Menu_Entry) -> None:
 
 @enforce_types
 def start_confirm(entries: Menu_Entry) -> None:
-    if len(players) < MIN_PLAYERS:
-        messagebox.showerror("Error", "You Need at Least 4 Players to Start!", icon = "error")
+    if len(players) < min_players:
+        messagebox.showerror("Error", f"You Need at Least {min_players} Players to Start!", icon = "error")
     else:
         if messagebox.askyesno("Confirm Choice", "Do you wish to start the game?", icon = "question"):
             remove_instances()
@@ -276,6 +278,33 @@ def load_backup() -> None:
     else:
         messagebox.showerror("Error", "No Backup Exists!", icon = "error")
 
+@enforce_types
+def change_script(entries: Menu_Entry, startup: bool = False) -> list[str]:
+    global global_entries, player_canvas, load_from_backup, max_players, min_players, players
+
+    if startup: 
+        max_players, min_players = load_role_data()
+        temp_players: list[str] = []
+    else:
+        max_players, min_players = load_script() 
+        temp_players = deepcopy([player.name for player in players])
+    
+    for i in range(len(players)):
+        players[0].delete()
+
+    entries.all_roles_lists = get_all_role_lists()
+    role_row_frames.get_role_reset_function(role_boundary_reset_for_icons)
+    role_row_frames.add_entries(entries)
+
+    return temp_players
+
+@enforce_types
+def script_change_command(entries: Menu_Entry) -> None:
+    temp_players: list[str] = change_script(entries)
+
+    for player in temp_players:
+        add_player(players, get_roles_by_players(), entries, player)
+
 # -- Setup Menu -- #
 @enforce_types
 def setup_menu(entries: Menu_Entry, default_names: list[str]) -> bool:
@@ -285,10 +314,7 @@ def setup_menu(entries: Menu_Entry, default_names: list[str]) -> bool:
     load_from_backup = False
 
     # -- File Handling -- #
-    max_players = load_role_data()
-    entries.all_roles_lists = get_all_role_lists()
-    role_row_frames.get_role_reset_function(role_boundary_reset_for_icons)
-    role_row_frames.add_entries(entries)
+    change_script(entries, startup = True)
 
     # -- Specific Functions --  #
     @enforce_types
@@ -329,6 +355,10 @@ def setup_menu(entries: Menu_Entry, default_names: list[str]) -> bool:
     # -- Randomise Button -- #
     random_button = tk.Button(settings_frame, text = "Randomise", command = role_boundary_reset_for_icons, bg = "#48f748", activebackground = "#55E036", fg = "#000000", activeforeground = "#000000")
     random_button.pack(side = tk.RIGHT, ipady = 3, ipadx = 8, padx = 4)
+
+    # -- Script Button -- #
+    script_button = tk.Button(settings_frame, text = "Script", command = lambda: script_change_command(entries), bg = "#5DF0B5", activebackground = "#C049C4", fg = "#000000", activeforeground = "#000000")
+    script_button.pack(side = tk.RIGHT, ipadx = 8, ipady = 3, padx = 4)
 
     # -- Testing Button -- #
     # index_access_button = tk.Button(settings_frame, text = "Testing", command = lambda: print(select_role(entries, num = 3)), bg = "#C65DF0", activebackground = "#C049C4", fg = "#ffffff", activeforeground = "#ffffff")

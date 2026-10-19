@@ -75,6 +75,9 @@ def selection_coindition(data: Game_Data, role: Role, name: str, is_primary_abil
 
 @enforce_types
 def nap_time(data: Game_Data) -> None:
+    '''
+    The starting phase used to help the evil team coordinate.
+    '''
     # -- A Menu To Inform Evil Players Of Their Allies And Bluffs -- #
     all_roles: set[str] = set(data.in_play_roles.keys()) - set(["Villager", "Testing"])
     playing_roles: set[str] = set(role.name for role in data.players.values())
@@ -119,6 +122,9 @@ def start_abilities(data: Game_Data) -> None:
 
 @enforce_types
 def night_phase(data: Game_Data, entries: Menu_Entry) -> None:
+    '''
+    The phase of the game where everyone secretly uses their abilities.
+    '''
     for name, role in data.alive_players.items():
         # -- Equation Type Handler -- #
         try:
@@ -174,6 +180,9 @@ def night_phase(data: Game_Data, entries: Menu_Entry) -> None:
 
 @enforce_types
 def voting_phase(data: Game_Data, entries: Menu_Entry, normal_start: bool = True) -> None:
+    '''
+    The phase of the game for discussion & the voting out of at most 1 player.
+    '''
     if data.playing or data.forced_continuation:
         voted_out: str = voting_menu(data, entries)
 
@@ -192,6 +201,9 @@ def voting_phase(data: Game_Data, entries: Menu_Entry, normal_start: bool = True
 
 @enforce_types
 def game(data: Game_Data, entries: Menu_Entry, normal_start: bool = True) -> None:
+    '''
+    Runs a single game of the modded Mafia with the roles assigned.
+    '''
     # -- Game Setup -- #
     if normal_start: start_abilities(data)
     init_game_menu(entries, data)

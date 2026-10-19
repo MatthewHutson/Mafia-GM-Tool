@@ -25,6 +25,10 @@ class none(Ability):
         pass
 
 class vote(Ability):
+    '''
+    The "Ability" Used To Indicate A Vote Phase.
+    '''
+
     @enforce_types
     def __init__(self) -> None:
         super().__init__(targets = 1, p = 0, ability_type = ["repeat"], can_pick_same_target = True)
@@ -39,6 +43,10 @@ class vote(Ability):
         pass
 
 class reveal(Ability):
+    '''
+    Each night, pick a player to investigate their alignment.
+    '''
+
     @enforce_types
     def __init__(self) -> None:
         super().__init__(targets = 1, p = 5, ability_type = ["repeat", "investigative"], priority = 7, can_pick_same_target = True)
@@ -86,6 +94,9 @@ class reveal(Ability):
         self.information(data, user, alignment)
 
 class endure(Ability):
+    '''
+    Each night, protect yourself.
+    '''
     @enforce_types
     def __init__(self) -> None:
         super().__init__(targets = 0, p = 12.5, ability_type = ["passive", "defensive"], priority = 2)
@@ -100,6 +111,9 @@ class endure(Ability):
         pass
 
 class protect(Ability):
+    '''
+    Each night, pick a player to protect
+    '''
     @enforce_types
     def __init__(self) -> None:
         super().__init__(targets = 1, p = 7.5, ability_type = ["repeat", "defensive"], priority = 2)
@@ -116,6 +130,9 @@ class protect(Ability):
         pass
 
 class link(Ability):
+    '''
+    X times per game at night, make two players lovers (See cupid_victory).
+    '''
     @enforce_types
     def __init__(self) -> None:
         super().__init__(targets = 2, p = 0, ability_type = ["on_demand"], priority = 2, uses = "x")
@@ -146,6 +163,9 @@ class link(Ability):
 
 @enforce_types
 class cupid_victory(Ability):
+    '''
+    If linked players die together, you win with the winning team (See link).
+    '''
     @enforce_types
     def __init__(self) -> None:
         super().__init__(targets = 0, p = 0, ability_type = ["passive", "on_vote", "game_end"], priority = 2)
@@ -180,6 +200,9 @@ class cupid_victory(Ability):
         self.ability(user, data)
 
 class heart_break(Ability):
+    '''
+    Unused Alternative Cupid Idea (See link & cupid_victory Abilities)
+    '''
     @enforce_types
     def __init__(self) -> None:
         super().__init__(targets = 1, p = 0, ability_type = ["on_demand"], priority = 2, uses = 1, can_pick_same_target = True)
@@ -203,6 +226,9 @@ class heart_break(Ability):
         self.ability(user, data)
 
 class jester(Ability):
+    '''
+    If you are voted out, you win with the winning team and poison everyone the following night.
+    '''
     @enforce_types
     def __init__(self) -> None:
         super().__init__(targets = 0, p = 0, ability_type = ["on_death", "no_action_round"])
@@ -225,6 +251,9 @@ class jester(Ability):
         self.ability(user, data, does_effect = False)
 
 class prosecute(Ability):
+    '''
+    On your first night, pick a player. If they are executed, you win with the winning team (disused).
+    '''
     @enforce_types
     def __init__(self) -> None:
         super().__init__(targets = 1, p = 0, ability_type = ["on_vote", "no_action_round", "keep_targets"], uses = 1)
@@ -249,6 +278,9 @@ class prosecute(Ability):
                 data.playing = False
 
 class poison(Ability):
+    '''
+    Each night, pick a player to poison.
+    '''
     @enforce_types
     def __init__(self) -> None:
         super().__init__(targets = 1, p = 0, ability_type = ["repeat"], priority = 0)
@@ -269,6 +301,9 @@ class poison(Ability):
         pass
 
 class kill(Ability):
+    '''
+    Each night, pick a player to kill.
+    '''
     @enforce_types
     def __init__(self) -> None:
         super().__init__(targets = 1, p = 0, ability_type = ["repeat", "on_death"], priority = 5, can_pick_same_target = True)
@@ -304,6 +339,9 @@ class kill(Ability):
             starpass().ability(user, data)
 
 class telepathy(Ability):
+    '''
+    You start by learning the role of every player.
+    '''
     @enforce_types
     def __init__(self) -> None:
         super().__init__(targets = 0, p = 0, ability_type = ["investigative"], priority = 4, uses = 1)
@@ -322,6 +360,9 @@ class telepathy(Ability):
         self.ability(user, data)
 
 class stalk(Ability):
+    '''
+    X times per game at night, you can pick a player to learn who visited them.
+    '''
     @enforce_types
     def __init__(self) -> None:
         super().__init__(targets = 1, p = 7.5, ability_type = ["on_demand", "investigative"], can_pick_same_target = True, priority = 11, uses = "x")
@@ -399,6 +440,9 @@ class stalk(Ability):
         self.ability(user, data, target)
 
 class resurrect(Ability):
+    '''
+    Once per game at night, resurrect a dead player.
+    '''
     @enforce_types
     def __init__(self) -> None:
         super().__init__(targets = 1, p = 10, ability_type = ["on_demand", "defensive"], target_living = False, uses = 1)  
@@ -428,6 +472,9 @@ class resurrect(Ability):
         data.players[user_role.targets[0]].remaining_life_counter = data.total_evil_count
 
 class vengance(Ability):
+    '''
+    Each Night, Pick a Player. If You Die That Night Or Day, They Also Die (Unused)
+    '''
     @enforce_types
     def __init__(self) -> None:
         super().__init__(targets = 1, p = 0, ability_type = ["on_death", "no_action_round"], can_pick_same_target = True)
@@ -446,6 +493,9 @@ class vengance(Ability):
         pass
 
 class ambush(Ability):
+    '''
+    Each night, pick a player to kill. A random player visiting your target also dies. Any living visitor learns there is an Ambusher.
+    '''
     @enforce_types
     def __init__(self) -> None:
         super().__init__(targets = 1, p = 0, ability_type = ["repeat"], priority = 3, can_pick_same_target = True)
@@ -488,6 +538,9 @@ class ambush(Ability):
         self.ability(user, data, False)
 
 class mayor(Ability):
+    '''
+    If you survive until final 3, your team wins. The first time you're attacked at night, you don't die.
+    '''
     @enforce_types
     def __init__(self) -> None:
         super().__init__(targets = 0, p = 0, ability_type = ["passive", "game_end", "on_vote"], priority = 9999)
@@ -518,6 +571,9 @@ class mayor(Ability):
             data.players[user].solo_win = len(data.players) == data.players[user].alternative_end_count
 
 class gamble(Ability):
+    '''
+    Each Night, You may receive a random town ability to use, nothing, death or jackpot.
+    '''
     @enforce_types
     def __init__(self) -> None:
         super().__init__(targets = 0, p = 0, ability_type = ["passive", "game_start"], priority = 6)
@@ -573,6 +629,9 @@ class gamble(Ability):
         self.ability(user, data)
 
 class instant_death(Ability):
+    '''
+    You die with no means of cheating death (see gamble).
+    '''
     @enforce_types
     def __init__(self) -> None:
         super().__init__(targets = 1, p = 2.5, ability_type = ["instant"])
@@ -613,6 +672,9 @@ class jackpot(Ability):
         self.ability(user, data)
 
 class magnet(Ability):
+    '''
+    Each night pick two players, they now target each other tonight.
+    '''
     @enforce_types
     def __init__(self) -> None:
         super().__init__(targets = 2, p = 0, ability_type = ["repeat"], priority = 1)
@@ -659,6 +721,9 @@ class magnet(Ability):
         self.magnetise(data, user, role, targets)
 
 class index(Ability):
+    '''
+    Each night, learn an in- play role that isn't your own or the evil leader.
+    '''
     @enforce_types
     def __init__(self) -> None:
         super().__init__(targets = 0, p = 10, ability_type = ["passive", "investigative"], priority = 9)
@@ -714,6 +779,9 @@ class index(Ability):
         self.information(data, user_role, selected_set)
     
 class examine(Ability):
+    '''
+    Each night, pick a player to learn which status effects they have.
+    '''
     @enforce_types
     def __init__(self) -> None:
         super().__init__(targets = 1, p = 12.5, ability_type = ["repeat", "investigative"], priority = 10, can_pick_same_target = True)
@@ -758,6 +826,9 @@ class examine(Ability):
                 data.players[info_reciever].information.append(item)
 
 class super_kill(Ability):
+    '''
+    Once per game at night, you can kill a player, even if protected. If promoted to Mafia, your first kill this game has this property.
+    '''
     @enforce_types
     def __init__(self) -> None:
         super().__init__(targets = 1, p = 0, ability_type = ["on_demand", "evil_priority"], priority = -1, can_pick_same_target = True, uses = 1)
@@ -778,6 +849,9 @@ class super_kill(Ability):
         pass
 
 class witness_protection(Ability):
+    '''
+    X-1 times per game at night, protect your client (see stop_vote).
+    '''
     @enforce_types
     def __init__(self):
         # -- A Variant of Protection For Lawyer -- #
@@ -802,6 +876,9 @@ class witness_protection(Ability):
         self.ability(self, user, data)
 
 class evidence_tampering(Ability):
+    '''
+    X-1 times per game at night, tamper with any evidence targetting your client (see stop_vote).
+    '''
     @enforce_types
     def __init__(self):
         # -- A Variant of Protection For Lawyer -- #
@@ -841,6 +918,9 @@ class evidence_tampering(Ability):
         self.ability(self, user, data)
 
 class stop_vote(Ability):
+    '''
+    On night 1, pick a client. If your client survives the game, you win with the winning team. You gain tools to defend your client (see witness_protection & evidence_tampering).
+    '''
     @enforce_types
     def __init__(self) -> None:
         super().__init__(targets = 1, p = 0, ability_type = ["on_vote", "first_night", "keep_targets"], priority = 10, uses = 1)
@@ -874,6 +954,9 @@ class stop_vote(Ability):
         self.ability(user, data, first_night)
 
 class bless(Ability):
+    '''
+    Once per game at night, bless a player (see vulnerable).
+    '''
     @enforce_types
     def __init__(self) -> None:
         super().__init__(targets = 1, p = 0, ability_type = ["on_demand"], uses = 1, priority = 1.1)
@@ -892,6 +975,9 @@ class bless(Ability):
         pass
 
 class vulnerable(Ability):
+    '''
+    If you are voted out, a random town player becomes doomed.
+    '''
     @enforce_types
     def __init__(self) -> None:
         super().__init__(targets = 0, p = 0, ability_type = ["on_death", "no_action_round"])
@@ -917,6 +1003,9 @@ class vulnerable(Ability):
         self.ability(user, data)
 
 class execute(Ability):
+    '''
+    Once per game at night, pick a player; if they are neutral or evil, you kill them.
+    '''
     @enforce_types
     def __init__(self) -> None:
         super().__init__(targets = 1, p = 5, ability_type = ["on_demand"], priority = -1, can_pick_same_target = True, uses = 1)
@@ -940,6 +1029,9 @@ class execute(Ability):
             target_role.die(data)
     
 class silence(Ability):
+    '''
+    Each night, silence a player. If successful, you steal any information they learned that night.
+    '''
     @enforce_types
     def __init__(self) -> None:
         super().__init__(targets = 1, p = 0, ability_type = ["repeat", "on_demand"], priority = 1)
@@ -959,6 +1051,9 @@ class silence(Ability):
         data.players[user].statuses.silenced = True
 
 class sidequest(Ability):
+    '''
+    You receive X+3 tasks on night 1. If you complete X+1 of them, you trigger a vote phase (see must_win).
+    '''
     @enforce_types
     def __init__(self) -> None:
         super().__init__(targets = 0, p = 0, ability_type = ["repeat", "on_vote", "first_night"], priority = 12)
@@ -1014,6 +1109,9 @@ class sidequest(Ability):
         self.ability(user, data, first_night)
 
 class must_live(Ability):
+    '''
+    If you survive the extra vote, you steal the win (see sidequest).
+    '''
     @enforce_types
     def __init__(self) -> None:
         super().__init__(targets = 0, p = 0, ability_type = ["on_death", "no_action_round"], priority = 12)
@@ -1031,6 +1129,9 @@ class must_live(Ability):
     
 
 class calculated_risk(Ability):
+    '''
+    TBD
+    '''
     @enforce_types
     def __init__(self) -> None:
         super().__init__(targets = [0, 1, 1, 1, 0, 1], p = 0, ability_type = ["repeat", "selection"], priority = 3)
@@ -1114,9 +1215,13 @@ class calculated_risk(Ability):
         self.backfire(user, data)
 
 class sabotage(Ability):
+    '''
+    Each night, you may poison a “category” of role once per category. Everyone learns when you do so. You may fake a use once.
+    '''
     @enforce_types
     def __init__(self) -> None:
-        super().__init__(targets = [0, 0], p = 0, ability_type = ["repeat", "selection", "on_demand"], priority = -2)
+        super().__init__(targets = [0, 0, 0], p = 0, ability_type = ["repeat", "selection", "on_demand"], priority = -2)
+        self.count = 3
     
     # -- Ability -- #
     @enforce_types
@@ -1130,10 +1235,13 @@ class sabotage(Ability):
                 for role in data.good_aligned.values():
                     if "defensive" in role.ability.ability_type or "defensive" in role.secondary_ability.ability_type:
                         role.statuses.poisoned = True
+            case 3:
+                pass # -- Faking a Use To Throw People Off
 
-        if "selection" in self.ability_type:
+        self.count -= 1
+
+        if "selection" in self.ability_type and self.count == 0:
             self.ability_type.remove("selection")
-        else:
             self.number_of_uses = 0
 
         data.announcements.append("The Saboteur Used Their Ability Last Night!")
@@ -1149,6 +1257,9 @@ class sabotage(Ability):
             role.statuses.poisoned = True
 
 class sacrificial_protection(Ability):
+    '''
+    Each Night, Pick a player, if they were to die, you die instead. You learn if that is how you died.
+    '''
     @enforce_types
     def __init__(self) -> None:
         super().__init__(targets = 1, p = 0, ability_type = ["repeat"])
@@ -1173,6 +1284,9 @@ class sacrificial_protection(Ability):
         pass
 
 class role_replicate(Ability):
+    '''
+    You gain the ability of the first player voted out. If they are evil, you become drunk and become a reasonable bluff role.
+    '''
     def __init__(self) -> None:
         super().__init__(targets = 0, p = 0, ability_type = ["on_vote", "no_action_round"])
         
@@ -1211,6 +1325,9 @@ class role_replicate(Ability):
         self.ability(user, data, poisoned = True)
 
 class douse(Ability):
+    '''
+    Each Night, pick a player to douse (see incenerate).
+    '''
     def __init__(self) -> None:
         super().__init__(targets = 1, p = 0, ability_type = ["repeat", "alternate"])
         
@@ -1221,7 +1338,7 @@ class douse(Ability):
         if not user_role.ability_cancel:
             target_role: Role = data.players[user_role.targets[0]]
             target_role.statuses.doused = True
-        else:
+        elif user_role.secondary_ability.number_of_uses != 0:
             user_role.secondary_ability(user, data)
 
     @enforce_types
@@ -1233,6 +1350,9 @@ class douse(Ability):
         self.ability(user, data)
 
 class incinerate(Ability):
+    '''
+    Once per game, you can kill all doused players. If everyone but you is dead, you win (see douse).
+    '''
     def __init__(self) -> None:
         super().__init__(targets = 0, p = 0, ability_type = [], uses = 1)
         
@@ -1265,6 +1385,9 @@ class incinerate(Ability):
         self.ability(user, data)
 
 class jail(Ability):
+    '''
+    Each Night, Pick a player to jail. Their ability fails & they are protected.
+    '''
     def __init__(self) -> None:
         super().__init__(targets = 1, p = 0, ability_type = [], priority = -3, can_pick_same_target = True)
         
@@ -1284,6 +1407,9 @@ class jail(Ability):
         pass
 
 class rewind(Ability):
+    '''
+    Once per game at night, you can learn how many good, neutral and evil players are alive.
+    '''
     def __init__(self) -> None:
         super().__init__(targets = 0, p = 0, ability_type = ["on_demand"], priority = 9, can_pick_same_target = True, uses = 1)
 
@@ -1338,6 +1464,9 @@ class rewind(Ability):
         self.information(user_role, good_count, neutral_count, evil_count)
 
 class starpass(Ability):
+    '''
+    When you die, a living minion is “promoted” to mafia and you become their role (see kill).
+    '''
     def __init__(self) -> None:
         super().__init__(targets = 0, p = 0, ability_type = ["on_death"], can_pick_same_target = True)
      
@@ -1369,6 +1498,9 @@ class starpass(Ability):
         self.ability(user, data)
 
 class chancellor(mayor):
+    '''
+    You have the Mayor's ability. You keep it even when promoted to Mafia. You make fake your attack announcement (see mayor).
+    '''
     def __init__(self) -> None:
         super().__init__()
 

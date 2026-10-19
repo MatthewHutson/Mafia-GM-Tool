@@ -28,6 +28,9 @@ class colours(Enum):
 # -- Ability Template Class -- #
 @dataclass
 class Status_Manager():
+    '''
+    Tracks the statuses applied to a particular player.
+    '''
     # -- Statuses -- #
     poisoned: bool = False
     drunk: bool = False
@@ -95,6 +98,9 @@ class Status_Manager():
 
 # -- Equation Type -- #
 class equation():
+    '''
+    A class to convert variable expressions into numerical results based on evil count (X)
+    '''
     # -- A Simple Equation -- #
     @enforce_types
     def __init__(self, equation: str):
@@ -116,6 +122,9 @@ class equation():
         return self.equation + " (Equation)"
 
 class Ability():
+    '''
+    The class to represent any role's ability or abilities.
+    '''
     @enforce_types
     def __init__(self, targets: int | list[int], p: int | float, ability_type: list[str], target_living: bool = True, priority: int = 255, can_pick_same_target: bool = False, uses: int | equation | str | None = None, refresh_max: int = 0) -> None:
         # -- Attributes -- #
@@ -156,12 +165,21 @@ class Ability():
 
     # -- Methods -- #
     def ability(self, user: str, data: Game_Data, **kwargs) -> None:
+        '''
+        The normal and healthy instance of the ability.
+        '''
         ...
 
     def if_poisoned(self, user: str, data: Game_Data, **kwargs) -> None:
+        '''
+        The effect of the ability if the user is poisoned or drunk.
+        '''
         ...
 
     def __call__(self, user: str, data: Game_Data, **kwargs) -> None:
+        '''
+        The handler of every possible case of trying to use an ability.
+        '''
         if is_instance(self.number_of_uses, int):
             self.number_of_uses -= 1
 
@@ -176,6 +194,9 @@ class Ability():
 
     @enforce_types
     def __eq__(self, ability2: Ability | type | None) -> bool:
+        '''
+        Allows an ability to be compared by type rather than by memory address or attributes.
+        '''
         if type(ability2) == type:
             return type(self) == ability2
         elif ability2 is None:
@@ -204,6 +225,9 @@ class Ability():
 # -- Role Class -- #
 @dataclass
 class Role:
+    '''
+    Stores all of the data & methods associated with a player and their role.
+    '''
     # -- Attributes - #
     name: str
     _alignment: bool # True Being Good, False Being Evil #
@@ -406,6 +430,9 @@ class Role:
     
 # -- Type Definitions -- #
 class Players(dict[str, Role]):
+    '''
+    A fancy type to manage the players in the game.
+    '''
     @enforce_types
     def __setitem__(self, key: str, value: Role) -> None:
         key = capitalise_words(key)
@@ -437,6 +464,9 @@ class Players(dict[str, Role]):
 # -- Data Handling Classes -- #
 @dataclass
 class Menu_Entry:
+    '''
+    A data structure used mainly to collect the setup menu data to be put into the game loop.
+    '''
     players: list[str]
     roles: list[Role]
     all_roles: list[str]
@@ -507,6 +537,9 @@ class Menu_Entry:
     
 @dataclass
 class Game_Data():
+    '''
+    The data structure to hold the game state along with every living and dead player's role. Also contains many methods to progress the game.
+    '''
     # -- Attributes -- #
     players: Players
     roles: dict[str, Role]

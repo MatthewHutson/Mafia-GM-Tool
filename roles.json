@@ -90,7 +90,8 @@
             "secondary_ability": "incinerate"
         },
         "Crewmate": {
-            "ability": "sidequest"
+            "ability": "sidequest",
+            "secondary_ability": "must_live"
         },
         "Cupid": {
             "ability": "link",

@@ -118,86 +118,102 @@ def start_abilities(data: Game_Data) -> None:
                 role.secondary_ability.ability(user, data)
 
 @enforce_types
+def night_phase(data: Game_Data, entries: Menu_Entry) -> None:
+    for name, role in data.alive_players.items():
+        # -- Equation Type Handler -- #
+        try:
+            if is_instance(role.ability.number_of_uses, equation):
+                role.ability.number_of_uses = role.ability.number_of_uses.get_value(data.total_evil_count)
+        except: pass
+        
+        try:
+            if is_instance(role.secondary_ability.number_of_uses, equation):
+                role.secondary_ability.number_of_uses = role.secondary_ability.number_of_uses.get_value(data.total_evil_count)
+        except: pass
+
+        if data.playing:
+            action_frame, action_label, ability = selection_menu_create(data, entries, name, functional = False)
+
+        role.made_choice = False
+        can_pick_primary_target: bool = selection_coindition(data, role, name, True)
+
+        if data.playing:
+            ability_selection_input(role, role.ability)
+            ability_selection_input(role, role.secondary_ability)  
+            selection_menu_destroy(data, entries, name, action_frame, action_label, ability, functional = False)
+
+        if can_pick_primary_target:
+            selection_menu(data, entries, name)
+
+        if "secondary_ability" in role.ability_type and not ("alternate" in role.ability_type and not role.ability_cancel):
+            can_pick_secondary_target: bool = selection_coindition(data, role, name, False)
+            if can_pick_secondary_target: selection_menu(data, entries, name, is_primary_ability = False)
+        else:
+            can_pick_secondary_target = False
+
+        if data.playing and not (can_pick_primary_target or can_pick_secondary_target) and not role.made_choice:
+            sleep(0.5)
+            messagebox.showinfo("Wake Up", f"Wake Up {name} to use no ability.", icon = "info")
+
+    if data.playing or data.forced_continuation:
+        use_abilities(data)
+
+        # -- Player And GM Info -- #
+        information(data)
+        life_death_sort(data)
+        information(data, tell_nothing = False, first_wave = False)
+
+        # -- Resetting The Player Data -- #
+        update_all_targets(data)
+        remove_round_data(data, keep_announcements = True)
+
+        pack_alive_and_dead(data, data.vote_role, 0)
+        use_death_abilities(data)
+        life_death_sort(data, update_data = True)
+        remove_round_data(data, used_Death_ability = True, keep_announcements = True)
+
+@enforce_types
+def voting_phase(data: Game_Data, entries: Menu_Entry, normal_start: bool = True) -> None:
+    if data.playing or data.forced_continuation:
+        voted_out: str = voting_menu(data, entries)
+
+        if data.playing and voted_out != "none":
+            data.players[voted_out].voted_out(data)
+    
+        life_death_sort(data)
+        use_vote_abiltities(data)
+        use_death_abilities(data)
+        life_death_sort(data)
+        remove_round_data(data, post_vote = True, keep_announcements = True)
+
+        if data.playing:
+            pack_alive_and_dead(data, data.vote_role, 0)
+    
+
+@enforce_types
 def game(data: Game_Data, entries: Menu_Entry, normal_start: bool = True) -> None:
     # -- Game Setup -- #
     if normal_start: start_abilities(data)
     init_game_menu(entries, data)
     nap_time(data)
 
-     # -- Game Loop -- #
-    while data.playing:
+    while data.playing or data.forced_continuation:
         # -- Game Loop -- #
-        data.turn_count += 1
+        data.update_phase()
+        previous_continuation: bool = data.forced_continuation
 
-        for name, role in data.alive_players.items():
-            # -- Equation Type Handler -- #
-            try:
-                if is_instance(role.ability.number_of_uses, equation):
-                    role.ability.number_of_uses = role.ability.number_of_uses.get_value(data.total_evil_count)
-            except: pass
-            
-            try:
-                if is_instance(role.secondary_ability.number_of_uses, equation):
-                    role.secondary_ability.number_of_uses = role.secondary_ability.number_of_uses.get_value(data.total_evil_count)
-            except: pass
-
-            if data.playing:
-                action_frame, action_label, ability = selection_menu_create(data, entries, name, functional = False)
-
-            role.made_choice = False
-            can_pick_primary_target: bool = selection_coindition(data, role, name, True)
-
-            if data.playing:
-                ability_selection_input(role, role.ability)
-                ability_selection_input(role, role.secondary_ability)  
-                selection_menu_destroy(data, entries, name, action_frame, action_label, ability, functional = False)
+        announcements(data)
+        data.announcements = []
         
-            if can_pick_primary_target:
-                selection_menu(data, entries, name)
+        match data.current_phase:
+            case "night": 
+                data.turn_count += 1
+                night_phase(data, entries)
+            case "vote":
+                voting_phase(data, entries)
 
-            if "secondary_ability" in role.ability_type and not ("alternate" in role.ability_type and not role.ability_cancel):
-                can_pick_secondary_target: bool = selection_coindition(data, role, name, False)
-                if can_pick_secondary_target: selection_menu(data, entries, name, is_primary_ability = False)
-            else:
-                can_pick_secondary_target = False
+        if previous_continuation: data.forced_continuation = False        
 
-            if data.playing and not (can_pick_primary_target or can_pick_secondary_target) and not role.made_choice:
-                sleep(0.5)
-                messagebox.showinfo("Wake Up", f"Wake Up {name} to use no ability.", icon = "info")
-
-        if data.playing:
-            use_abilities(data)
-
-            # -- Player And GM Info -- #
-            information(data)
-            life_death_sort(data)
-            information(data, tell_nothing = False, first_wave = False)
-
-            # -- Resetting The Player Data -- #
-            update_all_targets(data)
-            remove_round_data(data, keep_announcements = True)
-
-            pack_alive_and_dead(data, data.vote_role, 0)
-            use_death_abilities(data)
-            life_death_sort(data, update_data = True)
-            remove_round_data(data, used_Death_ability = True, keep_announcements = True)
-
-            check_for_victory(data)
-
-            if data.playing:
-                voted_out: str = voting_menu(data, entries)
-
-                if data.playing and voted_out != "none":
-                    data.players[voted_out].voted_out(data)
-            
-                life_death_sort(data)
-                use_vote_abiltities(data)
-                use_death_abilities(data)
-                life_death_sort(data)
-                remove_round_data(data, post_vote = True)
-
-                if data.playing:
-                    pack_alive_and_dead(data, data.vote_role, 0)
-
-        game_over_abilities(data)
         check_for_victory(data)
+
+    game_over_abilities(data)

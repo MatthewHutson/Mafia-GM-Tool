@@ -974,7 +974,7 @@ class sidequest(Ability):
 
         if first_night:
             self.total_tasks = data.total_evil_count + 3
-            self.required_tasks = self.total_tasks - 1
+            self.required_tasks = self.total_tasks - 2
             solo_count = self.total_tasks // 2
             social_count = self.total_tasks - solo_count
             
@@ -990,7 +990,7 @@ class sidequest(Ability):
 
             user_role.information.append(f"Your Tasks Are:" + "".join(["\n  " + chr(i + 97) + ") " + self.tasks[i] for i in range(len(self.tasks))]))
 
-        else:
+        elif self.completed_tasks < self.required_tasks:
             check = None
             while check is None:
                 check = messagebox.askyesnocancel("Ability", f"Has {user}, the {user_role.name} completed a task?", default = "cancel", icon = "question")
@@ -998,8 +998,11 @@ class sidequest(Ability):
 
             if check:
                 self.completed_tasks += 1
-                if self.completed_tasks >= self.required_tasks:
+                if self.completed_tasks == self.required_tasks:
                     user_role.solo_win = True
+                    data.forced_continuation = True
+                    data.next_phase = "vote"
+                    data.announcements.append("The Crewmate Has Completed Enough Required Tasks. You Must Vote Them Out Or The Game Will End!")
                     data.playing = False
 
     @enforce_types
@@ -1009,6 +1012,23 @@ class sidequest(Ability):
     @enforce_types
     def if_drunk(self, user: str, data: Game_Data, first_night: bool = False) -> None:
         self.ability(user, data, first_night)
+
+class must_live(Ability):
+    @enforce_types
+    def __init__(self) -> None:
+        super().__init__(targets = 0, p = 0, ability_type = ["on_death", "no_action_round"], priority = 12)
+    
+    # -- Ability -- #
+    @enforce_types
+    def ability(self, user: str, data: Game_Data) -> None:
+        user_role: Role = data.players[user]
+        user_role.solo_win = False
+        data.playing = True
+
+    @enforce_types
+    def if_poisoned(self, user: str, data: Game_Data):
+        self.ability(user, data)
+    
 
 class calculated_risk(Ability):
     @enforce_types

@@ -553,7 +553,6 @@ def selection_menu_destroy(data: Game_Data, entries: Menu_Entry, user: str, acti
 def selection_menu(data: Game_Data, entries: Menu_Entry, user: str, target: str = "", is_primary_ability: bool = True, can_recurse: bool = True) -> None:
     global selected_players
     action_frame, action_label, ability = selection_menu_create(data, entries, user, target, is_primary_ability)
-    announcements(data)
     root.mainloop()
     selection_menu_destroy(data, entries, user, action_frame, action_label, ability, is_primary_ability, can_recurse)
 

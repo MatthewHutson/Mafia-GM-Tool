@@ -535,6 +535,10 @@ class Game_Data():
     wanted_data: list[str] = None
     temp_deaths: list[str] = None
     temp_ressurections: list[str] = None
+    current_phase: str = "none"
+    next_phase: str = "night"
+    game_phases: list[str] = None
+    forced_continuation: bool = False
 
     # -- Properties -- #
     @property
@@ -588,6 +592,7 @@ class Game_Data():
         self.announcements = []
         self.temp_deaths = []
         self.temp_ressurections = []
+        self.game_phases = ["night", "vote"]
 
         # -- Variable Count Considerations -- #
         if self.total_evil_count == 0:
@@ -796,3 +801,8 @@ class Game_Data():
     
     def death_announcements(self) -> None:
         pass
+
+    def update_phase(self) -> None:
+        self.current_phase = self.next_phase
+        index: int = (self.game_phases.index(self.current_phase) + 1) % (len(self.game_phases))
+        self.next_phase = self.game_phases[index]

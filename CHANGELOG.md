@@ -1,4 +1,5 @@
 # Changelog #
-Added descriptions to main classes & every abilit.
-Minor Bug Fix - Arsonist may have been able to incinerate multiple times.
-Adjusted Simplified Role Sheet
+Changed Crewmate Text
+Corrected A Few Role Descriptions On Simplified Sheet
+Added Link To Simplified Sheet on README
+Altered Evil Minion Counts on "Everything" Script

@@ -15,7 +15,7 @@
     "boundaries": {
         "guarenteed": ["lead", "information", "defensive"],
         "overflow": ["Villager"],
-        "evil_support": [6, 10, 14, 18],
+        "evil_support": [6, 11, 16, 21],
         "min_players": 6
     }
 }

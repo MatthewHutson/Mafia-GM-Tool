@@ -919,7 +919,7 @@ class evidence_tampering(Ability):
 
 class stop_vote(Ability):
     '''
-    On night 1, pick a client. If your client survives the game, you win with the winning team. You gain tools to defend your client (see witness_protection & evidence_tampering).
+    On night 1, pick a client, you learn their role. If they remains alive, you win with the winning team. You gain tools to defend your client (see witness_protection & evidence_tampering).
     '''
     @enforce_types
     def __init__(self) -> None:
@@ -1097,7 +1097,7 @@ class sidequest(Ability):
                     user_role.solo_win = True
                     data.forced_continuation = True
                     data.next_phase = "vote"
-                    data.announcements.append("The Crewmate Has Completed Enough Required Tasks. You Must Vote Them Out Or The Game Will End!")
+                    data.announcements.append("The Crewmate has completed their tasks, vote to eject them or lose the game!")
                     data.playing = False
 
     @enforce_types
@@ -1285,7 +1285,7 @@ class sacrificial_protection(Ability):
 
 class role_replicate(Ability):
     '''
-    You gain the ability of the first player voted out. If they are evil, you become drunk and become a reasonable bluff role.
+    You gain the ability of the first player voted out. If they are evil, you become drunk and become a reasonable bluff.
     '''
     def __init__(self) -> None:
         super().__init__(targets = 0, p = 0, ability_type = ["on_vote", "no_action_round"])
@@ -1499,7 +1499,7 @@ class starpass(Ability):
 
 class chancellor(mayor):
     '''
-    You have the Mayor's ability. You keep it even when promoted to Mafia. You make fake your attack announcement (see mayor).
+    You have the Mayor's ability. You keep it even when promoted to Mafia. You may fake your attack announcement (see mayor).
     '''
     def __init__(self) -> None:
         super().__init__()

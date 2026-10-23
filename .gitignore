@@ -4,3 +4,4 @@ defaults.txt
 backup.csv
 *backup.json
 src/discord_bot/*
+~$*

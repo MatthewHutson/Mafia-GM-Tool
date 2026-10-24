@@ -4,6 +4,7 @@ from menu.menu_classes import *
 from menu.mimi_stand_counter import counter_init
 #from menu.card_index import card_index, destroy_card_index
 from menu.settings import display_settings, remove_instances, update_settings
+from menu.life_and_death_popup import life_and_death_popup
 from menu.timer import create_timer, delete_timer
 from menu.loading_system import *
 from tkinter import messagebox
@@ -305,6 +306,13 @@ def script_change_command(entries: Menu_Entry) -> None:
     for player in temp_players:
         add_player(players, get_roles_by_players(), entries, player)
 
+@enforce_types
+def skip_night(data: Game_Data):
+    if messagebox.askyesno("Fuck With The Gamestate?", "Do you want to make the next phase a voting phase?"):
+        data.next_phase = "vote"
+    else:
+        data.next_phase = "night"
+
 # -- Setup Menu -- #
 @enforce_types
 def setup_menu(entries: Menu_Entry, default_names: list[str]) -> bool:
@@ -514,9 +522,10 @@ def selection_menu_create(data: Game_Data, entries: Menu_Entry, user: str, targe
         else:
             tk.Label(secondary_frame, text = f"Secondary Ability:\nNone", bg = bg_2).pack(side = tk.TOP, fill = "both", padx = 2, pady = 2, ipady = 10, expand = False, anchor = "w")
 
-    # -- Vote Skip Button -- #
-    if user == "none":
+    else: # -- Voting only Buttons -- #
         tk.Button(vote_frame, text = "Skip Vote", command = skip, bg = "#64F05D", activebackground = "#64C449", fg = text_colour, activeforeground = text_colour).pack(side = tk.LEFT, ipadx = 24, ipady = 8, padx = 4, pady = 2, anchor = "sw")
+        tk.Button(vote_frame, text = "Next Vote", command = lambda: skip_night(data), bg = "#F05DF0", activebackground = "#C449C4", fg = text_colour, activeforeground = text_colour).pack(side = tk.LEFT, ipadx = 24, ipady = 8, padx = 4, pady = 2, anchor = "sw")
+
 
     # -- Timer Button -- #
     create_timer(vote_frame, 300, main_font, (12, 2), (4, 2), tk.RIGHT)

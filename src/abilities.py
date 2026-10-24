@@ -1056,7 +1056,7 @@ class sidequest(Ability):
     '''
     @enforce_types
     def __init__(self) -> None:
-        super().__init__(targets = 0, p = 0, ability_type = ["repeat", "on_vote", "first_night"], priority = 12)
+        super().__init__(targets = [0, 0, 0, 0, 0, 0, 0, 0], p = 0, ability_type = ["repeat", "on_vote", "first_night"], priority = 12)
         self.tasks : list[str] = []
         self.completed_tasks = 0
         self.total_tasks = 0
@@ -1086,19 +1086,13 @@ class sidequest(Ability):
             user_role.information.append(f"Your Tasks Are:" + "".join(["\n  " + chr(i + 97) + ") " + self.tasks[i] for i in range(len(self.tasks))]))
 
         elif self.completed_tasks < self.required_tasks:
-            check = None
-            while check is None:
-                check = messagebox.askyesnocancel("Ability", f"Has {user}, the {user_role.name} completed a task?", default = "cancel", icon = "question")
-                sleep(0.5)
-
-            if check:
-                self.completed_tasks += 1
-                if self.completed_tasks == self.required_tasks:
-                    user_role.solo_win = True
-                    data.forced_continuation = True
-                    data.next_phase = "vote"
-                    data.announcements.append("The Crewmate has completed their tasks, vote to eject them or lose the game!")
-                    data.playing = False
+            self.completed_tasks += self.selection_index
+            if self.completed_tasks >= self.required_tasks:
+                user_role.solo_win = True
+                data.forced_continuation = True
+                data.next_phase = "vote"
+                data.announcements.append("The Crewmate has completed their tasks, vote to eject them or lose the game!")
+                data.playing = False
 
     @enforce_types
     def if_poisoned(self, user: str, data: Game_Data, first_night: bool = False) -> None:
@@ -1481,7 +1475,7 @@ class starpass(Ability):
             user_role: Role = data.players[user]
             user_copy: Role = deepcopy(user_role)
 
-            user_role = minion_copy.name
+            user_role.name = minion_copy.name
             user_role.ability = minion_copy.ability
             user_role.secondary_ability = minion_role.secondary_ability
 

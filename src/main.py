@@ -7,10 +7,10 @@ from tkinter import messagebox
 from time import sleep
 from classes_and_types import *
 from menu.menu import *
-#from menu.card_index import card_init
+from menu.life_and_death_popup import remove_instances
 from menu.settings import load_settings
 from game_loop_functions import *
-from game import game
+from game import game, win_con_sort
 from pathlib import Path
 import abilities as a
 
@@ -70,8 +70,9 @@ def main() -> None:
 
         winners = []
         win_steal: bool = False
+        ordered_players: Players = win_con_sort(data)
 
-        for name, role in game_data.players.items():
+        for name, role in ordered_players.items():
             if role.solo_win:
                 if not role.team_win_condition:
                     if role.channeled_role == None:
@@ -80,24 +81,21 @@ def main() -> None:
                     else:
                         winners.append(f"\n{name} as the {role.name} chanelling the {role.channeled_role}")
                 else:
-                    # -- For Mayor -- #
+                    # -- For Mayor & Chancellor -- #
                     if role.currently_alive:
-                        if role.alignment:
-                            game_data.good_win = True
-                            game_data.evil_win = False
-                        elif not game_data.good_win:
-                            game_data.good_win = False
-                            game_data.evil_win = True
-                            
+                        game_data.good_win = role.alignment
+                        game_data.evil_win = not role.alignment
+
         if not win_steal:
             if game_data.good_win: winners.append("\nThe Good Team!")
             if game_data.evil_win: winners.append("\nThe Evil Team!")
 
         show_victory(winners, game_data.turn_count)
+        remove_instances()
 
     except Exception as e:
         game_data.backup_to_json()
-        raise e
+        #raise e
     
 # -- On Run -- #
 if __name__ == "__main__":
@@ -108,4 +106,4 @@ if __name__ == "__main__":
             playing = messagebox.askyesno("Game Over", "Do you want to play another round?", icon = "question")
         except Exception as e:
             playing = False
-            #raise e
+            raise e

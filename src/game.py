@@ -7,7 +7,6 @@ from time import sleep
 import threading
 from classes_and_types import *
 from menu.menu import *
-#from menu.card_index import card_init
 from game_loop_functions import *
 import abilities as a
 
@@ -183,6 +182,8 @@ def voting_phase(data: Game_Data, entries: Menu_Entry, normal_start: bool = True
     '''
     The phase of the game for discussion & the voting out of at most 1 player.
     '''
+    life_and_death_popup(data)
+
     if data.playing or data.forced_continuation:
         voted_out: str = voting_menu(data, entries)
 
@@ -197,17 +198,20 @@ def voting_phase(data: Game_Data, entries: Menu_Entry, normal_start: bool = True
 
         if data.playing:
             pack_alive_and_dead(data, data.vote_role, 0)
-    
 
+    life_and_death_popup(data)
+    
 @enforce_types
 def game(data: Game_Data, entries: Menu_Entry, normal_start: bool = True) -> None:
     '''
     Runs a single game of the modded Mafia with the roles assigned.
     '''
+
     # -- Game Setup -- #
     if normal_start: start_abilities(data)
     init_game_menu(entries, data)
     nap_time(data)
+    life_and_death_popup(data)
 
     while data.playing or data.forced_continuation:
         # -- Game Loop -- #
@@ -229,3 +233,19 @@ def game(data: Game_Data, entries: Menu_Entry, normal_start: bool = True) -> Non
         check_for_victory(data)
 
     game_over_abilities(data)
+
+@enforce_types
+def win_con_sort(data: Game_Data) -> Players:
+    '''
+    Puts certain roles at the end of the win con checks to ensure the integrity of order (i.e for Mayor vs Chancellor)
+    '''
+    end_checks = ["Mayor"]
+
+    player_order = Players({name: role for name, role in data.players.items() if not role.name in end_checks})
+
+    for check in end_checks:
+        for name, role in data.players.items():
+            if role.name == check:
+                player_order[name] = role
+
+    return player_order

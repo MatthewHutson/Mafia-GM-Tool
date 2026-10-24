@@ -74,7 +74,7 @@ class Vertical_Scroll_Frame(tk.Frame):
 
     @enforce_types
     def add(self, frame: tk.Widget, height: int = 0) -> None:
-        frame.pack(side = tk.TOP, fill = "x", pady = 2, ipady = height, expand = True)
+        frame.pack(side = tk.TOP, fill = "x", pady = 2, ipady = height, expand = False)
         frame.update()
 
     @enforce_types

@@ -1,2 +1,2 @@
 # Changelog #
-Readme Updates - Added setup menu instructions
+Fixed Image in README

@@ -22,11 +22,11 @@ If you want to filter which roles you want to be in play, you can add a `JSON` f
 ### Setup Menu
 Upon starting the program, you are greeted with the setup menu:
 
-![An image of the stup menu](image.png)
+![An image of the stup menu](images\image.png)
 
 You can either add players by typing their name into the textbox and use the `add` button or enter key to type it in or you can use the `defaults` button to load the contents of `defaults.txt`.
 
-From there, you can use the `script` button to load any valid JSON file in the `Scripts` folder. 
+From there, you can use the `script` button to load any valid JSON file in the `Scripts` folder. By default, the `Everything.json` file is loaded.
 
 To change what roles are in play, you can `randomise` them or click individual roles to cycle through the remaining options.
 
